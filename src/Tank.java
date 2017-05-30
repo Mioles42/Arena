@@ -83,8 +83,8 @@ public class Tank extends Entity {
     }
 
     @Override
-    void initialize(Handler handler, int location) {
-        this.location = location;
+    void initialize(Handler handler, int uuid) {
+        this.uuid = uuid;
     }
 
     @Override
@@ -92,11 +92,11 @@ public class Tank extends Entity {
         return "This is a Tank!\nImplement toString() later, you bum.";
     }
 
-    public int valueOfGene(int geneSpace, Tank owner) {
+    public int valueOfGene(int geneSpace, Object... parameters) {
         Gene gene = data[geneSpace];
         int result = 0x0000;
         try {
-            result = gene.actuate(owner);
+            result = gene.actuateSoft(this, parameters);
         } catch(IllegalArgumentException e) {
             System.out.println("Invalid arguments. This should not be worrisome.");
         }
@@ -118,15 +118,24 @@ public class Tank extends Entity {
         Entity e = handler.entityAt(entity);
         return (int) (Math.sqrt((e.x - x) * (e.x - x) + (e.y - y) * (e.y - y)) / 16);
     }
-    public int getThis() {return location;}
-    public int getNearest() {return (handler.closestToDistance(x, y, 0)).getLocation();}
-    public int getFarthest() {return (handler.closestToDistance(x, y, viewDistance)).getLocation();}
-    public int entityAt(int distance) {return (handler.closestToDistance(x, y, distance)).getLocation();}
+    public int getThis() {return uuid;}
+    public int getNearest() {return (handler.closestToDistance(x, y, 0)).getUUID();}
+    public int getFarthest() {return (handler.closestToDistance(x, y, viewDistance)).getUUID();}
+    public int entityAt(int distance) {return (handler.closestToDistance(x, y, distance)).getUUID();}
     public int flashOf(int entity) {
         Entity e = handler.entityAt(entity);
         if(e instanceof Tank) return ((Tank) e).flash;
         else return 0x0000;
     }
     public int isTank(int entity) {return (handler.entityAt(entity) instanceof Tank)? 0xFFFF:0x0000;}
-    public int withVariable(int address, int value) {return valueOfGene(address, );}
+    public int entitiesInSight() {return handler.withinDistance(x, y, viewDistance);}
+    public int randomValue() {return (int) (Math.random() * 0xFFFF);}
+    public int randomEntity() {
+        int result;
+        do {result = randomValue();}
+        while (handler.entityAt(result) == null);
+        return result;
+    }
+
+
 }

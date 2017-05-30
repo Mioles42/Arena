@@ -13,7 +13,7 @@ public class Handler {
 
     public void update() {
         for(Entity e: entities) {
-            e.update(this);
+            e.update();
             for(Entity j: entities) {
                 if(e.intersectsWith(j) && e != j) e.intersect(j);
             }
@@ -30,7 +30,7 @@ public class Handler {
         Entity result = null;
         for(Entity e: entities) {
             if(e == null) continue;
-            int closeness = ((x - e.x) * (x - e.x) + (y - e.y) * (y - e.y) - distance * distance)
+            int closeness = ((x - e.x) * (x - e.x) + (y - e.y) * (y - e.y) - distance * distance);
             if(closeness < record) {
                 record = closeness;
                 result = e;
@@ -45,12 +45,21 @@ public class Handler {
         for(Entity e: entities) {
             if(e == null || !(e instanceof Tank)) continue;
             if ((x - e.x) * (x - e.x) + (y - e.y) * (y - e.y) > searchRadius * searchRadius) continue;
-            int closeness = ((Tank) e).valueOfGene(dataSpace, ((Tank)e)) - value
+            int closeness = ((Tank) e).valueOfGene(dataSpace, ((Tank)e)) - value;
             if(closeness < record) {
                 record = closeness;
                 result = e;
             }
         }
         return result;
+    }
+
+    public int withinDistance(int x, int y, int distance) {
+        int count = 0x0000;
+        for(Entity e: entities) {
+            if(e == null) continue;
+            if ((x - e.x) * (x - e.x) + (y - e.y) * (y - e.y) < distance * distance) count++;
+        }
+        return count;
     }
 }

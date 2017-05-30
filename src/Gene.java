@@ -17,7 +17,13 @@ public abstract class Gene {
         return genome;
     }
     public abstract byte getSource();
-    public abstract int actuate(Tank t, Object... args);
+    public abstract int getNumberOfParameters();
+
+    //Hard actuation: Actuate gene and fully complete all actions, changing the state of the target Tank.
+    public abstract int actuateHard(Tank t, Object... args);
+
+    //Soft actuation: Actuate gene for return value on given tank, but don't change the state of said Tank.
+    public abstract int actuateSoft(Tank t, Object... args);
     public abstract boolean isProtected();
 
 }

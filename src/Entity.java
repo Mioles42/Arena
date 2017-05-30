@@ -20,7 +20,7 @@ public abstract class Entity {
 
     protected Handler handler;
 
-    protected int location;
+    protected int uuid;
 
     protected void applyPhysics() {
         velX += accX;
@@ -41,5 +41,5 @@ public abstract class Entity {
         this.location = location;
     }
 
-    public int getLocation() { return location; }
+    public int getUUID() { return uuid; }
 }
