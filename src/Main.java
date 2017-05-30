@@ -10,20 +10,21 @@ public class Main implements KeyListener, MouseListener, WindowListener, MouseMo
     private Handler handler;
     private JFrame window;
 
-    private List entities;
+    private Entity[] entities;
 
     public static void main(String[] args) {
+
         new Main().run();
     }
 
     public Main() {
 
-        entities = new ArrayList<Entity>();
+        entities = new Entity[0xFFFF];
 
         renderer = new Renderer(entities);
         handler = new Handler(entities);
 
-        entities.add(new Tank());
+        entities[1] = new Tank(handler);
 
         window = new JFrame();
 

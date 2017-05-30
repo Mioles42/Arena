@@ -20,16 +20,20 @@ public class Tank extends Entity {
     int damage = 1; //shot damage
     int health = 1; //health
     int regeneration = 1; //regeneration
-    int speed = 1; //max speed
+    int maxSpeed = 1; //max speed
     int acceleration = 1; //max acceleration
     int toughness = 1; //body damage
     int metabolism = 1; //effectiveness of cogs
 
+    //Flash color:
+    int flashR = 0x8888;
+    int flashG = 0x8888;
+    int flashB = 0x8888;
+
     //Fitness:
     int fitness = 0;
 
-    //Other attributes
-    protected int flash;
+
     protected int viewDistance;
 
     public static void generateGenome(Genome sourceGenome) {
@@ -54,7 +58,7 @@ public class Tank extends Entity {
         r = 0;
         width = 50;
         height = 50;
-        velX = 20;
+        vel = 20;
         this.handler = handler;
     }
 
@@ -96,7 +100,7 @@ public class Tank extends Entity {
         Gene gene = data[geneSpace];
         int result = 0x0000;
         try {
-            result = gene.actuateSoft(this, parameters);
+            result = gene.actuate(this, parameters);
         } catch(IllegalArgumentException e) {
             System.out.println("Invalid arguments. This should not be worrisome.");
         }
@@ -110,7 +114,44 @@ public class Tank extends Entity {
 
     public int getTrue() {return 0xFFFF;}
     public int getFalse() {return 0xFFFF;}
-    public int bearing(int entity) {
+
+    public int move(int speed) {
+        if(speed > 0x0000) this.acc = acceleration;
+        if(speed > maxSpeed) {
+            this.vel = maxSpeed;
+            return maxSpeed;
+        }
+        else {
+            this.vel = speed;
+            return Math.abs(speed);
+        }
+    }
+
+    public int reverse(int speed) {
+        if(speed > 0x0000) this.acc = -acceleration;
+        if(speed > maxSpeed) {
+            this.velLimit = maxSpeed;
+            return maxSpeed;
+        }
+        else {
+            this.velLimit = speed;
+            return Math.abs(speed);
+        }
+    }
+
+    public int flash(int r, int g, int b) {
+        this.flashR = r;
+        this.flashG = g;
+        this.flashB = b;
+
+        return r;
+    }
+
+    public int fire() {
+
+    }
+
+    public int bearingTo(int entity) {
         Entity e = handler.entityAt(entity);
         return (int) (0xFFFF * ((Math.asin((e.x - x) / (e.y - y))) / (2 * Math.PI)));
     }
@@ -122,9 +163,19 @@ public class Tank extends Entity {
     public int getNearest() {return (handler.closestToDistance(x, y, 0)).getUUID();}
     public int getFarthest() {return (handler.closestToDistance(x, y, viewDistance)).getUUID();}
     public int entityAt(int distance) {return (handler.closestToDistance(x, y, distance)).getUUID();}
-    public int flashOf(int entity) {
+    public int flashROf(int entity) {
         Entity e = handler.entityAt(entity);
-        if(e instanceof Tank) return ((Tank) e).flash;
+        if(e instanceof Tank) return ((Tank) e).flash.getRed();
+        else return 0x0000;
+    }
+    public int flashGOf(int entity) {
+        Entity e = handler.entityAt(entity);
+        if(e instanceof Tank) return ((Tank) e).flash.getGreen();
+        else return 0x0000;
+    }
+    public int flashBOf(int entity) {
+        Entity e = handler.entityAt(entity);
+        if(e instanceof Tank) return ((Tank) e).flash.getBlue();
         else return 0x0000;
     }
     public int isTank(int entity) {return (handler.entityAt(entity) instanceof Tank)? 0xFFFF:0x0000;}

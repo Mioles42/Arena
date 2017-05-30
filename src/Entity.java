@@ -6,14 +6,13 @@ import java.awt.*;
 public abstract class Entity {
 
     protected int x;
-    protected int velX;
-    protected int accX;
     protected int y;
-    protected int velY;
-    protected int accY;
     protected int r;
+    protected int vel;
+    protected int velLimit;
+    protected int drag;
+    protected int acc;
     protected int velR;
-    protected int accR;
 
     protected int width;
     protected int height;
@@ -23,22 +22,25 @@ public abstract class Entity {
     protected int uuid;
 
     protected void applyPhysics() {
-        velX += accX;
-        velY += accY;
-        velR += accR;
 
-        x += velX;
-        y += velY;
+        vel -= drag;
+        vel += acc;
+        if(vel > velLimit) vel = velLimit;
+        if(vel < -velLimit) vel = -velLimit;
+
+        x += vel * (int) Math.cos(r);
+        y += vel * (int) Math.sin(r);
         r += velR;
+
     }
 
     abstract void render(Graphics g);
     abstract void update();
     abstract boolean intersectsWith(Entity e);
     abstract void intersect(Entity e);
-    void initialize(Handler handler, int location) {
+    void initialize(Handler handler, int uuid) {
         this.handler = handler;
-        this.location = location;
+        this.uuid = uuid;
     }
 
     public int getUUID() { return uuid; }

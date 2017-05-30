@@ -20,6 +20,11 @@ public class OriginGene extends Gene {
     }
 
     @Override
+    public int getNumberOfParameters() {
+        return 0;
+    }
+
+    @Override
     public int actuate(Tank t, Object... args) {
         int result = 0x0000;
         try {
