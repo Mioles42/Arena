@@ -6,7 +6,10 @@
 public class Global {
 
     //Number of ticks in-simulation
-    private int time;
+    private static  int time;
+
+    //Milliseconds per tick
+    static int tickSpeed = 10;
 
     //1 pixel= 1 tank-meter
     static int ARENA_SIZE_PIXELS = 43640;

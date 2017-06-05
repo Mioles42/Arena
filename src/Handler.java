@@ -13,6 +13,7 @@ public class Handler {
 
     public void update() {
         for(Entity e: entities) {
+            if(e == null) continue;
             e.update();
             for(Entity j: entities) {
                 if(e.intersectsWith(j) && e != j) e.intersect(j);

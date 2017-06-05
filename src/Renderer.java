@@ -13,6 +13,7 @@ public class Renderer {
 
     public void render(Graphics g) {
         for(Entity e: entities) {
+            if(e == null) continue;
             e.render(g);
         }
     }

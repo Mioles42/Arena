@@ -20,7 +20,7 @@ public class Tank extends Entity {
     int damage = 1; //shot damage
     int health = 1; //health
     int regeneration = 1; //regeneration
-    int maxSpeed = 1; //max speed
+    int maxSpeed = 5; //max speed
     int acceleration = 1; //max acceleration
     int toughness = 1; //body damage
     int metabolism = 1; //effectiveness of cogs
@@ -55,10 +55,10 @@ public class Tank extends Entity {
     public Tank(Handler handler) {
         x = 100;
         y = 100;
-        r = 0;
-        width = 50;
-        height = 50;
-        vel = 20;
+        r = 35;
+        width = 32;
+        height = 32;
+        vel = 1;
         this.handler = handler;
     }
 
@@ -73,10 +73,12 @@ public class Tank extends Entity {
     @Override
     void update() {
         applyPhysics();
+        move(1);
     }
 
     @Override
     boolean intersectsWith(Entity e) {
+        if(e == null) return false;
         int distanceSquared = (x - e.x)*(x - e.x)+(y - e.y)*(y - e.y);
         return distanceSquared <= (width/2 - e.width/2)*(width/2 - e.width/2);
     }
@@ -93,7 +95,7 @@ public class Tank extends Entity {
 
     @Override
     public String toString() {
-        return "This is a Tank!\nImplement toString() later, you bum.";
+        return super.toString() + "{x: " + x + ", y: " + y + "}";
     }
 
     public int valueOfGene(int geneSpace, Object... parameters) {
@@ -148,7 +150,7 @@ public class Tank extends Entity {
     }
 
     public int fire() {
-
+        return 0x0000;
     }
 
     public int bearingTo(int entity) {
@@ -165,17 +167,17 @@ public class Tank extends Entity {
     public int entityAt(int distance) {return (handler.closestToDistance(x, y, distance)).getUUID();}
     public int flashROf(int entity) {
         Entity e = handler.entityAt(entity);
-        if(e instanceof Tank) return ((Tank) e).flash.getRed();
+        if(e instanceof Tank) return ((Tank) e).flashR;
         else return 0x0000;
     }
     public int flashGOf(int entity) {
         Entity e = handler.entityAt(entity);
-        if(e instanceof Tank) return ((Tank) e).flash.getGreen();
+        if(e instanceof Tank) return ((Tank) e).flashG;
         else return 0x0000;
     }
     public int flashBOf(int entity) {
         Entity e = handler.entityAt(entity);
-        if(e instanceof Tank) return ((Tank) e).flash.getBlue();
+        if(e instanceof Tank) return ((Tank) e).flashB;
         else return 0x0000;
     }
     public int isTank(int entity) {return (handler.entityAt(entity) instanceof Tank)? 0xFFFF:0x0000;}

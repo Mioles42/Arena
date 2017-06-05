@@ -59,7 +59,7 @@ public class Main implements KeyListener, MouseListener, WindowListener, MouseMo
             window.repaint();
             handler.update();
 
-            while(System.currentTimeMillis() < time + 1000) ;
+            while(System.currentTimeMillis() < time + Global.tickSpeed) ;
         }
     }
 

@@ -9,7 +9,7 @@ public abstract class Entity {
     protected int y;
     protected int r;
     protected int vel;
-    protected int velLimit;
+    protected int velLimit = 201;
     protected int drag;
     protected int acc;
     protected int velR;
@@ -22,6 +22,8 @@ public abstract class Entity {
     protected int uuid;
 
     protected void applyPhysics() {
+
+        System.out.println("Applying physics to " + this);
 
         vel -= drag;
         vel += acc;
