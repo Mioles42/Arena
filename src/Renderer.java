@@ -16,5 +16,7 @@ public class Renderer {
             if(e == null) continue;
             e.render(g);
         }
+        g.drawString(Global.tickSpeed + "t/s", 5, 15);
+        g.drawString("t:" + Global.time + "t", 5, 35);
     }
 }

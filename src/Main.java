@@ -42,7 +42,7 @@ public class Main implements KeyListener, MouseListener, WindowListener, MouseMo
         panel.addMouseMotionListener(this);
         window.addWindowListener(this);
 
-        window.setSize(300, 300);
+        window.setSize(700, 700);
         window.setName("Arena");
         window.setLocation(300, 300);
 
@@ -54,12 +54,19 @@ public class Main implements KeyListener, MouseListener, WindowListener, MouseMo
 
     public void run() {
         System.out.println("Running...");
+
+        //How long does a single tick last?
+        double tickTime = 1000 * (1.0 / (double) Global.tickSpeed);
+        System.out.println("[Main.run()] Found " + tickTime + " milliseconds per tick");
+
         while(true) {
             long time = System.currentTimeMillis();
-            window.repaint();
             handler.update();
+            Global.time++;
 
-            while(System.currentTimeMillis() < time + Global.tickSpeed) ;
+            while(System.currentTimeMillis() < time + tickTime) {
+                window.repaint();
+            }
         }
     }
 

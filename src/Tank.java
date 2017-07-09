@@ -20,8 +20,7 @@ public class Tank extends Entity {
     int damage = 1; //shot damage
     int health = 1; //health
     int regeneration = 1; //regeneration
-    int maxSpeed = 5; //max speed
-    int acceleration = 1; //max acceleration
+    int acceleration = 1; //acceleration (translates to speed due to drag)
     int toughness = 1; //body damage
     int metabolism = 1; //effectiveness of cogs
 
@@ -55,31 +54,39 @@ public class Tank extends Entity {
     public Tank(Handler handler) {
         x = 100;
         y = 100;
-        r = 35;
+        r = 0;
         width = 32;
         height = 32;
-        vel = 1;
+        velX = 1;
+        velY = 2;
+        drag = .8;
         this.handler = handler;
     }
 
 
     @Override
     void render(Graphics g) {
-        System.out.println("Rendering the Tank at " + this);
-        g.setColor(new Color(0, 255, 255));
-        g.fillOval(x - width/2, y - height/2, width, height);
+        g.setColor(new Color(100, 100, 90));
+
+        int x1 = (int) ((1.3 * width) * (Math.cos(r + 0.01)));
+        int x2 = (int) ((1.3 * width) * (Math.cos(r - 0.01)));
+
+        int y1 = (int) ((1.3 * width) * (Math.sin(r + 0.01)));
+        int y2 = (int) ((1.3 * width) * (Math.sin(r - 0.01)));
+
+        g.fillOval((int) x - width/2, (int) y - height/2, width, height);
     }
 
     @Override
     void update() {
         applyPhysics();
-        move(1);
+        forward(1);
     }
 
     @Override
     boolean intersectsWith(Entity e) {
         if(e == null) return false;
-        int distanceSquared = (x - e.x)*(x - e.x)+(y - e.y)*(y - e.y);
+        double distanceSquared = (x - e.x)*(x - e.x)+(y - e.y)*(y - e.y);
         return distanceSquared <= (width/2 - e.width/2)*(width/2 - e.width/2);
     }
 
@@ -117,28 +124,27 @@ public class Tank extends Entity {
     public int getTrue() {return 0xFFFF;}
     public int getFalse() {return 0xFFFF;}
 
-    public int move(int speed) {
-        if(speed > 0x0000) this.acc = acceleration;
-        if(speed > maxSpeed) {
-            this.vel = maxSpeed;
-            return maxSpeed;
-        }
-        else {
-            this.vel = speed;
-            return Math.abs(speed);
-        }
-    }
+    public int forward(int force) {
+        //Essentially, accelerate the tank in the direction it's facing.
+        //This will typically take a tank to its max speed (based on drag.)
+        //To go slower a tank has to monitor when it's moving forwards.
+        if(force > acceleration) force = acceleration; //Tanks can't move faster than a certain limit
 
-    public int reverse(int speed) {
-        if(speed > 0x0000) this.acc = -acceleration;
-        if(speed > maxSpeed) {
-            this.velLimit = maxSpeed;
-            return maxSpeed;
-        }
-        else {
-            this.velLimit = speed;
-            return Math.abs(speed);
-        }
+        //Translate polar force into cartesian vector
+        this.accX = force * Math.cos(r);
+        this.accY = force * Math.sin(r);
+
+        return force;
+    }
+    public int backward(int force) {
+        //Same as forward, but reversed
+        if(force > acceleration) force = acceleration; //Tanks can't move faster than a certain limit
+
+        //Translate polar force into cartesian vector
+        this.accX = -force * Math.cos(r);
+        this.accY = -force * Math.sin(r);
+
+        return force;
     }
 
     public int flash(int r, int g, int b) {

@@ -5,33 +5,37 @@ import java.awt.*;
  */
 public abstract class Entity {
 
-    protected int x;
-    protected int y;
-    protected int r;
-    protected int vel;
-    protected int velLimit = 201;
-    protected int drag;
-    protected int acc;
-    protected int velR;
+    double x; //X position, in pixels
+    double y; //Y position, in pixels
+    double r; //Rotation, in degrees
+    double velX; //X velocity, in pixels per tick.
+    double velY; //Y velocity, in pixels per tick.
+    double velR; //Rotational velocity, in degrees per tick.
+    double accX; //X acceleration, in pixels per tick per tick.
+    double accY; //Y acceleration, in pixels per tick per tick.
+    double accR; //Rotational acceleration, in degrees per tick per tick.
 
-    protected int width;
-    protected int height;
+    double drag; //The amount that an Entity naturally slows down each tick, per unit of velocity.
 
-    protected Handler handler;
+    int width;
+    int height;
 
-    protected int uuid;
+    Handler handler;
 
-    protected void applyPhysics() {
+    int uuid;
 
-        System.out.println("Applying physics to " + this);
+    void applyPhysics() {
 
-        vel -= drag;
-        vel += acc;
-        if(vel > velLimit) vel = velLimit;
-        if(vel < -velLimit) vel = -velLimit;
+        x -= drag * velX;
+        y -= drag * velY;
+        r -= drag * velR;
 
-        x += vel * (int) Math.cos(r);
-        y += vel * (int) Math.sin(r);
+        velX += accX;
+        velY += accY;
+        velR += accR;
+
+        x += velX;
+        y += velY;
         r += velR;
 
     }

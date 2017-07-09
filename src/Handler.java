@@ -26,12 +26,12 @@ public class Handler {
         return entities[location];
     }
 
-    public Entity closestToDistance(int x, int y, int distance) {
-        int record = 0xFFFF;
+    public Entity closestToDistance(double x, double y, int distance) {
+        double record = 0xFFFF;
         Entity result = null;
         for(Entity e: entities) {
             if(e == null) continue;
-            int closeness = ((x - e.x) * (x - e.x) + (y - e.y) * (y - e.y) - distance * distance);
+            double closeness = ((x - e.x) * (x - e.x) + (y - e.y) * (y - e.y) - distance * distance);
             if(closeness < record) {
                 record = closeness;
                 result = e;
@@ -40,13 +40,13 @@ public class Handler {
         return result;
     }
 
-    public Entity closestToValue(int x, int y, int searchRadius, int dataSpace, int value) {
-        int record = 0xFFFF;
+    public Entity closestToValue(double x, double y, int searchRadius, int dataSpace, int value) {
+        double record = 0xFFFF;
         Entity result = null;
         for(Entity e: entities) {
             if(e == null || !(e instanceof Tank)) continue;
             if ((x - e.x) * (x - e.x) + (y - e.y) * (y - e.y) > searchRadius * searchRadius) continue;
-            int closeness = ((Tank) e).valueOfGene(dataSpace, ((Tank)e)) - value;
+            double closeness = ((Tank) e).valueOfGene(dataSpace, ((Tank)e)) - value;
             if(closeness < record) {
                 record = closeness;
                 result = e;
@@ -55,7 +55,7 @@ public class Handler {
         return result;
     }
 
-    public int withinDistance(int x, int y, int distance) {
+    public int withinDistance(double x, double y, int distance) {
         int count = 0x0000;
         for(Entity e: entities) {
             if(e == null) continue;
