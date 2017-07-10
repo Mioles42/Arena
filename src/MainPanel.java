@@ -1,10 +1,8 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.util.ArrayList;
-import java.util.List;
 
-public class Main implements KeyListener, MouseListener, WindowListener, MouseMotionListener {
+public class MainPanel extends JPanel implements KeyListener, MouseListener, WindowListener, MouseMotionListener {
 
     private Renderer renderer;
     private Handler handler;
@@ -14,10 +12,10 @@ public class Main implements KeyListener, MouseListener, WindowListener, MouseMo
 
     public static void main(String[] args) {
 
-        new Main().run();
+        new MainPanel().run();
     }
 
-    public Main() {
+    public MainPanel() {
 
         entities = new Entity[0xFFFF];
 
@@ -26,38 +24,33 @@ public class Main implements KeyListener, MouseListener, WindowListener, MouseMo
 
         entities[1] = new Tank(handler);
 
-        window = new JFrame();
+        window = new Window(this);
 
-        JPanel panel = new JPanel() {
-            public void paint(Graphics g) {
-                super.paint(g);
-                render(g);
-            }
-        };
 
-        panel.setBackground(new Color(170, 170, 160));
+        this.setBackground(new Color(170, 170, 160));
 
-        panel.addKeyListener(this);
-        panel.addMouseListener(this);
-        panel.addMouseMotionListener(this);
+        this.addKeyListener(this);
+        this.addMouseListener(this);
+        this.addMouseMotionListener(this);
         window.addWindowListener(this);
 
-        window.setSize(700, 700);
+        window.setSize(1200, 700);
         window.setName("Arena");
         window.setLocation(300, 300);
-
-        window.add(panel);
         window.setVisible(true);
     }
 
-
+    public void paint(Graphics g) {
+        super.paint(g);
+        render(g);
+    }
 
     public void run() {
         System.out.println("Running...");
 
         //How long does a single tick last?
         double tickTime = 1000 * (1.0 / (double) Global.tickSpeed);
-        System.out.println("[Main.run()] Found " + tickTime + " milliseconds per tick");
+        System.out.println("[MainPanel.run()] Found " + tickTime + " milliseconds per tick");
 
         while(true) {
             long time = System.currentTimeMillis();
@@ -65,7 +58,7 @@ public class Main implements KeyListener, MouseListener, WindowListener, MouseMo
             Global.time++;
 
             while(System.currentTimeMillis() < time + tickTime) {
-                window.repaint();
+                this.repaint();
             }
         }
     }
