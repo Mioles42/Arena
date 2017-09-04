@@ -5,6 +5,8 @@
 # IntelliJ project files
 .idea/dictionaries/
 .idea/inspectionProfiles/
+.idea/workspace.xml
+
+# Output files
+out/
 src/com/
-/.idea/workspace.xml
-/out/
