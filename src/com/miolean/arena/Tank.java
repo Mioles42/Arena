@@ -37,10 +37,11 @@ public class Tank extends Entity {
     //Program index:
     private int index = 0;
 
-    //Defined memory indexes:
-    private UByte sNumber = ub(0);
-    private UByte uNumber = ub(0);
-    private UByte pNumber = ub(0);
+    //Loaded memory:
+    private int loadedU = 0;
+    private int loadedP = 0;
+    private int loadedS = 0; //not that you can run SMEM, but it's used in other places
+    private int totalMemories = 0;
 
     //Comparison flags:
     private boolean equal = false;
@@ -99,36 +100,9 @@ public class Tank extends Entity {
             in.next();
             opcode = (short) Integer.parseInt(in.next().trim(), 16);
         }
-
-        for(Gene g: KMEM) System.out.println(g);
     }
 
-    Tank(int accX) {
-        x = 50;
-        y = 50;
-        this.accX = accX;
-        width = 40;
-        height = 40;
-
-        //1: Initialize memories.
-        UMEM = new UByte[256][];
-        PMEM = new UByte[256][];
-        SMEM = new UByte[256][];
-        WMEM = new UByte[256];
-        UMEM[0] = new UByte[256];
-        PMEM[0] = new UByte[256];
-        SMEM[0] = new UByte[256];
-
-        for(int i = 0; i < 256; i++) {
-            UMEM[0][i] = ub(0);
-            SMEM[0][i] = ub(0);
-            PMEM[0][i] = ub(0);
-            WMEM[i] = ub(0);
-        }
-
-    }
-
-    Tank() {
+    Tank(String file) {
         //Todo: This is totally a placeholder
         //0: Initial values for testing.
         x = 100;
@@ -142,26 +116,34 @@ public class Tank extends Entity {
         PMEM = new UByte[256][];
         SMEM = new UByte[256][];
         WMEM = new UByte[256];
-        UMEM[0] = new UByte[256];
-        PMEM[0] = new UByte[256];
-        SMEM[0] = new UByte[256];
+        createMemory(UMEM, ub(0));
+        createMemory(PMEM, ub(0));
+        createMemory(SMEM, ub(0));
 
-        for(int i = 0; i < 256; i++) {
-            UMEM[0][i] = ub(0);
-            SMEM[0][i] = ub(0);
-            PMEM[0][i] = ub(0);
-            WMEM[i] = ub(0);
+        for(int i = 0; i < 256; i++) WMEM[i] = ub(0);
+
+        //2: Initialize stats.
+        for(int i = 0; i < stats.length; i++) stats[i] = ub(1);
+
+        //3: Grab memories from file.
+        Scanner in = new Scanner(Tank.class.getClassLoader().getResourceAsStream("gen/" + file + ".txt"));
+        String next = "";
+        String value = "";
+        while(in.hasNext()) {
+            next = in.next().trim();
+            value = in.next().trim();
+            if(next.substring(0,1).equals("~")){
+                if(next.substring(1).equals("$")) loadedS = Integer.parseInt(value.substring(0,2));
+                if(next.substring(1).equals("@")) loadedP = Integer.parseInt(value.substring(0,2));
+                if(next.substring(1).equals("%")) loadedU = Integer.parseInt(value.substring(0,2));
+            }
+            if(next.substring(0,1).equals("&")) WMEM[Integer.parseInt(next.substring(1))] = ub(Integer.parseInt(value));
+            if(next.substring(0,1).equals("$")) SMEM[loadedS][Integer.parseInt(next.substring(1), 16)] = ub(Integer.parseInt(value, 16));
+            if(next.substring(0,1).equals("@")) PMEM[loadedP][Integer.parseInt(next.substring(1), 16)] = ub(Integer.parseInt(value, 16));
+            if(next.substring(0,1).equals("%")) UMEM[loadedU][Integer.parseInt(next.substring(1), 16)] = ub(Integer.parseInt(value, 16));
         }
 
-        stats[STAT_SPEED] = ub(50);
-
-        //Let's go one deeper.
-        PMEM[0][0] = ub(0x51);
-        PMEM[0][1] = ub(0x0);
-        PMEM[0][2] = ub(0x42);
-
-        WMEM[0x42] = ub(7);
-
+        stats[STAT_SPEED] = ub(10);
     }
 
     @Override
@@ -235,21 +217,43 @@ public class Tank extends Entity {
     @Override
     void update() {
         applyPhysics();
-        //forward(1);
-        //Fun time!
-        for(int i = 0; i < PMEM.length-3; i++) {
-            if(PMEM[0][i].val() == 0x00) continue;
-            if(KMEM[PMEM[0][i].val()] == null) continue;
-            try {
-                System.out.println("[Tank.update()] Attempting to invoke " + KMEM[PMEM[0][i].val()] + " with " + PMEM[0][i+1].val() + ", " + PMEM[0][i+2].val() + ", " + PMEM[0][i+3].val());
-                KMEM[PMEM[0][i].val()].getMeaning().invoke(this, PMEM[0][i+1].val(), PMEM[0][i+2].val(), PMEM[0][i+3].val());
-            } catch (IllegalAccessException | InvocationTargetException e) {
-                e.printStackTrace();
-            }
-            //Assuming nothing went wrong we've completed a command
-            i += 3; //don't want to run the arguments by accident
+
+        //Run the loaded P memory!
+        runGenes(PMEM[loadedP]);
+    }
+
+    void runGenes(UByte[] genes) {
+        for(int i = 0; i < genes.length-3; i++) {
+            //For every entry in this list of genes (excluding the ones at the end that don't have enough others after them as arguments)
+
+            if(PMEM[0][i].val() == 0x00) continue; //Don't even bother with opcode 0x00, standing for "do nothing"
+            if(KMEM[PMEM[0][i].val()] == null) continue; //If the opcode doesn't actually stand for something meaningful, skip it too
+
+            //Since everything appears to be in order, let's try to run that as a gene.
+            try { KMEM[PMEM[0][i].val()].getMeaning().invoke(this, PMEM[0][i+1].val(), PMEM[0][i+2].val(), PMEM[0][i+3].val());
+            } catch (IllegalAccessException | InvocationTargetException e) { e.printStackTrace(); }
+
+            //Assuming nothing went wrong we've completed a command by now. (If something did go wrong, we'll at least have a stack trace.)
+            i += 3; //We don't want to run the arguments by accident, so let's skip them.
         }
-        System.out.println("[" + x + ", " + y + "]");
+    }
+    //Instantiate memory number [number] as a UByte[256].
+    void createMemory(UByte[][] memory, UByte number) {
+        memory[number.val()] = new UByte[256];
+        for(int i = 0; i < 256; i++) {
+            memory[number.val()][i] = ub(0);
+        }
+    }
+
+    //Destroy memory number [number], making it null.
+    void destroyMemory(UByte[][] memory, UByte number) {
+        //Never ever destroy memory 0.
+        if(number.val() != 0) {
+            memory[number.val()] = null;
+            totalMemories--;
+        }
+        if(memory == PMEM && number.val() == loadedP) loadedP = 0;
+        if(memory == UMEM && number.val() == loadedU) loadedU = 0;
     }
 
     @Override
@@ -280,7 +284,6 @@ public class Tank extends Entity {
 
 
     public void forward(int force) {
-        System.out.println("Forward with force " + force);
         //Essentially, accelerate the tank in the direction it's facing.
         //This will typically take a tank to its max speed (based on drag.)
         //To go slower a tank has to monitor when it's moving forwards.

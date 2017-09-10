@@ -18,11 +18,9 @@ public class Gene {
 
         try {
             Method method = Tank.class.getMethod("_" + meaning, int.class, int.class, int.class);
-            System.out.println("Found method _" + meaning);
             this.meaning = method;
         } catch (NoSuchMethodException e) {
-            //Yeah, there's really no recovery from this.
-            System.out.println("Failed to find method _" + meaning);
+            //This is normal; undefined methods should produce this error
         }
 
     }

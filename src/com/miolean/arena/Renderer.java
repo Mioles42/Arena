@@ -26,10 +26,6 @@ public class Renderer {
             if(e == null) continue;
             e.render(g);
         }
-
-        g.setColor(Color.BLACK);
-        g.drawString(Global.tickSpeed + "tk/s", 15, 25);
-        g.drawString("t:" + Global.time + "tks", 15, 45);
         g.setColor(Color.RED);
         g.drawRect(10, 10, ARENA_SIZE - BORDER, ARENA_SIZE - BORDER);
 

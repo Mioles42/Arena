@@ -25,8 +25,7 @@ public class MainPanel extends JPanel implements KeyListener, MouseListener, Win
         renderer = new Renderer(entities);
         handler = new Handler(entities);
 
-        entities[1] = new Tank();
-        entities[2] = new Tank(3);
+        entities[1] = new Tank("adam");
         viewholder = entities[1];
 
         window = new Window(this);
@@ -70,6 +69,10 @@ public class MainPanel extends JPanel implements KeyListener, MouseListener, Win
     }
 
     public void render(Graphics g) {
+        g.setColor(Color.BLACK);
+        g.drawString(Global.tickSpeed + "tk/s", 15, 25);
+        g.drawString("t:" + Global.time + "tks", 15, 45);
+
         g.translate((int) (-viewholder.x + this.getWidth()/2), (int) (-viewholder.y + this.getHeight()/2));
         renderer.render(g);
     }
