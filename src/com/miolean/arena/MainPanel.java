@@ -11,6 +11,7 @@ public class MainPanel extends JPanel implements KeyListener, MouseListener, Win
     private JFrame window;
 
     private Entity[] entities;
+    private Entity viewholder;
 
     public static void main(String[] args) {
 
@@ -25,6 +26,8 @@ public class MainPanel extends JPanel implements KeyListener, MouseListener, Win
         handler = new Handler(entities);
 
         entities[1] = new Tank();
+        entities[2] = new Tank(3);
+        viewholder = entities[1];
 
         window = new Window(this);
 
@@ -67,6 +70,7 @@ public class MainPanel extends JPanel implements KeyListener, MouseListener, Win
     }
 
     public void render(Graphics g) {
+        g.translate((int) (-viewholder.x + this.getWidth()/2), (int) (-viewholder.y + this.getHeight()/2));
         renderer.render(g);
     }
 

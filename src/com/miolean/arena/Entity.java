@@ -23,7 +23,7 @@ abstract class Entity {
     double accY; //Y acceleration, in pixels per tick per tick.
     double accR; //Rotational acceleration, in degrees per tick per tick.
 
-    double drag; //The amount that an Entity naturally slows down each tick, per unit of velocity.
+    double drag = 1; //The amount that an Entity naturally slows down each tick, per unit of velocity.
 
     //Size components:
     int width;

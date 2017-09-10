@@ -103,6 +103,31 @@ public class Tank extends Entity {
         for(Gene g: KMEM) System.out.println(g);
     }
 
+    Tank(int accX) {
+        x = 50;
+        y = 50;
+        this.accX = accX;
+        width = 40;
+        height = 40;
+
+        //1: Initialize memories.
+        UMEM = new UByte[256][];
+        PMEM = new UByte[256][];
+        SMEM = new UByte[256][];
+        WMEM = new UByte[256];
+        UMEM[0] = new UByte[256];
+        PMEM[0] = new UByte[256];
+        SMEM[0] = new UByte[256];
+
+        for(int i = 0; i < 256; i++) {
+            UMEM[0][i] = ub(0);
+            SMEM[0][i] = ub(0);
+            PMEM[0][i] = ub(0);
+            WMEM[i] = ub(0);
+        }
+
+    }
+
     Tank() {
         //Todo: This is totally a placeholder
         //0: Initial values for testing.
@@ -111,10 +136,6 @@ public class Tank extends Entity {
         r = 0;
         width = 40;
         height = 40;
-        accX = 1;
-        velY = 7;
-        velR = 1;
-        drag = 1;
 
         //1: Initialize memories.
         UMEM = new UByte[256][];
