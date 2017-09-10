@@ -23,12 +23,6 @@ public class Handler {
         }
     }
 
-    public Entity entityAt(byte uuidMost, byte uuidLeast) {
-        short uuid = (short) (((short) uuidMost) << 8);
-        uuid += uuidLeast;
-        return entities[uuid];
-    }
-
     public boolean remove(int uuid) {
         if(entities[uuid] == null) return false;
         entities[uuid] = null;
@@ -56,5 +50,9 @@ public class Handler {
             if ((x - e.x) * (x - e.x) + (y - e.y) * (y - e.y) < distance * distance) count++;
         }
         return count;
+    }
+
+    public Entity getByUUID(UByte uuidLeast, UByte uuidMost) {
+        return entities[uuidMost.val()*256 + uuidLeast.val()];
     }
 }

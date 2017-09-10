@@ -29,10 +29,13 @@ abstract class Entity {
     int width;
     int height;
 
+    //Entities can also be destroyed:
+    int health;
+
     //Other things:
-    private Handler handler; //The Handler which manages this Entity and which can be asked to destroy it.
-    private int uuidMost; //A Universally Unique ID for use by other Entities (namely Tanks) to reference it.
-    private int uuidLeast;
+    protected Handler handler; //The Handler which manages this Entity and which can be asked to destroy it.
+    protected int uuidMost; //A Universally Unique ID for use by other Entities (namely Tanks) to reference it. Can totally be negative.
+    protected int uuidLeast;
 
     void applyPhysics() {
 

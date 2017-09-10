@@ -93,7 +93,8 @@ public class Window extends JFrame implements ChangeListener {
 
         slider = new JSlider();
         slider.setMaximum(1000);
-        slider.setMinimum(20);
+        slider.setMinimum(1);
+        slider.setValue(20);
         slider.setFocusable(false);
         slider.addChangeListener(this);
         controlPanel.setLayout(new GridBagLayout());

@@ -11,30 +11,30 @@
     /16/ COMP   / "Compare"                     /70 /0  /
 ^2 Memory
     /20/ MOV    / "Move into REG"               /150/0  /
-    /21/ SMEM   / "Store in SMEM"               /150/0  /
-    /22/ PMEM   / "Store in PMEM"               /50 /4  /
-    /23/ UMEM   / "Store in UMEM"               /20 /32 /
-    /24/ SMEM   / "Get from SMEM"               /150/0  /
-    /25/ PMEM   / "Get from PMEM"               /50 /0  /
-    /26/ UMEM   / "Get from UMEM"               /20 /0  /
+    /21/ SSTO   / "Store in SMEM"               /150/0  /
+    /22/ PSTO   / "Store in PMEM"               /50 /4  /
+    /23/ USTO   / "Store in UMEM"               /20 /32 /
+    /24/ SGET   / "Get from SMEM"               /150/0  /
+    /25/ PGET   / "Get from PMEM"               /50 /0  /
+    /26/ UGET   / "Get from UMEM"               /20 /0  /
     /27/ ZMOV   / "Move immed into REG"         /200/0  /
-    /28/ ZSMEM  / "Move immed into SMEM"        /100/0  /
-    /29/ ZPMEM  / "Move immed into PMEM"        /50 /8  /
-    /2A/ ZUMEM  / "Move immed into UMEM"        /20 /32 /
+    /28/ ZSSTO  / "Move immed into SMEM"        /100/0  /
+    /29/ ZPSTO  / "Move immed into PMEM"        /50 /8  /
+    /2A/ ZUSTO  / "Move immed into UMEM"        /20 /32 /
     /2B/ WCLR   / "W range clear"               /20 /0  /
     /2C/ SCLR   / "S range clear"               /10 /0  /
     /2D/ PCLR   / "P range clear"               /6  /0  /
     /2E/ UCLR   / "U range clear"               /2  /0  /
 ^3 Physics
-    /30/ XPOS   /"X Position"                   /10 /0  /
-    /31/ XVEL   /"X Velocity"                   /10 /0  /
-    /32/ XACC   /"X Acceleration"               /10 /0  /
-    /33/ YPOS   /"Y Position"                   /10 /0  /
-    /34/ YVEL   /"Y Velocity"                   /10 /0  /
-    /35/ YACC   /"Y Acceleration"               /10 /0  /
-    /36/ RPOS   /"R Position"                   /10 /0  /
-    /37/ RVEL   /"R Velocity"                   /10 /0  /
-    /38/ RACC   /"R Acceleration"               /10 /0  /
+    /30/ POSX   /"X Position"                   /10 /0  /
+    /31/ VELX   /"X Velocity"                   /10 /0  /
+    /32/ ACCX   /"X Acceleration"               /10 /0  /
+    /33/ POSY   /"Y Position"                   /10 /0  /
+    /34/ VELY   /"Y Velocity"                   /10 /0  /
+    /35/ ACCY   /"Y Acceleration"               /10 /0  /
+    /36/ POSR   /"R Position"                   /10 /0  /
+    /37/ VELR   /"R Velocity"                   /10 /0  /
+    /38/ ACCR   /"R Acceleration"               /10 /0  /
 ^4 Sight
     /40/ VIEW   /"Set sight range"              /30 /4  /
     /41/ NEAR   /"Number nearby"                /30 /0  /
@@ -49,7 +49,7 @@
     /60/ ADD    / "Add"                         /20 /0  /
     /61/ SUB    / "Subtract"                    /20 /0  /
     /62/ PROD   / "Multiply"                    /10 /0  /
-    /63/ DIFF   / "Divide"                      /10 /0  /
+    /63/ QUOT   / "Divide"                      /10 /0  /
     /64/ BWOR   / "Bitwise OR"                  /5  /0  /
     /65/ BWAND  / "Bitwise AND"                 /5  /0  /
     /66/ BWXOR  / "Bitwise XOR"                 /5  /0  /
@@ -83,15 +83,15 @@
     /B2/ PFULL  / "P filled"                    /5  /0  /
     /B3/ UFULL  / "U filled"                    /5  /0  /
 ^C Tracking
-    /C0/ OXPOS  / "Other X Position             /20 /0  /
-    /C1/ OXVEL  / "Other X Velocity"            /20 /0  /
-    /C2/ OXACC  / "Other X Acceleration"        /20 /0  /
-    /C3/ OYPOS  / "Other Y Position"            /20 /0  /
-    /C4/ OYVEL  / "Other Y Velocity"            /20 /0  /
-    /C5/ OYACC  / "Other Y Acceleration"        /20 /0  /
-    /C6/ ORPOS  / "Other R Position"            /20 /0  /
-    /C7/ ORVEL  / "Other R Velocity"            /20 /0  /
-    /C8/ ORACC  / "Other R Acceleration"        /20 /0  /
+    /C0/ OPOSX  / "Other X Position             /20 /0  /
+    /C1/ OVELX  / "Other X Velocity"            /20 /0  /
+    /C2/ OACCX  / "Other X Acceleration"        /20 /0  /
+    /C3/ OPOSY  / "Other Y Position"            /20 /0  /
+    /C4/ OVELY  / "Other Y Velocity"            /20 /0  /
+    /C5/ OACCY  / "Other Y Acceleration"        /20 /0  /
+    /C6/ OPOSR  / "Other R Position"            /20 /0  /
+    /C7/ OVELR  / "Other R Velocity"            /20 /0  /
+    /C8/ OACCR  / "Other R Acceleration"        /20 /0  /
 ^D Expansion
     /D0/ LSMEM  / "Loaded S memory"             /7  /0  /
     /D1/ SMEMX  / "Loaded S size"               /7  /0  /
