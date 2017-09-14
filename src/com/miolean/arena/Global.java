@@ -18,4 +18,17 @@ public class Global {
     static final int ARENA_SIZE = 43640;
 
     static final int BORDER = 20;
+
+    static boolean[] KEY = new boolean[8];
+
+    //Key constants
+    static final int KEY_Q = 0;
+    static final int KEY_W = 1;
+    static final int KEY_E = 2;
+    static final int KEY_R = 3;
+    static final int KEY_A = 4;
+    static final int KEY_S = 5;
+    static final int KEY_D = 6;
+    static final int KEY_F = 7;
+
 }

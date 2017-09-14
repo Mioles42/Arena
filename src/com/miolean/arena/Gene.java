@@ -20,7 +20,7 @@ public class Gene {
             Method method = Tank.class.getMethod("_" + meaning, int.class, int.class, int.class);
             this.meaning = method;
         } catch (NoSuchMethodException e) {
-            //This is normal; undefined methods should produce this error
+            System.out.println("Failed to find method " + meaning);
         }
 
     }

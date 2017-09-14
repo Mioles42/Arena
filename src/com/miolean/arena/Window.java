@@ -4,14 +4,18 @@ import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 
 
-public class Window extends JFrame implements ChangeListener {
+public class Window extends JFrame implements ChangeListener ,KeyListener {
 
     private JSlider slider;
+    MainPanel main;
 
 
     Window(MainPanel mainPanel) {
+        this.main = mainPanel;
         LayoutManager layout = new GridBagLayout();
         setLayout(layout);
         try {
@@ -109,5 +113,21 @@ public class Window extends JFrame implements ChangeListener {
         if(e.getSource() == slider) {
             Global.tickSpeed = slider.getValue();
         }
+    }
+
+    @Override
+    public void keyTyped(KeyEvent e) {
+        main.keyTyped(e);
+    }
+
+    @Override
+    public void keyPressed(KeyEvent e) {
+        main.keyPressed(e);
+    }
+
+    @Override
+    public void keyReleased(KeyEvent e) {
+        main.keyReleased(e);
+
     }
 }

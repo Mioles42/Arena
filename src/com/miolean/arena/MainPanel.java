@@ -4,7 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
-public class MainPanel extends JPanel implements KeyListener, MouseListener, WindowListener, MouseMotionListener {
+public class MainPanel extends JPanel implements Runnable, KeyListener, MouseListener, WindowListener, MouseMotionListener {
 
     private Renderer renderer;
     private Handler handler;
@@ -14,8 +14,8 @@ public class MainPanel extends JPanel implements KeyListener, MouseListener, Win
     private Entity viewholder;
 
     public static void main(String[] args) {
-
-        new MainPanel().run();
+        Thread gameThread = new Thread(new MainPanel());
+        gameThread.run();
     }
 
     public MainPanel() {
@@ -25,7 +25,7 @@ public class MainPanel extends JPanel implements KeyListener, MouseListener, Win
         renderer = new Renderer(entities);
         handler = new Handler(entities);
 
-        entities[1] = new Tank("adam");
+        entities[1] = new ControlledTank(new Tank("player"));
         viewholder = entities[1];
 
         window = new Window(this);
@@ -42,6 +42,8 @@ public class MainPanel extends JPanel implements KeyListener, MouseListener, Win
         window.setName("Arena");
         window.setLocation(300, 300);
         window.setVisible(true);
+
+        requestFocus();
     }
 
     public void paint(Graphics g) {
@@ -72,6 +74,10 @@ public class MainPanel extends JPanel implements KeyListener, MouseListener, Win
         g.setColor(Color.BLACK);
         g.drawString(Global.tickSpeed + "tk/s", 15, 25);
         g.drawString("t:" + Global.time + "tks", 15, 45);
+        g.drawString(Global.KEY[Global.KEY_W]? "W":"", 15, 65);
+        g.drawString(Global.KEY[Global.KEY_A]? "A":"", 35, 65);
+        g.drawString(Global.KEY[Global.KEY_S]? "S":"", 55, 65);
+        g.drawString(Global.KEY[Global.KEY_D]? "D":"", 75, 65);
 
         g.translate((int) (-viewholder.x + this.getWidth()/2), (int) (-viewholder.y + this.getHeight()/2));
         renderer.render(g);
@@ -79,8 +85,28 @@ public class MainPanel extends JPanel implements KeyListener, MouseListener, Win
 
 
     @Override public void keyTyped(KeyEvent e) {}
-    @Override public void keyPressed(KeyEvent e) {}
-    @Override public void keyReleased(KeyEvent e) {}
+    @Override public void keyPressed(KeyEvent e) {
+        char key = e.getKeyChar();
+        if(key == 'q') Global.KEY[Global.KEY_Q] = true;
+        if(key == 'w') Global.KEY[Global.KEY_W] = true;
+        if(key == 'e') Global.KEY[Global.KEY_E] = true;
+        if(key == 'r') Global.KEY[Global.KEY_R] = true;
+        if(key == 'a') Global.KEY[Global.KEY_A] = true;
+        if(key == 's') Global.KEY[Global.KEY_S] = true;
+        if(key == 'd') Global.KEY[Global.KEY_D] = true;
+        if(key == 'f') Global.KEY[Global.KEY_F] = true;
+    }
+    @Override public void keyReleased(KeyEvent e) {
+        char key = e.getKeyChar();
+        if(key == 'q')  Global.KEY[Global.KEY_Q] = false;
+        if(key == 'w')  Global.KEY[Global.KEY_W] = false;
+        if(key == 'e')  Global.KEY[Global.KEY_E] = false;
+        if(key == 'r')  Global.KEY[Global.KEY_R] = false;
+        if(key == 'a')  Global.KEY[Global.KEY_A] = false;
+        if(key == 's')  Global.KEY[Global.KEY_S] = false;
+        if(key == 'd')  Global.KEY[Global.KEY_D] = false;
+        if(key == 'f')  Global.KEY[Global.KEY_F] = false;
+    }
     @Override public void mouseClicked(MouseEvent e) {}
     @Override public void mousePressed(MouseEvent e) {}
     @Override public void mouseReleased(MouseEvent e) {}

@@ -48,21 +48,21 @@ public class Tank extends Entity {
     private boolean greater = false;
 
     //Stat constants
-    private static final int STAT_HASTE = 0x0; //shot speed
-    private static final int STAT_DAMAGE = 0x1; //shot damage
-    private static final int STAT_REGEN = 0x2; //regeneration
-    private static final int STAT_SPEED = 0x3; //acceleration (translates to speed due to drag)
-    private static final int STAT_TOUGHNESS = 0x4; //body damage
-    private static final int STAT_ROTATE_SPEED = 0x5;
+    static final int STAT_HASTE = 0x0; //shot speed
+    static final int STAT_DAMAGE = 0x1; //shot damage
+    static final int STAT_REGEN = 0x2; //regeneration
+    static final int STAT_SPEED = 0x3; //acceleration (translates to speed due to drag)
+    static final int STAT_TOUGHNESS = 0x4; //body damage
+    static final int STAT_ROTATE_SPEED = 0x5;
 
     //Type constant
-    private static final int TYPE_TANK = 0x0;
-    private static final int TYPE_COG = 0x4;
-    private static final int TYPE_BULLET = 0x8;
-    private static final int TYPE_WALL = 0x12;
+    static final int TYPE_TANK = 0x0;
+    static final int TYPE_COG = 0x4;
+    static final int TYPE_BULLET = 0x8;
+    static final int TYPE_WALL = 0x12;
 
 
-    private UByte[] stats = new UByte[8];
+    protected UByte[] stats = new UByte[8];
 
     //Flash color:
     private int flashR = 0x00;
@@ -102,6 +102,14 @@ public class Tank extends Entity {
         }
     }
 
+    //Create a totally blank Tank
+    Tank() {
+        width = 40;
+        height = 40;
+
+    }
+
+    //Create a Tank from a file
     Tank(String file) {
         //Todo: This is totally a placeholder
         //0: Initial values for testing.
@@ -127,8 +135,8 @@ public class Tank extends Entity {
 
         //3: Grab memories from file.
         Scanner in = new Scanner(Tank.class.getClassLoader().getResourceAsStream("gen/" + file + ".txt"));
-        String next = "";
-        String value = "";
+        String next;
+        String value;
         while(in.hasNext()) {
             next = in.next().trim();
             value = in.next().trim();
@@ -288,15 +296,17 @@ public class Tank extends Entity {
         //This will typically take a tank to its max speed (based on drag.)
         //To go slower a tank has to monitor when it's moving forwards.
         if(force > stats[STAT_SPEED].val()) force = stats[STAT_SPEED].val(); //Tanks can't move faster than a certain limit
+        if(force < -stats[STAT_SPEED].val()) force = -stats[STAT_SPEED].val(); //Tanks can't move faster than a certain limit
 
         //Translate polar force into cartesian vector
-        this.accX = force * Math.cos(r);
-        this.accY = force * Math.sin(r);
+        this.accX = force * Math.cos(r) / 16; //Scaling!
+        this.accY = force * -Math.sin(r) / 16;
     }
     public void rotate(int force) {
-        if(force > stats[STAT_ROTATE_SPEED].val()) force = stats[STAT_ROTATE_SPEED].val(); //Tanks can't move faster than a certain limit
+        if(force > stats[STAT_ROTATE_SPEED].val()) force = stats[STAT_ROTATE_SPEED].val(); //Tanks can't rotate faster than a certain limit
+        if(force < -stats[STAT_ROTATE_SPEED].val()) force = -stats[STAT_ROTATE_SPEED].val(); //Tanks can't rotate faster than a certain limit
 
-        this.accR = force;
+        this.accR = ((double) force ) / 128;
     }
 
     public void setLEDR(int value) { flashR = value;}
@@ -321,6 +331,8 @@ public class Tank extends Entity {
      * Beware. Not intended for human consumption.
      * All arguments are intended to be within the range [0, 255].
      */
+    // 0 (DEV ONLY)
+
     // 1
     public void _GOTO (int regin, int arg1, int arg2) {index = WMEM[arg1].val();}
     public void _GOE  (int regin, int arg1, int arg2) {if(equal) index = WMEM[arg1].val();}
