@@ -25,8 +25,8 @@ public class MainPanel extends JPanel implements Runnable, KeyListener, MouseLis
         renderer = new Renderer(entities);
         handler = new Handler(entities);
 
-        entities[1] = new ControlledTank(new Tank("player"));
-        viewholder = entities[1];
+        handler.add(new ControlledTank(new Tank("player")));
+        viewholder = entities[0];
 
         window = new Window(this);
 
@@ -74,10 +74,7 @@ public class MainPanel extends JPanel implements Runnable, KeyListener, MouseLis
         g.setColor(Color.BLACK);
         g.drawString(Global.tickSpeed + "tk/s", 15, 25);
         g.drawString("t:" + Global.time + "tks", 15, 45);
-        g.drawString(Global.KEY[Global.KEY_W]? "W":"", 15, 65);
-        g.drawString(Global.KEY[Global.KEY_A]? "A":"", 35, 65);
-        g.drawString(Global.KEY[Global.KEY_S]? "S":"", 55, 65);
-        g.drawString(Global.KEY[Global.KEY_D]? "D":"", 75, 65);
+        g.drawOval(this.getWidth()/2, this.getHeight()/2, 2, 2);
 
         g.translate((int) (-viewholder.x + this.getWidth()/2), (int) (-viewholder.y + this.getHeight()/2));
         renderer.render(g);
@@ -95,19 +92,28 @@ public class MainPanel extends JPanel implements Runnable, KeyListener, MouseLis
         if(key == 's') Global.KEY[Global.KEY_S] = true;
         if(key == 'd') Global.KEY[Global.KEY_D] = true;
         if(key == 'f') Global.KEY[Global.KEY_F] = true;
+        if(key == ' ') Global.KEY[Global.KEY_SPACE] = true;
     }
     @Override public void keyReleased(KeyEvent e) {
         char key = e.getKeyChar();
-        if(key == 'q')  Global.KEY[Global.KEY_Q] = false;
-        if(key == 'w')  Global.KEY[Global.KEY_W] = false;
-        if(key == 'e')  Global.KEY[Global.KEY_E] = false;
-        if(key == 'r')  Global.KEY[Global.KEY_R] = false;
-        if(key == 'a')  Global.KEY[Global.KEY_A] = false;
-        if(key == 's')  Global.KEY[Global.KEY_S] = false;
-        if(key == 'd')  Global.KEY[Global.KEY_D] = false;
-        if(key == 'f')  Global.KEY[Global.KEY_F] = false;
+        if(key == 'q') Global.KEY[Global.KEY_Q] = false;
+        if(key == 'w') Global.KEY[Global.KEY_W] = false;
+        if(key == 'e') Global.KEY[Global.KEY_E] = false;
+        if(key == 'r') Global.KEY[Global.KEY_R] = false;
+        if(key == 'a') Global.KEY[Global.KEY_A] = false;
+        if(key == 's') Global.KEY[Global.KEY_S] = false;
+        if(key == 'd') Global.KEY[Global.KEY_D] = false;
+        if(key == ' ') Global.KEY[Global.KEY_SPACE] = false;
+        if(e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+            System.out.println("com.miolean.arena.Window closing...");
+            System.exit(0);
+        }
     }
-    @Override public void mouseClicked(MouseEvent e) {}
+    @Override public void mouseClicked(MouseEvent e) {
+        System.out.println("(" +
+                (e.getX() + viewholder.x - this.getWidth()/2) + ", " +
+                (e.getY() + viewholder.y - this.getHeight()/2) + ")");
+    }
     @Override public void mousePressed(MouseEvent e) {}
     @Override public void mouseReleased(MouseEvent e) {}
     @Override public void mouseEntered(MouseEvent e) {}

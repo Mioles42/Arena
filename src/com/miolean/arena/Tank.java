@@ -27,8 +27,11 @@ import static com.miolean.arena.UByte.*;
 @SuppressWarnings("unused")
 public class Tank extends Entity {
 
+    //General constants
+    protected final int MAX_BULLET_RECHARGE = 40;
+
     //Memories
-    private static final Gene[] KMEM;
+    public static final Gene[] KMEM;
     private UByte[][] UMEM;
     private UByte[][] PMEM;
     private UByte[][] SMEM;
@@ -54,6 +57,7 @@ public class Tank extends Entity {
     static final int STAT_SPEED = 0x3; //acceleration (translates to speed due to drag)
     static final int STAT_TOUGHNESS = 0x4; //body damage
     static final int STAT_ROTATE_SPEED = 0x5;
+    static final int STAT_BULLET_SPEED = 0x5;
 
     //Type constant
     static final int TYPE_TANK = 0x0;
@@ -73,6 +77,7 @@ public class Tank extends Entity {
     int fitness = 0;
     int cogs = 0;
     private int viewDistance = 10;
+    private long lastFireTime = Global.time;
 
     //Memory:
 
@@ -152,6 +157,9 @@ public class Tank extends Entity {
         }
 
         stats[STAT_SPEED] = ub(10);
+        stats[STAT_BULLET_SPEED] = ub(10);
+        stats[STAT_ROTATE_SPEED] = ub(10);
+        stats[STAT_HASTE] = ub(10);
     }
 
     @Override
@@ -289,7 +297,13 @@ public class Tank extends Entity {
         if(y < BORDER) y = BORDER;
     }
 
-
+    public void fire() {
+        if(lastFireTime + MAX_BULLET_RECHARGE - stats[STAT_HASTE].val()/8 < Global.time) {
+            Bullet bullet = new Bullet(this);
+            handler.add(bullet);
+            lastFireTime = Global.time;
+        }
+    }
 
     public void forward(int force) {
         //Essentially, accelerate the tank in the direction it's facing.
@@ -299,8 +313,8 @@ public class Tank extends Entity {
         if(force < -stats[STAT_SPEED].val()) force = -stats[STAT_SPEED].val(); //Tanks can't move faster than a certain limit
 
         //Translate polar force into cartesian vector
-        this.accX = force * Math.cos(r) / 16; //Scaling!
-        this.accY = force * -Math.sin(r) / 16;
+        this.accX = force * Math.cos(r) / 32; //Scaling!
+        this.accY = force * -Math.sin(r) / 32;
     }
     public void rotate(int force) {
         if(force > stats[STAT_ROTATE_SPEED].val()) force = stats[STAT_ROTATE_SPEED].val(); //Tanks can't rotate faster than a certain limit

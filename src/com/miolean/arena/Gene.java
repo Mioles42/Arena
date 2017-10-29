@@ -11,6 +11,25 @@ public class Gene {
     UByte cost;
     UByte weight;
 
+    public static final String[] GENE_CATEGORIES = {
+            "Reserved",
+            "Branching",
+            "Memory",
+            "Physics",
+            "Sight",
+            "Action",
+            "Math",
+            "Recognition",
+            "Interaction",
+            "State",
+            "Stats",
+            "Space",
+            "Tracking",
+            "Expansion",
+            "Query",
+            "Generation"
+    };
+
     public Gene(String meaning, String description, UByte cost, UByte weight) {
         this.description = description;
         this.cost = cost;
@@ -27,7 +46,7 @@ public class Gene {
 
     @Override
     public String toString() {
-        return meaning + ": " + description + " [cst " + cost + ", wgt " + weight + "]";
+        return (meaning == null? "Unlisted" : meaning.getName().substring(1)) + ": " + description + "     [cost " + cost + ", weight " + weight + "]";
     }
 
     public Method getMeaning() {

@@ -12,9 +12,10 @@ public class ControlledTank extends Tank {
         this.x = origin.x;
         this.y = origin.y;
         this.stats = origin.stats;
+        health = 10;
 
-        stats[STAT_SPEED] = ub(100);
-        stats[STAT_ROTATE_SPEED] = ub(100);
+        stats[STAT_SPEED] = ub(10);
+        stats[STAT_ROTATE_SPEED] = ub(10);
     }
 
     public ControlledTank(int x, int y) {
@@ -32,5 +33,7 @@ public class ControlledTank extends Tank {
         if(KEY[KEY_A]) rotate(8);
         else if(KEY[KEY_D]) rotate(-8);
         else rotate(0);
+
+        if(KEY[KEY_SPACE]) fire();
     }
 }

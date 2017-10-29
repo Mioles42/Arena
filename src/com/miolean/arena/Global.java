@@ -19,7 +19,7 @@ public class Global {
 
     static final int BORDER = 20;
 
-    static boolean[] KEY = new boolean[8];
+    static boolean[] KEY = new boolean[9];
 
     //Key constants
     static final int KEY_Q = 0;
@@ -30,5 +30,6 @@ public class Global {
     static final int KEY_S = 5;
     static final int KEY_D = 6;
     static final int KEY_F = 7;
+    static final int KEY_SPACE = 8;
 
 }

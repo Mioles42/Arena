@@ -1,5 +1,6 @@
 
 ^0 Reserved
+    /01/ SNO    / "Significant nothing"         /0  /0  /
 
 ^1 Branching
     /10/ GOTO   / "Goto"                        /40 /1  /

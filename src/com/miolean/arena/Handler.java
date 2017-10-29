@@ -9,6 +9,8 @@ public class Handler {
 
     private Entity[] entities;
 
+    int lastUUIDUsed = 0;
+
     public Handler(Entity[] entities) {
         this.entities = entities;
     }
@@ -20,12 +22,25 @@ public class Handler {
             for(Entity j: entities) {
                 if(e.intersectsWith(j) && e != j) e.intersect(j);
             }
+            if(e.health == 0) remove(e.getUUID());
         }
     }
 
     public boolean remove(int uuid) {
         if(entities[uuid] == null) return false;
         entities[uuid] = null;
+        return true;
+    }
+
+    public boolean add(Entity e) {
+        while(entities[lastUUIDUsed] != null) {
+            lastUUIDUsed++;
+            lastUUIDUsed %= entities.length;
+        }
+        entities[lastUUIDUsed] = e;
+        e.uuidMost = lastUUIDUsed >> 8;
+        e.uuidLeast = lastUUIDUsed % 0b100000000;
+        e.handler = this;
         return true;
     }
 

@@ -3,6 +3,8 @@ package com.miolean.arena;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.MutableTreeNode;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -18,14 +20,19 @@ public class Window extends JFrame implements ChangeListener ,KeyListener {
         this.main = mainPanel;
         LayoutManager layout = new GridBagLayout();
         setLayout(layout);
+
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e) {
             e.printStackTrace();
         }
 
+        makeMainLayout();
+    }
+
+    public void makeMainLayout() {
         JPanel genomePanel = new JPanel();
-        JPanel activeSetPanel = new JPanel();
+        JPanel pmemPanel = new JPanel();
         JPanel usedSetPanel = new JPanel();
 
 
@@ -43,11 +50,11 @@ public class Window extends JFrame implements ChangeListener ,KeyListener {
         c.ipady = 5;
         c.weightx = .7;
         c.weighty = .5;
-        mainContainer.add(mainPanel, BorderLayout.CENTER);
+        mainContainer.add(main, BorderLayout.CENTER);
         mainContainer.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createEmptyBorder(10, 10, 10, 10),
                 BorderFactory.createLoweredBevelBorder()
-            ));
+        ));
         this.add(mainContainer, c);
 
         //Add the info panel:
@@ -57,6 +64,7 @@ public class Window extends JFrame implements ChangeListener ,KeyListener {
         infoPanelPanel.setLayout(new BorderLayout());
         infoPanelPanel.add(infoPanel, BorderLayout.CENTER);
         infoPanel.setBackground(new Color(0, 155, 0));
+
         c = new GridBagConstraints();
         c.fill = GridBagConstraints.BOTH;
         c.gridx = 1;
@@ -68,9 +76,18 @@ public class Window extends JFrame implements ChangeListener ,KeyListener {
         c.weightx = .4;
         c.weighty = .5;
 
-        infoPanel.addTab("Genome", genomePanel);
-        infoPanel.addTab("Active Set", activeSetPanel);
+        ImageIcon genomeIcon = new ImageIcon(Window.class.getClassLoader().getResource("tex/list.png"));
+
+        makeGenomePanel(genomePanel);
+
+        infoPanel.addTab("Program Memory", pmemPanel);
         infoPanel.addTab("Used Set", usedSetPanel);
+        infoPanel.addTab("Genome", genomeIcon, genomePanel);
+
+        JLabel genomeLabel = new JLabel("Genome", genomeIcon, JLabel.CENTER);
+        genomeLabel.setVerticalTextPosition(JLabel.BOTTOM);
+        genomeLabel.setHorizontalTextPosition(JLabel.CENTER);
+        infoPanel.setTabComponentAt(2, genomeLabel);
 
         infoPanelPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         this.add(infoPanelPanel, c);
@@ -78,7 +95,6 @@ public class Window extends JFrame implements ChangeListener ,KeyListener {
         //Add the control panel:
         JPanel controlPanel = new JPanel();
         JPanel controlPanelPanel = new JPanel();
-        controlPanel.setBackground(new Color(100, 150, 250));
 
         c = new GridBagConstraints();
         c.fill = GridBagConstraints.BOTH;
@@ -92,7 +108,10 @@ public class Window extends JFrame implements ChangeListener ,KeyListener {
         c.weighty = .3;
         controlPanelPanel.setLayout(new BorderLayout());
         controlPanelPanel.add(controlPanel, BorderLayout.CENTER);
-        controlPanelPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        controlPanelPanel.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createEmptyBorder(10, 10, 10, 10),
+                BorderFactory.createEtchedBorder()
+        ));
         this.add(controlPanelPanel, c);
 
         slider = new JSlider();
@@ -106,7 +125,57 @@ public class Window extends JFrame implements ChangeListener ,KeyListener {
         c.fill = GridBagConstraints.HORIZONTAL;
         controlPanel.add(slider, c);
 
+
+
+
     }
+
+    public void makeGenomePanel(JPanel genomePanel) {
+
+        genomePanel.setLayout(new GridBagLayout());
+
+        int category = -1;
+
+        DefaultMutableTreeNode root = new DefaultMutableTreeNode("");
+        DefaultMutableTreeNode branch = null;
+        DefaultMutableTreeNode twig;
+
+
+        for(int i = 0; i < Tank.KMEM.length; i++) {
+            if(i/16 > category) {
+                if(branch != null) root.add(branch);
+                category = i/16;
+                branch = new DefaultMutableTreeNode(Integer.toHexString(category).toUpperCase() + "  " + Gene.GENE_CATEGORIES[category]);
+                //Add a new section!
+            }
+            if(Tank.KMEM[i] != null) {
+                 twig = new DefaultMutableTreeNode(Integer.toHexString(i).toUpperCase() + "|  " + Tank.KMEM[i]);
+                 branch.add(twig);
+            }
+        }
+
+        root.add(branch);
+
+        GridBagConstraints c = new GridBagConstraints();
+        c.fill = GridBagConstraints.BOTH;
+        c.gridx = 0;
+        c.gridy = 0;
+        c.gridheight = 1;
+        c.gridwidth = 1;
+        c.ipadx = 5;
+        c.ipady = 5;
+        c.weightx = .1;
+        c.weighty = .1;
+
+        JTree tree = new JTree(root);
+        tree.setEditable(false);
+        tree.setFocusable(false);
+        JScrollPane scrollPane = new JScrollPane(tree);
+        genomePanel.add(scrollPane, c);
+
+
+    }
+
 
     @Override
     public void stateChanged(ChangeEvent e) {
