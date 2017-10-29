@@ -57,7 +57,8 @@ public class Tank extends Entity {
     static final int STAT_SPEED = 0x3; //acceleration (translates to speed due to drag)
     static final int STAT_TOUGHNESS = 0x4; //body damage
     static final int STAT_ROTATE_SPEED = 0x5;
-    static final int STAT_BULLET_SPEED = 0x5;
+    static final int STAT_BULLET_SPEED = 0x6;
+    static final int STAT_MAX_HEALTH = 0x7;
 
     //Type constant
     static final int TYPE_TANK = 0x0;
@@ -156,15 +157,16 @@ public class Tank extends Entity {
             if(next.substring(0,1).equals("%")) UMEM[loadedU][Integer.parseInt(next.substring(1), 16)] = ub(Integer.parseInt(value, 16));
         }
 
+        //4: Do default stats.
         stats[STAT_SPEED] = ub(10);
         stats[STAT_BULLET_SPEED] = ub(10);
         stats[STAT_ROTATE_SPEED] = ub(10);
         stats[STAT_HASTE] = ub(10);
+        stats[STAT_MAX_HEALTH] = ub(11);
     }
 
     @Override
     void render(Graphics g) {
-        g.setColor(new Color(100, 100, 90));
 
         //Body! (This part's easy)
         //(There's actually no calculation necessary for this.)
@@ -221,7 +223,8 @@ public class Tank extends Entity {
         g.setColor(Color.GRAY);
         g.fillPolygon(gunXPoints, gunYPoints, 3); //Barrel
 
-        g.setColor(Color.LIGHT_GRAY);
+        double healthColor = (((double) health) / stats[STAT_MAX_HEALTH].val());
+        g.setColor(new Color((int) (healthColor * 100 + 100), (int) (healthColor * 100 + 100), (int) (healthColor * 100 + 100)));
         g.fillOval((int) x - width/2, (int) y - height/2, width, height); //Body
 
         g.setColor(Color.GRAY);
@@ -234,8 +237,12 @@ public class Tank extends Entity {
     void update() {
         applyPhysics();
 
+
         //Run the loaded P memory!
         runGenes(PMEM[loadedP]);
+
+        //Make sure health is valid
+        if(health > stats[STAT_MAX_HEALTH].val()) health = stats[STAT_MAX_HEALTH].val();
     }
 
     void runGenes(UByte[] genes) {
@@ -298,7 +305,7 @@ public class Tank extends Entity {
     }
 
     public void fire() {
-        if(lastFireTime + MAX_BULLET_RECHARGE - stats[STAT_HASTE].val()/8 < Global.time) {
+        if(lastFireTime + MAX_BULLET_RECHARGE - stats[STAT_HASTE].val() < Global.time) {
             Bullet bullet = new Bullet(this);
             handler.add(bullet);
             lastFireTime = Global.time;
@@ -313,8 +320,8 @@ public class Tank extends Entity {
         if(force < -stats[STAT_SPEED].val()) force = -stats[STAT_SPEED].val(); //Tanks can't move faster than a certain limit
 
         //Translate polar force into cartesian vector
-        this.accX = force * Math.cos(r) / 32; //Scaling!
-        this.accY = force * -Math.sin(r) / 32;
+        this.accX = force * Math.cos(r) / 6; //Scaling!
+        this.accY = force * -Math.sin(r) / 6;
     }
     public void rotate(int force) {
         if(force > stats[STAT_ROTATE_SPEED].val()) force = stats[STAT_ROTATE_SPEED].val(); //Tanks can't rotate faster than a certain limit
@@ -346,6 +353,7 @@ public class Tank extends Entity {
      * All arguments are intended to be within the range [0, 255].
      */
     // 0 (DEV ONLY)
+    public void _SNO (int regin, int arg1, int arg2) {/* Significant nothing */}
 
     // 1
     public void _GOTO (int regin, int arg1, int arg2) {index = WMEM[arg1].val();}

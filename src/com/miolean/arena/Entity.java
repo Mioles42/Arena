@@ -31,7 +31,7 @@ abstract class Entity {
     int height;
 
     //Entities can also be destroyed:
-    int health;
+    int health = 1;
 
     //Other things:
     protected Handler handler; //The Handler which manages this Entity and which can be asked to destroy it.
@@ -39,6 +39,7 @@ abstract class Entity {
     protected int uuidLeast;
 
     void applyPhysics() {
+        System.out.println("At (" + x + ", " + y + ")");
         r %= 6.28;
 
         velX -= drag * velX;

@@ -12,10 +12,16 @@ public class ControlledTank extends Tank {
         this.x = origin.x;
         this.y = origin.y;
         this.stats = origin.stats;
-        health = 10;
+        health = 100;
 
-        stats[STAT_SPEED] = ub(10);
-        stats[STAT_ROTATE_SPEED] = ub(10);
+
+        //Do better default stats.
+        stats[STAT_SPEED] = ub(100);
+        stats[STAT_BULLET_SPEED] = ub(100);
+        stats[STAT_ROTATE_SPEED] = ub(100);
+        stats[STAT_HASTE] = ub(100);
+        stats[STAT_DAMAGE] = ub(1);
+        stats[STAT_MAX_HEALTH] = ub(100);
     }
 
     public ControlledTank(int x, int y) {

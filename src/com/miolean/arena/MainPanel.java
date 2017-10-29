@@ -28,6 +28,11 @@ public class MainPanel extends JPanel implements Runnable, KeyListener, MouseLis
         handler.add(new ControlledTank(new Tank("player")));
         viewholder = entities[0];
 
+        Entity dummy = new Tank("adam");
+        dummy.health = 10;
+
+        handler.add(dummy);
+
         window = new Window(this);
 
 
@@ -73,7 +78,8 @@ public class MainPanel extends JPanel implements Runnable, KeyListener, MouseLis
     public void render(Graphics g) {
         g.setColor(Color.BLACK);
         g.drawString(Global.tickSpeed + "tk/s", 15, 25);
-        g.drawString("t:" + Global.time + "tks", 15, 45);
+        g.drawString("Time:" + Global.time + "tks", 15, 45);
+        g.drawString("Entities:" + handler.numEntities, 15, 65);
         g.drawOval(this.getWidth()/2, this.getHeight()/2, 2, 2);
 
         g.translate((int) (-viewholder.x + this.getWidth()/2), (int) (-viewholder.y + this.getHeight()/2));

@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 public class Handler {
 
     private Entity[] entities;
+    int numEntities;
 
     int lastUUIDUsed = 0;
 
@@ -22,13 +23,14 @@ public class Handler {
             for(Entity j: entities) {
                 if(e.intersectsWith(j) && e != j) e.intersect(j);
             }
-            if(e.health == 0) remove(e.getUUID());
+            if(e.health <= 0) remove(e.getUUID());
         }
     }
 
     public boolean remove(int uuid) {
         if(entities[uuid] == null) return false;
         entities[uuid] = null;
+        numEntities--;
         return true;
     }
 
@@ -41,6 +43,7 @@ public class Handler {
         e.uuidMost = lastUUIDUsed >> 8;
         e.uuidLeast = lastUUIDUsed % 0b100000000;
         e.handler = this;
+        numEntities++;
         return true;
     }
 
