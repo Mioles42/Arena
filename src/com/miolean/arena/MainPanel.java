@@ -8,6 +8,7 @@ public class MainPanel extends JPanel implements Runnable, KeyListener, MouseLis
 
     private Renderer renderer;
     private Handler handler;
+    private Distributer distributer;
     private JFrame window;
 
     private Entity[] entities;
@@ -24,6 +25,7 @@ public class MainPanel extends JPanel implements Runnable, KeyListener, MouseLis
 
         renderer = new Renderer(entities);
         handler = new Handler(entities);
+        distributer = new Distributer(handler);
 
         handler.add(new ControlledTank(new Tank("player")));
         viewholder = entities[0];
@@ -67,6 +69,7 @@ public class MainPanel extends JPanel implements Runnable, KeyListener, MouseLis
             tickTime = 1000 * (1.0 / (double) Global.tickSpeed);
             long time = System.currentTimeMillis();
             handler.update();
+            distributer.distribute();
             Global.time++;
 
             while(System.currentTimeMillis() < time + tickTime) {
