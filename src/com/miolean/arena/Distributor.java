@@ -1,10 +1,10 @@
 package com.miolean.arena;
 
-public class Distributer {
+public class Distributor {
 
     private Handler handler;
 
-    public Distributer(Handler handler) {
+    public Distributor(Handler handler) {
         this.handler = handler;
     }
 

@@ -79,8 +79,8 @@ public class Tank extends Entity {
     int cogs = 0;
     private int viewDistance = 10;
     private long lastFireTime = Global.time;
+    private String name = "";
 
-    //Memory:
 
 
     static {
@@ -123,6 +123,7 @@ public class Tank extends Entity {
         r = 0;
         width = 40;
         height = 40;
+        name = file;
 
         //1: Initialize memories.
         UMEM = new UByte[256][];
@@ -162,6 +163,7 @@ public class Tank extends Entity {
         stats[STAT_ROTATE_SPEED] = ub(10);
         stats[STAT_HASTE] = ub(10);
         stats[STAT_MAX_HEALTH] = ub(11);
+        health = 11;
     }
 
     @Override
@@ -230,6 +232,9 @@ public class Tank extends Entity {
         g.fillOval((int) x - width/8, (int) y - height/8, width/4, height/4); //Beacon
         g.setColor(new Color(flashR, flashG, flashB));
         g.fillOval((int) x - width/10, (int) y - height/10, width/5, height/5); //Beacon
+
+        g.setColor(Color.black);
+        g.drawString(name, (int) x - width, (int) y - height);
     }
 
     @Override
