@@ -112,7 +112,6 @@ public class Tank extends Entity {
     Tank() {
         width = 40;
         height = 40;
-
     }
 
     //Create a Tank from a file
@@ -147,11 +146,11 @@ public class Tank extends Entity {
             next = in.next().trim();
             value = in.next().trim();
             if(next.substring(0,1).equals("~")){
-                if(next.substring(1).equals("$")) loadedS = Integer.parseInt(value.substring(0,2));
-                if(next.substring(1).equals("@")) loadedP = Integer.parseInt(value.substring(0,2));
-                if(next.substring(1).equals("%")) loadedU = Integer.parseInt(value.substring(0,2));
+                if(next.substring(1).equals("$")) loadedS = Integer.parseInt(value.substring(0,2), 16);
+                if(next.substring(1).equals("@")) loadedP = Integer.parseInt(value.substring(0,2), 16);
+                if(next.substring(1).equals("%")) loadedU = Integer.parseInt(value.substring(0,2), 16);
             }
-            if(next.substring(0,1).equals("&")) WMEM[Integer.parseInt(next.substring(1))] = ub(Integer.parseInt(value));
+            if(next.substring(0,1).equals("&")) WMEM[Integer.parseInt(next.substring(1), 16)] = ub(Integer.parseInt(value, 16));
             if(next.substring(0,1).equals("$")) SMEM[loadedS][Integer.parseInt(next.substring(1), 16)] = ub(Integer.parseInt(value, 16));
             if(next.substring(0,1).equals("@")) PMEM[loadedP][Integer.parseInt(next.substring(1), 16)] = ub(Integer.parseInt(value, 16));
             if(next.substring(0,1).equals("%")) UMEM[loadedU][Integer.parseInt(next.substring(1), 16)] = ub(Integer.parseInt(value, 16));
@@ -237,6 +236,7 @@ public class Tank extends Entity {
     void update() {
         applyPhysics();
 
+        System.out.printf("%d R, %d G, %d B\n", flashR, flashG, flashB);
 
         //Run the loaded P memory!
         runGenes(PMEM[loadedP]);

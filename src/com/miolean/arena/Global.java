@@ -15,7 +15,7 @@ public class Global {
     static int tickSpeed = 20;
 
     //1 pixel= 1 tank-meter
-    static final int ARENA_SIZE = 43640;
+    static final int ARENA_SIZE = 1024;
 
     static final int BORDER = 20;
 

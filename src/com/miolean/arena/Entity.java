@@ -39,7 +39,6 @@ abstract class Entity {
     protected int uuidLeast;
 
     void applyPhysics() {
-        System.out.println("At (" + x + ", " + y + ")");
         r %= 6.28;
 
         velX -= drag * velX;

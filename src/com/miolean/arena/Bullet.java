@@ -30,14 +30,14 @@ public class Bullet extends Entity {
 
     @Override
     void render(Graphics g) {
-
+        g.setColor(new Color(200, 150, 0));
         g.fillOval((int) x - width/2, (int) y - height/2, width, height);
     }
 
     @Override
     void update() {
         applyPhysics();
-        if(velX < 1 && velY < 1) health = 0;
+        if(Math.abs(velX) < 1 && Math.abs(velY) < 1) health = 0;
         if((x > ARENA_SIZE - BORDER) || (x < BORDER) || (y > ARENA_SIZE - BORDER) || (y < BORDER)) health = 0;
     }
 
