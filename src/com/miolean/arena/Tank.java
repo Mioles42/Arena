@@ -59,6 +59,7 @@ public class Tank extends Entity {
     static final int STAT_ROTATE_SPEED = 0x5;
     static final int STAT_BULLET_SPEED = 0x6;
     static final int STAT_MAX_HEALTH = 0x7;
+    static final int STAT_BULLET_SPREAD = 0x8;
 
     //Type constant
     static final int TYPE_TANK = 0x0;
@@ -67,7 +68,7 @@ public class Tank extends Entity {
     static final int TYPE_WALL = 0x12;
 
 
-    protected UByte[] stats = new UByte[8];
+    protected UByte[] stats = new UByte[9];
 
     //Flash color:
     private int flashR = 0x00;
@@ -169,6 +170,9 @@ public class Tank extends Entity {
     @Override
     void render(Graphics g) {
 
+        g.setColor(Color.black);
+        g.drawOval((int) (x - width/2), (int) (y - height/2), width, height);
+
         //Body! (This part's easy)
         //(There's actually no calculation necessary for this.)
 
@@ -241,7 +245,6 @@ public class Tank extends Entity {
     void update() {
         applyPhysics();
 
-        System.out.printf("%d R, %d G, %d B\n", flashR, flashG, flashB);
 
         //Run the loaded P memory!
         runGenes(PMEM[loadedP]);
@@ -288,12 +291,13 @@ public class Tank extends Entity {
     boolean intersectsWith(Entity e) {
         if(e == null) return false;
         double distanceSquared = (x - e.x)*(x - e.x)+(y - e.y)*(y - e.y);
-        return distanceSquared <= (width/2 - e.width/2)*(width/2 - e.width/2);
+        double minDistance = (width/2.0 + e.width/2.0);
+
+        return distanceSquared <= minDistance;
     }
 
     @Override
     void intersect(Entity e) {
-
     }
 
     @Override

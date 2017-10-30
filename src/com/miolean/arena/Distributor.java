@@ -9,13 +9,12 @@ public class Distributor {
     }
 
     public void distribute() {
-        if(Math.random() < 0.01) {
-            //Poor Adam
-            Tank adam = new Tank("adam");
-            adam.x = Math.random() * Global.ARENA_SIZE;
-            adam.y = Math.random() * Global.ARENA_SIZE;
-            adam.r = Math.random() * Global.ARENA_SIZE;
-            handler.add(adam);
+        if(Math.random() < 0.05) {
+            Cog cog = new Cog(1 + (int) (5 * Math.random()));
+            cog.x = Math.random() * Global.ARENA_SIZE;
+            cog.y = Math.random() * Global.ARENA_SIZE;
+            cog.r = Math.random() * Global.ARENA_SIZE;
+            handler.add(cog);
         }
     }
 }

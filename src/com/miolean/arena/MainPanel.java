@@ -31,7 +31,7 @@ public class MainPanel extends JPanel implements Runnable, KeyListener, MouseLis
         viewholder = entities[0];
 
         Entity dummy = new Tank("adam");
-        dummy.health = 10;
+        dummy.health = 256;
 
         handler.add(dummy);
 
