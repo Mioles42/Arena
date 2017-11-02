@@ -8,7 +8,6 @@ import java.awt.*;
  * Entities can update themselves every tick and render themselves.
  * They can also interact with Entities with which they intersect.
  */
-
 @SuppressWarnings("unused")
 abstract class Entity {
 
@@ -34,9 +33,9 @@ abstract class Entity {
     int health = 1;
 
     //Other things:
-    protected Handler handler; //The Handler which manages this Entity and which can be asked to destroy it.
-    protected int uuidMost; //A Universally Unique ID for use by other Entities (namely Tanks) to reference it. Can totally be negative.
-    protected int uuidLeast;
+    Handler handler; //The Handler which manages this Entity and which can be asked to destroy it.
+    int uuidMost; //A Universally Unique ID for use by other Entities (namely Tanks) to reference it. Can totally be negative.
+    int uuidLeast;
 
     void applyPhysics() {
         r %= 6.28;
@@ -59,12 +58,8 @@ abstract class Entity {
     abstract void update();
     abstract boolean intersectsWith(Entity e);
     abstract void intersect(Entity e);
-
-    void initialize(Handler handler, byte uuidLeast, byte uuidMost) {
-        this.handler = handler;
-        this.uuidLeast = uuidLeast;
-        this.uuidMost = uuidMost;
-    }
+    //abstract void onCreate();
+    //abstract void onDestroy();
 
     short getUUID() {
         short uuid = (short) (((short) uuidMost) << 8);

@@ -163,7 +163,7 @@ public class Tank extends Entity {
         stats[STAT_BULLET_SPEED] = ub(10);
         stats[STAT_ROTATE_SPEED] = ub(10);
         stats[STAT_HASTE] = ub(10);
-        stats[STAT_MAX_HEALTH] = ub(11);
+        stats[STAT_MAX_HEALTH] = ub(255);
         health = 11;
     }
 
@@ -228,8 +228,9 @@ public class Tank extends Entity {
         g.setColor(Color.GRAY);
         g.fillPolygon(gunXPoints, gunYPoints, 3); //Barrel
 
-        double healthColor = (((double) health) / stats[STAT_MAX_HEALTH].val());
-        g.setColor(new Color((int) (healthColor * 100 + 100), (int) (healthColor * 100 + 100), (int) (healthColor * 100 + 100)));
+        double healthPercent = (((double) health) / stats[STAT_MAX_HEALTH].val());
+        if(healthPercent < 0) healthPercent = 0;
+        g.setColor(new Color((int) (healthPercent * 100 + 100), (int) (healthPercent * 100 + 100), (int) (healthPercent * 100 + 100)));
         g.fillOval((int) x - width/2, (int) y - height/2, width, height); //Body
 
         g.setColor(Color.GRAY);

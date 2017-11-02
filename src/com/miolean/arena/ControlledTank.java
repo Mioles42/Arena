@@ -17,12 +17,12 @@ public class ControlledTank extends Tank {
 
         //Do better default stats.
         stats[STAT_SPEED] = ub(100);
-        stats[STAT_BULLET_SPEED] = ub(10);
+        stats[STAT_BULLET_SPEED] = ub(50);
         stats[STAT_ROTATE_SPEED] = ub(100);
-        stats[STAT_HASTE] = ub(10);
-        stats[STAT_DAMAGE] = ub(20);
+        stats[STAT_HASTE] = ub(100);
+        stats[STAT_DAMAGE] = ub(30);
         stats[STAT_MAX_HEALTH] = ub(100);
-        stats[STAT_BULLET_SPREAD] = ub(1);
+        stats[STAT_BULLET_SPREAD] = ub(100);
     }
 
     public ControlledTank(int x, int y) {
@@ -42,5 +42,6 @@ public class ControlledTank extends Tank {
         else rotate(0);
 
         if(KEY[KEY_SPACE]) fire();
+        if(KEY[KEY_F]) health--;
     }
 }
