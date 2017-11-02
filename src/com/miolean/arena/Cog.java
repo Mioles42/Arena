@@ -4,11 +4,11 @@ import java.awt.*;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Rectangle2D;
 
-public class Cog extends Entity {
+class Cog extends Entity {
 
-    int value;
+    private int value;
 
-    public Cog(int value) {
+    Cog(int value) {
         this.value = value;
         width = 5 + value*2;
         height = 5 + value*2;

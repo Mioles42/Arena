@@ -4,7 +4,7 @@ import java.awt.*;
 
 public class TrackerDot extends Entity {
 
-    int persistence;
+    private int persistence;
 
     public TrackerDot(double x, double y, int persistence) {
         health = 42424242;

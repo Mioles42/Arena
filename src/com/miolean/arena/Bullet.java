@@ -2,16 +2,15 @@ package com.miolean.arena;
 
 import java.awt.*;
 import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
 
 import static com.miolean.arena.Global.ARENA_SIZE;
 import static com.miolean.arena.Global.BORDER;
 
-public class Bullet extends Entity {
+class Bullet extends Entity {
 
-    Tank source;
+    private Tank source;
 
-    public Bullet(Tank source) {
+    Bullet(Tank source) {
         this.source = source;
 
         x = source.x;
@@ -20,7 +19,6 @@ public class Bullet extends Entity {
         velX = (15 + source.stats[Tank.STAT_BULLET_SPEED].val()) * Math.cos(r + source.stats[Tank.STAT_BULLET_SPREAD].val()/256*(Math.random() - .5));
         velY = (15 + source.stats[Tank.STAT_BULLET_SPEED].val()) * -Math.sin(r + source.stats[Tank.STAT_BULLET_SPREAD].val()/256*(Math.random() - .5));
         velR = 0;
-        accX = 0;
         accX = 0;
         accY = 0;
         accR = 0;

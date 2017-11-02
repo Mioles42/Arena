@@ -22,8 +22,8 @@ abstract class Entity {
     double accY; //Y acceleration, in pixels per tick per tick.
     double accR; //Rotational acceleration, in degrees per tick per tick.
 
-    static double drag = 0.1; //The amount that an Entity naturally slows down each tick, per unit of velocity.
-    static double rdrag = 0.5;
+    private final static double DRAG = 0.1; //The amount that an Entity naturally slows down each tick, per unit of velocity.
+    private final static double RDRAG = 0.5;
 
     //Size components:
     int width;
@@ -40,9 +40,9 @@ abstract class Entity {
     void applyPhysics() {
         r %= 6.28;
 
-        velX -= drag * velX;
-        velY -= drag * velY;
-        velR -= rdrag * velR;
+        velX -= DRAG * velX;
+        velY -= DRAG * velY;
+        velR -= RDRAG * velR;
 
         velX += accX;
         velY += accY;

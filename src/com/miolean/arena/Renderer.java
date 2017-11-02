@@ -6,15 +6,15 @@ import static com.miolean.arena.Global.*;
 /**
  * Created by commandm on 2/16/17.
  */
-public class Renderer {
+class Renderer {
 
     private Entity[] entities;
 
-    public Renderer(Entity[] entities) {
+    Renderer(Entity[] entities) {
         this.entities = entities;
     }
 
-    public void render(Graphics g) {
+    void render(Graphics g) {
 
         g.setColor(Color.GRAY);
         for(int i = 0; i < ARENA_SIZE / 64; i++) {

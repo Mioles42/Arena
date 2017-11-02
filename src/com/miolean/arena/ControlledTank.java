@@ -4,16 +4,10 @@ import static com.miolean.arena.UByte.ub;
 
 public class ControlledTank extends Tank {
 
-    //If this ControlledTank is possessing another...
-    Tank origin;
-
-    public ControlledTank(Tank origin) {
-        this.origin = origin;
-        this.x = origin.x;
-        this.y = origin.y;
-        this.stats = origin.stats;
+    public ControlledTank(int x, int y) {
+        this.x = x;
+        this.y = y;
         health = 100;
-
 
         //Do better default stats.
         stats[STAT_SPEED] = ub(100);
@@ -23,11 +17,6 @@ public class ControlledTank extends Tank {
         stats[STAT_DAMAGE] = ub(30);
         stats[STAT_MAX_HEALTH] = ub(100);
         stats[STAT_BULLET_SPREAD] = ub(100);
-    }
-
-    public ControlledTank(int x, int y) {
-        this.x = x;
-        this.y = y;
     }
 
     @Override

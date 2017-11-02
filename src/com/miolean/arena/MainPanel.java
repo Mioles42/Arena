@@ -9,25 +9,25 @@ public class MainPanel extends JPanel implements Runnable, KeyListener, MouseLis
     private Renderer renderer;
     private Handler handler;
     private Distributor distributor;
-    private JFrame window;
 
-    private Entity[] entities;
     private Entity viewholder;
+
+    private boolean isRunning = true;
 
     public static void main(String[] args) {
         Thread gameThread = new Thread(new MainPanel());
         gameThread.run();
     }
 
-    public MainPanel() {
+    private MainPanel() {
 
-        entities = new Entity[0xFFFF];
+        Entity[] entities = new Entity[0xFFFF];
 
         renderer = new Renderer(entities);
         handler = new Handler(entities);
         distributor = new Distributor(handler);
 
-        handler.add(new ControlledTank(new Tank("player")));
+        handler.add(new ControlledTank(300, 300));
         viewholder = entities[0];
 
         Entity dummy = new Tank("adam");
@@ -35,7 +35,7 @@ public class MainPanel extends JPanel implements Runnable, KeyListener, MouseLis
 
         handler.add(dummy);
 
-        window = new Window(this);
+        JFrame window = new Window(this);
 
 
         this.setBackground(new Color(170, 170, 160));
@@ -65,7 +65,7 @@ public class MainPanel extends JPanel implements Runnable, KeyListener, MouseLis
         double tickTime = 1000 * (1.0 / (double) Global.tickSpeed);
         System.out.println("[com.miolean.arena.MainPanel.run()] Found " + tickTime + " milliseconds per tick");
 
-        while(true) {
+        while(isRunning) {
             tickTime = 1000 * (1.0 / (double) Global.tickSpeed);
             long time = System.currentTimeMillis();
             handler.update();
@@ -78,7 +78,7 @@ public class MainPanel extends JPanel implements Runnable, KeyListener, MouseLis
         }
     }
 
-    public void render(Graphics g) {
+    private void render(Graphics g) {
         g.setColor(Color.BLACK);
         g.drawString(Global.tickSpeed + "tk/s", 15, 25);
         g.drawString("Time:" + Global.time + "tks", 15, 45);
@@ -131,7 +131,7 @@ public class MainPanel extends JPanel implements Runnable, KeyListener, MouseLis
     @Override public void mouseMoved(MouseEvent e) {}
     @Override public void windowOpened(WindowEvent e) {}
     @Override public void windowClosing(WindowEvent e) {
-        System.out.println("com.miolean.arena.Window closing...");
+        isRunning = false;
         System.exit(0);
     }
     @Override public void windowClosed(WindowEvent e) {}

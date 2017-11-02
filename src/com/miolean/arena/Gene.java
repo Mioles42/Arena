@@ -6,12 +6,12 @@ import java.lang.reflect.Method;
 
 public class Gene {
 
-    Method meaning;
-    String description;
-    UByte cost;
-    UByte weight;
+    private Method meaning;
+    private String description;
+    private UByte cost;
+    private UByte weight;
 
-    public static final String[] GENE_CATEGORIES = {
+    static final String[] GENE_CATEGORIES = {
             "Reserved",
             "Branching",
             "Memory",
@@ -30,14 +30,13 @@ public class Gene {
             "Generation"
     };
 
-    public Gene(String meaning, String description, UByte cost, UByte weight) {
+    Gene(String meaning, String description, UByte cost, UByte weight) {
         this.description = description;
         this.cost = cost;
         this.weight = weight;
 
         try {
-            Method method = Tank.class.getMethod("_" + meaning, int.class, int.class, int.class);
-            this.meaning = method;
+            this.meaning = Tank.class.getMethod("_" + meaning, int.class, int.class, int.class);
         } catch (NoSuchMethodException e) {
             System.out.println("Failed to find method " + meaning);
         }
@@ -49,7 +48,7 @@ public class Gene {
         return (meaning == null? "Unlisted" : meaning.getName().substring(1)) + ": " + description + "     [cost " + cost + ", weight " + weight + "]";
     }
 
-    public Method getMeaning() {
+    Method getMeaning() {
         return meaning;
     }
 }

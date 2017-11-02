@@ -6,7 +6,7 @@ package com.miolean.arena;
  */
 
 
-public class Global {
+class Global {
 
     //Number of ticks in-simulation
     static int time;

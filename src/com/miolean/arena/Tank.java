@@ -1,13 +1,12 @@
 package com.miolean.arena;
 
-import java.awt.Color;
-import java.awt.Graphics;
+import java.awt.*;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.Scanner;
 
-import static com.miolean.arena.Global.*;
-import static com.miolean.arena.UByte.*;
+import static com.miolean.arena.Global.ARENA_SIZE;
+import static com.miolean.arena.Global.BORDER;
+import static com.miolean.arena.UByte.ub;
 
 /**
  * Created by commandm on 5/13/17.
@@ -28,10 +27,10 @@ import static com.miolean.arena.UByte.*;
 public class Tank extends Entity {
 
     //General constants
-    protected final int MAX_BULLET_RECHARGE = 40;
+    private final int MAX_BULLET_RECHARGE = 40;
 
     //Memories
-    public static final Gene[] KMEM;
+    static final Gene[] KMEM;
     private UByte[][] UMEM;
     private UByte[][] PMEM;
     private UByte[][] SMEM;
@@ -270,7 +269,7 @@ public class Tank extends Entity {
         }
     }
     //Instantiate memory number [number] as a UByte[256].
-    void createMemory(UByte[][] memory, UByte number) {
+    private void createMemory(UByte[][] memory, UByte number) {
         memory[number.val()] = new UByte[256];
         for(int i = 0; i < 256; i++) {
             memory[number.val()][i] = ub(0);
