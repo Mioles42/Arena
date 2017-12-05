@@ -1,13 +1,15 @@
 
 ^0 Reserved
+    /01/ SNO    / "Significant nothing"         /0  /0  /
+    /02/ PRINT  / "Debug - print args"          /0  /0  /
 
 ^1 Branching
     /10/ GOTO   / "Goto"                        /40 /1  /
     /11/ GOE    / "Goto if equal"               /40 /1  /
     /12/ GOG    / "Goto if greater"             /40 /1  /
-    /13/ ZGOTO  / "Goto immed"                  /50 /1  /
-    /14/ ZGOE   / "Goto immed if equal"         /50 /1  /
-    /15/ ZGOG   / "Goto immed if greater"       /50 /1  /
+    /13/ IGOTO  / "Goto immed"                  /50 /1  /
+    /14/ IGOE   / "Goto immed if equal"         /50 /1  /
+    /15/ IGOG   / "Goto immed if greater"       /50 /1  /
     /16/ COMP   / "Compare"                     /70 /0  /
 ^2 Memory
     /20/ MOV    / "Move into REG"               /150/0  /
@@ -17,10 +19,10 @@
     /24/ SGET   / "Get from SMEM"               /150/0  /
     /25/ PGET   / "Get from PMEM"               /50 /0  /
     /26/ UGET   / "Get from UMEM"               /20 /0  /
-    /27/ ZMOV   / "Move immed into REG"         /200/0  /
-    /28/ ZSSTO  / "Move immed into SMEM"        /100/0  /
-    /29/ ZPSTO  / "Move immed into PMEM"        /50 /8  /
-    /2A/ ZUSTO  / "Move immed into UMEM"        /20 /32 /
+    /27/ IMOV   / "Move immed into REG"         /200/0  /
+    /28/ ISSTO  / "Move immed into SMEM"        /100/0  /
+    /29/ IPSTO  / "Move immed into PMEM"        /50 /8  /
+    /2A/ IUSTO  / "Move immed into UMEM"        /20 /32 /
     /2B/ WCLR   / "W range clear"               /20 /0  /
     /2C/ SCLR   / "S range clear"               /10 /0  /
     /2D/ PCLR   / "P range clear"               /6  /0  /
@@ -58,13 +60,10 @@
     /70/ OTYPE  / "Type of other"               /30 /0  /
     /71/ OHP    / "Health of other"             /30 /0  /
     /72/ OCOG   / "Cogs of other"               /30 /0  /
-    /73/ OSTAT  / "Stat of other"               /30 /0  /
 ^8 Interaction
     /80/ WALL   / "Place wall"                  /40 /4  /
     /81/ SPIT   / "Spit out cogs"               /20 /4  /
-    /82/ LEDR   / "Set beacon R"                /30 /0  /
-    /83/ LEDG   / "Set beacon G"                /30 /0  /
-    /84/ LEDB   / "Set beacon B"                /30 /0  /
+    /82/ LED    / "Set beacon"                  /30 /0  /
     /85/ OLEDR  / "Get beacon R"                /30 /0  /
     /86/ OLEDG  / "Get beacon G"                /30 /0  /
     /87/ OLEDB  / "Get beacon B"                /30 /0  /
@@ -77,11 +76,10 @@
 ^A Stats
     /A0/ UPG    / "Upgrade"                     /70 /4  /
     /A1/ STAT   / "Value of stat"               /20 /0  /
+    /A2/ KWGT   / "K weight (0 if invalid)"     /5  /0  /
+    /A3/ COST   / "Cost"                        /40 /0  /
 ^B Space
-    /B0/ WFULL  / "W filled"                    /5  /0  /
-    /B1/ SFULL  / "S filled"                    /5  /0  /
-    /B2/ PFULL  / "P filled"                    /5  /0  /
-    /B3/ UFULL  / "U filled"                    /5  /0  /
+
 ^C Tracking
     /C0/ OPOSX  / "Other X Position             /20 /0  /
     /C1/ OVELX  / "Other X Velocity"            /20 /0  /
@@ -108,9 +106,11 @@
     /DC/ SSWAP  / "Change S memory"             /10 /1  /
     /DD/ PSWAP  / "Change U memory"             /1  /4  /
     /DE/ USWAP  / "Change P memory"             /10 /2  /
-^E Query
-    /E0/ KWGT   / "K weight (0 if invalid)"     /5  /0  /
-    /E1/ COST   /"Cost"                         /40 /0  /
+^E Crossing
+    /E0/ TARG   / "Set copy target"             /15 /0  /
+    /E1/ SCOPY  / "Copy S memory from other"    /10 /0  /
+    /E2/ PCOPY  / "Copy P memory from other"    /30 /0  /
+    /E3/ UCOPY  / "Copy U memory from other"    /1  /0  /
 ^F Generation {
     /F0/ REP    / "Reproduce"                   /42 /42 /
     /F1/ TWK    / "Tweak K weight"              /42 /16 /

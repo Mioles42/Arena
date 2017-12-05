@@ -6,7 +6,7 @@ package com.miolean.arena;
  */
 
 
-public class Global {
+class Global {
 
     //Number of ticks in-simulation
     static int time;
@@ -15,7 +15,21 @@ public class Global {
     static int tickSpeed = 20;
 
     //1 pixel= 1 tank-meter
-    static final int ARENA_SIZE = 43640;
+    static final int ARENA_SIZE = 1024;
 
     static final int BORDER = 20;
+
+    static boolean[] KEY = new boolean[9];
+
+    //Key constants
+    static final int KEY_Q = 0;
+    static final int KEY_W = 1;
+    static final int KEY_E = 2;
+    static final int KEY_R = 3;
+    static final int KEY_A = 4;
+    static final int KEY_S = 5;
+    static final int KEY_D = 6;
+    static final int KEY_F = 7;
+    static final int KEY_SPACE = 8;
+
 }

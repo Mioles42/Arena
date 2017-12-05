@@ -6,33 +6,49 @@ import java.lang.reflect.Method;
 
 public class Gene {
 
-    Method meaning;
-    String description;
+    private Method meaning;
+    private String description;
     UByte cost;
     UByte weight;
 
-    public Gene(String meaning, String description, UByte cost, UByte weight) {
+    static final String[] GENE_CATEGORIES = {
+            "Reserved",
+            "Branching",
+            "Memory",
+            "Physics",
+            "Sight",
+            "Action",
+            "Math",
+            "Recognition",
+            "Interaction",
+            "State",
+            "Stats",
+            "Space",
+            "Tracking",
+            "Expansion",
+            "Query",
+            "Generation"
+    };
+
+    Gene(String meaning, String description, UByte cost, UByte weight) {
         this.description = description;
         this.cost = cost;
         this.weight = weight;
 
         try {
-            Method method = Tank.class.getMethod("_" + meaning, int.class, int.class, int.class);
-            System.out.println("Found method _" + meaning);
-            this.meaning = method;
+            this.meaning = Tank.class.getMethod("_" + meaning, int.class, int.class, int.class);
         } catch (NoSuchMethodException e) {
-            //Yeah, there's really no recovery from this.
-            System.out.println("Failed to find method _" + meaning);
+            System.out.println("Failed to find method " + meaning);
         }
 
     }
 
     @Override
     public String toString() {
-        return meaning + ": " + description + " [cst " + cost + ", wgt " + weight + "]";
+        return (meaning == null? "Unlisted" : meaning.getName().substring(1)) + ": " + description + "     [cost " + cost + ", weight " + weight + "]";
     }
 
-    public Method getMeaning() {
+    Method getMeaning() {
         return meaning;
     }
 }
