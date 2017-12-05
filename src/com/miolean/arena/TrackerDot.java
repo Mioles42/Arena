@@ -35,4 +35,14 @@ public class TrackerDot extends Entity {
     void intersect(Entity e) {
 
     }
+
+    @Override
+    void onBirth() {
+
+    }
+
+    @Override
+    void onDeath() {
+
+    }
 }

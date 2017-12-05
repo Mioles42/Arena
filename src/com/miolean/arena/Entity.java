@@ -66,4 +66,7 @@ abstract class Entity {
         uuid += uuidLeast;
         return uuid;
     }
+
+    abstract void onBirth();
+    abstract void onDeath();
 }

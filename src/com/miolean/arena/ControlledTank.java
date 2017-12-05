@@ -10,24 +10,24 @@ public class ControlledTank extends Tank {
         health = 100;
 
         //Do better default stats.
-        stats[STAT_SPEED] = ub(100);
-        stats[STAT_BULLET_SPEED] = ub(50);
-        stats[STAT_ROTATE_SPEED] = ub(100);
+        stats[STAT_SPEED] = ub(20);
+        stats[STAT_BULLET_SPEED] = ub(20);
+        stats[STAT_ROTATE_SPEED] = ub(10);
         stats[STAT_HASTE] = ub(100);
-        stats[STAT_DAMAGE] = ub(30);
+        stats[STAT_DAMAGE] = ub(1);
         stats[STAT_MAX_HEALTH] = ub(100);
-        stats[STAT_BULLET_SPREAD] = ub(100);
+        stats[STAT_BULLET_SPREAD] = ub(50);
     }
 
     @Override
     public void update() {
         applyPhysics();
-        if(KEY[KEY_W]) forward(8);
-        else if(KEY[KEY_S]) forward(-8);
+        if(KEY[KEY_W]) forward(100);
+        else if(KEY[KEY_S]) forward(-100);
         else forward(0);
 
-        if(KEY[KEY_A]) rotate(8);
-        else if(KEY[KEY_D]) rotate(-8);
+        if(KEY[KEY_A]) rotate(100);
+        else if(KEY[KEY_D]) rotate(-100);
         else rotate(0);
 
         if(KEY[KEY_SPACE]) fire();

@@ -42,4 +42,14 @@ class Cog extends Entity {
         ((Tank) e).cogs += value;
         this.health = 0;
     }
+
+    @Override
+    void onBirth() {
+
+    }
+
+    @Override
+    void onDeath() {
+
+    }
 }

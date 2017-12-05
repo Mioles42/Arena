@@ -26,6 +26,7 @@ class Handler {
     }
 
     void remove(int uuid) {
+        entities[uuid].onDeath();
         entities[uuid] = null;
         numEntities--;
     }
@@ -40,6 +41,7 @@ class Handler {
         e.uuidLeast = lastUUIDUsed % 0b100000000;
         e.handler = this;
         numEntities++;
+        e.onBirth();
     }
 
 
@@ -56,17 +58,17 @@ class Handler {
 //        }
 //        return result;
 //    }
-//
-//    public int withinDistance(double x, double y, int distance) {
-//        int count = 0x0000;
-//        for(Entity e: entities) {
-//            if(e == null) continue;
-//            if ((x - e.x) * (x - e.x) + (y - e.y) * (y - e.y) < distance * distance) count++;
-//        }
-//        return count;
-//    }
+
+    public int withinDistance(double x, double y, int distance) {
+        int count = 0x0000;
+        for(Entity e: entities) {
+            if(e == null) continue;
+            if ((x - e.x) * (x - e.x) + (y - e.y) * (y - e.y) < distance * distance) count++;
+        }
+        return count;
+    }
 
     Entity getByUUID(UByte uuidLeast, UByte uuidMost) {
-        return entities[uuidMost.val()*256 + uuidLeast.val()];
+        return entities[uuidMost.val()<<8 + uuidLeast.val()];
     }
 }

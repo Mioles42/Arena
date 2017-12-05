@@ -14,6 +14,9 @@ public class MainPanel extends JPanel implements Runnable, KeyListener, MouseLis
 
     private boolean isRunning = true;
 
+    //Let's also measure whether we are using the extra tick time to render (if not, adding tick speed will do nothing)
+    boolean renderPoint = false;
+
     public static void main(String[] args) {
         Thread gameThread = new Thread(new MainPanel());
         gameThread.run();
@@ -65,15 +68,19 @@ public class MainPanel extends JPanel implements Runnable, KeyListener, MouseLis
         double tickTime = 1000 * (1.0 / (double) Global.tickSpeed);
         System.out.println("[com.miolean.arena.MainPanel.run()] Found " + tickTime + " milliseconds per tick");
 
+
         while(isRunning) {
+            renderPoint = false;
             tickTime = 1000 * (1.0 / (double) Global.tickSpeed);
             long time = System.currentTimeMillis();
             handler.update();
             distributor.distribute();
             Global.time++;
+            this.repaint();
 
             while(System.currentTimeMillis() < time + tickTime) {
                 this.repaint();
+                renderPoint = true;
             }
         }
     }
@@ -83,10 +90,12 @@ public class MainPanel extends JPanel implements Runnable, KeyListener, MouseLis
         g.drawString(Global.tickSpeed + "tk/s", 15, 25);
         g.drawString("Time:" + Global.time + "tks", 15, 45);
         g.drawString("Entities:" + handler.numEntities, 15, 65);
+        if(! renderPoint) g.drawString("Tick limit reached", 15, 85);
         g.drawOval(this.getWidth()/2, this.getHeight()/2, 2, 2);
 
         g.translate((int) (-viewholder.x + this.getWidth()/2), (int) (-viewholder.y + this.getHeight()/2));
         renderer.render(g);
+
     }
 
 

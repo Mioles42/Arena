@@ -8,8 +8,8 @@ public class Gene {
 
     private Method meaning;
     private String description;
-    private UByte cost;
-    private UByte weight;
+    UByte cost;
+    UByte weight;
 
     static final String[] GENE_CATEGORIES = {
             "Reserved",
