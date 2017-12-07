@@ -22,7 +22,7 @@ public final class UByte implements Serializable {
 
     @Override
     public String toString() {
-        return "" + (value+128);
+        return "" + Integer.toHexString(value+128);
     }
 
     public static UByte ub(int value) {

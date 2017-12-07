@@ -99,8 +99,8 @@ public class Tank extends Entity {
         while(opcode < 0xFF) {
             method = in.next().trim();
             description = in.next().trim();
-            cost = ub(Integer.parseInt(in.next().trim(), 16));
             weight = ub(Integer.parseInt(in.next().trim(), 16));
+            cost = ub(Integer.parseInt(in.next().trim(), 16));
 
             KMEM[opcode] = new Gene(method, description, cost, weight);
 
@@ -176,8 +176,6 @@ public class Tank extends Entity {
                 for(int i = 0; i < KMEM.length; i++) {
                     Gene g = KMEM[i];
                     if(g == null) continue;
-                    System.out.print(i);
-                    System.out.println(g.getMeaning().getName());
                     if(g.getMeaning().getName().equals(value)) value = Integer.toHexString(i);
                 }
             }
@@ -273,8 +271,6 @@ public class Tank extends Entity {
     @Override
     void update() {
         applyPhysics();
-
-
         //Run the loaded P memory!
         runGenes(PMEM[loadedP]);
 
@@ -292,7 +288,7 @@ public class Tank extends Entity {
             //Since everything appears to be in order, let's try to run that as a gene.
             try {
                 KMEM[genes[i].val()].getMeaning().invoke(this, genes[i+1].val(), genes[i+2].val(), genes[i+3].val());
-                System.out.printf(name + " is running command %s(%d, %d, %d)\n", KMEM[genes[i].val()].getMeaning().getName(), genes[i+1].val(), genes[i+2].val(), genes[i+3].val());
+                //System.out.printf(name + " is running command %s(%d, %d, %d)\n", KMEM[genes[i].val()].getMeaning().getName(), genes[i+1].val(), genes[i+2].val(), genes[i+3].val());
             } catch (IllegalAccessException | InvocationTargetException e) { e.printStackTrace(); }
 
             //Assuming nothing went wrong we've completed a command by now. (If something did go wrong, we'll at least have a stack trace.)
@@ -407,7 +403,7 @@ public class Tank extends Entity {
      */
     // 0 (DEV ONLY)
     public void _SNO (int arg0, int arg1, int arg2) {/* Significant nothing */}
-    public void _PRINT(int arg0, int arg1, int arg2) {System.out.printf("%s says: %d, %d, %d.\n", name, arg0, arg1, arg2);}
+    public void _PRINT(int arg0, int arg1, int arg2) {System.out.printf("%s says: %s, %s, %s.\n", name, WMEM[arg0].val(), WMEM[arg1].val(), WMEM[arg2].val());}
     // 1
     public void _GOTO (int arg0, int arg1, int arg2) {index = WMEM[arg0].val();}
     public void _GOE  (int arg0, int arg1, int arg2) {if(equal) index = WMEM[arg0].val();}
@@ -521,12 +517,12 @@ public class Tank extends Entity {
     // F
     public void _REP  (int arg0, int arg1, int arg2) {reproduce();}
     public void _TWK  (int arg0, int arg1, int arg2) {}
-    public void _KRAND(int arg0, int arg1, int arg2) {}
-    public void _URAND(int arg0, int arg1, int arg2) {}
-    public void _PRAND(int arg0, int arg1, int arg2) {}
-    public void _SRAND(int arg0, int arg1, int arg2) {}
-    public void _WRAND(int arg0, int arg1, int arg2) {}
-    public void _IRAND(int arg0, int arg1, int arg2) {}
+    public void _KRAND(int arg0, int arg1, int arg2) {WMEM[arg0] = randomGene();}
+    public void _URAND(int arg0, int arg1, int arg2) {WMEM[arg0] = randomExists(UMEM[arg1]);}
+    public void _PRAND(int arg0, int arg1, int arg2) {WMEM[arg0] = randomExists(PMEM[arg1]);}
+    public void _SRAND(int arg0, int arg1, int arg2) {WMEM[arg0] = randomExists(SMEM[arg1]);}
+    public void _WRAND(int arg0, int arg1, int arg2) {WMEM[arg0] = randomExists(WMEM);}
+    public void _IRAND(int arg0, int arg1, int arg2) {WMEM[arg0] = ub((int) (Math.random() * 255));}
 
 
     static UByte randomExists(UByte[] memory) {
@@ -543,8 +539,24 @@ public class Tank extends Entity {
 
         return ub(index);
     }
-//
-//    static UByte randomGene() {
-//
-//    }
+
+    static UByte randomGene() {
+
+        if(totalKWeight == 0) { //not set up yet
+            for(Gene g: KMEM) {
+                if(g != null) totalKWeight += g.weight.val();
+            }
+        }
+
+        int rand = (int) (Math.random() * totalKWeight);
+        int selection = -1;
+        while(rand > 0) {
+            selection++;
+            if(KMEM[selection] != null) rand -= KMEM[selection].weight.val();
+        }
+
+        return ub(selection);
+
+
+    }
 }
