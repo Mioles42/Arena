@@ -516,7 +516,7 @@ public class Tank extends Entity {
 
     // F
     public void _REP  (int arg0, int arg1, int arg2) {reproduce();}
-    public void _TWK  (int arg0, int arg1, int arg2) {}
+    public void _TWK  (int arg0, int arg1, int arg2) {KMEM[arg0].weight = WMEM[arg1];}
     public void _KRAND(int arg0, int arg1, int arg2) {WMEM[arg0] = randomGene();}
     public void _URAND(int arg0, int arg1, int arg2) {WMEM[arg0] = randomExists(UMEM[arg1]);}
     public void _PRAND(int arg0, int arg1, int arg2) {WMEM[arg0] = randomExists(PMEM[arg1]);}
