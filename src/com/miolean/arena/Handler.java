@@ -71,4 +71,15 @@ class Handler {
     Entity getByUUID(UByte uuidLeast, UByte uuidMost) {
         return entities[uuidMost.val()<<8 + uuidLeast.val()];
     }
+
+    Entity entityAtLocation(int x, int y) {
+
+        TrackerDot location = new TrackerDot(x, y, 1);
+
+        for(Entity e: entities) {
+            if(e != null && e.intersectsWith(location)) return e;
+        }
+
+        return null;
+    }
 }

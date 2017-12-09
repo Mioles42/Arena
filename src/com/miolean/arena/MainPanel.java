@@ -33,7 +33,7 @@ public class MainPanel extends JPanel implements Runnable, KeyListener, MouseLis
         handler.add(new ControlledTank(300, 300));
         viewholder = entities[0];
 
-        Entity dummy = new Tank("adam");
+        Entity dummy = new Tank("eve");
         dummy.health = 256;
 
         handler.add(dummy);
@@ -128,9 +128,24 @@ public class MainPanel extends JPanel implements Runnable, KeyListener, MouseLis
         }
     }
     @Override public void mouseClicked(MouseEvent e) {
-        System.out.println("(" +
-                (e.getX() + viewholder.x - this.getWidth()/2) + ", " +
-                (e.getY() + viewholder.y - this.getHeight()/2) + ")");
+        int x = (int) (e.getX() + viewholder.x - this.getWidth()/2);
+        int y = (int) (e.getY() + viewholder.y - this.getHeight()/2);
+
+        Entity newHolder = handler.entityAtLocation(x, y);
+        if(newHolder == null) {
+            if (viewholder instanceof ControlledTank) {
+                viewholder.x = x;
+                viewholder.y = y;
+            } else {
+                newHolder = new ControlledTank(x, y);
+                handler.add(newHolder);
+                viewholder = newHolder;
+            }
+        } else {
+            if (viewholder instanceof ControlledTank) viewholder.health = 0;
+            viewholder = newHolder;
+        }
+
     }
     @Override public void mousePressed(MouseEvent e) {}
     @Override public void mouseReleased(MouseEvent e) {}

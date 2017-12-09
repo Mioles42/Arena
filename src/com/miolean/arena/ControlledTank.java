@@ -33,4 +33,14 @@ public class ControlledTank extends Tank {
         if(KEY[KEY_SPACE]) fire();
         if(KEY[KEY_F]) health--;
     }
+
+    @Override
+    public void onBirth() {
+
+    }
+
+    @Override
+    public void onDeath() {
+
+    }
 }
