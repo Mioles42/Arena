@@ -11,6 +11,8 @@ public class TrackerDot extends Entity {
         this.x = x;
         this.y = y;
         this.persistence = persistence;
+        width = 4;
+        height = 4;
     }
 
     @Override

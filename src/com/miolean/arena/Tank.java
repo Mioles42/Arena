@@ -81,6 +81,8 @@ public class Tank extends Entity {
     private long lastFireTime = Global.time;
     private String name = "";
     static int totalKWeight;
+    String log = "";
+    private boolean generateLog = false;
 
 
 
@@ -288,11 +290,17 @@ public class Tank extends Entity {
             //Since everything appears to be in order, let's try to run that as a gene.
             try {
                 KMEM[genes[i].val()].getMeaning().invoke(this, genes[i+1].val(), genes[i+2].val(), genes[i+3].val());
+                if(generateLog) log += KMEM[genes[i].val()].getMeaning().getName() + "("
+                        + genes[i+1].val() + ", "
+                        + genes[i+2].val() + ", "
+                        + genes[i+3].val() + ")";
                 //System.out.printf(name + " is running command %s(%d, %d, %d)\n", KMEM[genes[i].val()].getMeaning().getName(), genes[i+1].val(), genes[i+2].val(), genes[i+3].val());
             } catch (IllegalAccessException | InvocationTargetException e) { e.printStackTrace(); }
 
             //Assuming nothing went wrong we've completed a command by now. (If something did go wrong, we'll at least have a stack trace.)
             i += 3; //We don't want to run the arguments by accident, so let's skip them.
+
+            generateLog = false;
         }
 
     }
@@ -319,7 +327,7 @@ public class Tank extends Entity {
     boolean intersectsWith(Entity e) {
         if(e == null) return false;
         double distanceSquared = (x - e.x)*(x - e.x)+(y - e.y)*(y - e.y);
-        double minDistance = (width/2.0 + e.width/2.0);
+        double minDistance = (width/2.0 + e.width/2.0) * (width/2.0 + e.width/2.0);
 
         return distanceSquared <= minDistance;
     }
@@ -394,7 +402,25 @@ public class Tank extends Entity {
 
     void onBirth() {
 
+        System.out.println(name + " loaded ================================");
+
+        int numZeroes = 0;
+
+        for(UByte u: PMEM[loadedP]) {
+            if(u.val() == 0) numZeroes++;
+
+            if(u.val() != 0) {
+                System.out.println(u);
+                numZeroes = 0;
+            }
+
+            if(u.val() == 0 && numZeroes < 4) System.out.println("0");
+
+            if(numZeroes == 4) System.out.println("[...]");
+        }
     }
+
+    void generateLog() {generateLog = true;}
 
     /*-----------------------------------------------------------------
      * Reflected methods (genes) are below.
@@ -403,14 +429,14 @@ public class Tank extends Entity {
      */
     // 0 (DEV ONLY)
     public void _SNO (int arg0, int arg1, int arg2) {/* Significant nothing */}
-    public void _PRINT(int arg0, int arg1, int arg2) {System.out.printf("%s says: %s, %s, %s.\n", name, WMEM[arg0].val(), WMEM[arg1].val(), WMEM[arg2].val());}
+    public void _PRINT(int arg0, int arg1, int arg2) {}//System.out.printf("%s says: %s, %s, %s.\n", name, WMEM[arg0].val(), WMEM[arg1].val(), WMEM[arg2].val());}
     // 1
-    public void _GOTO (int arg0, int arg1, int arg2) {index = WMEM[arg0].val();}
-    public void _GOE  (int arg0, int arg1, int arg2) {if(equal) index = WMEM[arg0].val();}
-    public void _GOG  (int arg0, int arg1, int arg2) {if(greater) index = WMEM[arg0].val();}
-    public void _IGOTO(int arg0, int arg1, int arg2) {index = arg0;}
-    public void _IGOE (int arg0, int arg1, int arg2) {if(equal) index = arg0;}
-    public void _IGOG (int arg0, int arg1, int arg2) {if(greater) index = arg0;}
+    public void _GOTO (int arg0, int arg1, int arg2) {index = WMEM[arg0].val() - 1;}
+    public void _GOE  (int arg0, int arg1, int arg2) {if(equal) index = WMEM[arg0].val() - 1;}
+    public void _GOG  (int arg0, int arg1, int arg2) {if(greater) index = WMEM[arg0].val() - 1;}
+    public void _IGOTO(int arg0, int arg1, int arg2) {index = arg0 - 1;}
+    public void _IGOE (int arg0, int arg1, int arg2) {if(equal) index = arg0 - 1;}
+    public void _IGOG (int arg0, int arg1, int arg2) {if(greater) index = arg0 - 1;}
     public void _COMP (int arg0, int arg1, int arg2) {equal = (WMEM[arg0].val() == WMEM[arg1].val()); greater = (WMEM[arg0].val() > WMEM[arg1].val());}
     // 2
     public void _MOV  (int arg0, int arg1, int arg2) {WMEM[arg0] = WMEM[arg1];}
@@ -453,7 +479,7 @@ public class Tank extends Entity {
     public void _ADD  (int arg0, int arg1, int arg2) {WMEM[arg0] = ub(arg1 + arg2);}
     public void _SUB  (int arg0, int arg1, int arg2) {WMEM[arg0] = ub(arg1 - arg2);}
     public void _PROD (int arg0, int arg1, int arg2) {WMEM[arg0] = ub(arg1 * arg2);}
-    public void _QUOT (int arg0, int arg1, int arg2) {WMEM[arg0] = ub(arg1 / arg2);}
+    public void _QUOT (int arg0, int arg1, int arg2) {if(arg2 != 0) WMEM[arg0] = ub(arg1 / arg2);}
     public void _BWOR (int arg0, int arg1, int arg2) {WMEM[arg0] = ub(arg1 | arg2);}
     public void _BWAND(int arg0, int arg1, int arg2) {WMEM[arg0] = ub(arg1 & arg2);}
     public void _BWXOR(int arg0, int arg1, int arg2) {WMEM[arg0] = ub(arg1 ^ arg2);}
@@ -466,7 +492,7 @@ public class Tank extends Entity {
     public void _WALL (int arg0, int arg1, int arg2) {} //TODO Implement _WALL() [when Walls exist]
     public void _SPIT (int arg0, int arg1, int arg2) {} //TODO Implement _SPIT() [when Cogs exist]
     public void _LED (int arg0, int arg1, int arg2) {setLEDR(WMEM[arg0].val());setLEDG(WMEM[arg1].val());setLEDB(WMEM[arg2].val());}
-    public void _OLEDR(int arg0, int arg1, int arg2) {WMEM[arg0] = ub(((Tank) handler.getByUUID(WMEM[arg1],WMEM[arg2])).flashR);}
+    public void _OLEDR(int arg0, int arg1, int arg2) {if(handler.getByUUID(WMEM[arg1],WMEM[arg2]) instanceof Tank)  WMEM[arg0] = ub(((Tank) handler.getByUUID(WMEM[arg1],WMEM[arg2])).flashR);}
     public void _OLEDG(int arg0, int arg1, int arg2) {WMEM[arg0] = ub(((Tank) handler.getByUUID(WMEM[arg1],WMEM[arg2])).flashG);}
     public void _OLEDB(int arg0, int arg1, int arg2) {WMEM[arg0] = ub(((Tank) handler.getByUUID(WMEM[arg1],WMEM[arg2])).flashB);}
     // 9
@@ -479,7 +505,7 @@ public class Tank extends Entity {
     public void _UPG  (int arg0, int arg1, int arg2) {upgrade(WMEM[arg0], WMEM[arg1].val());}
     public void _STAT (int arg0, int arg1, int arg2) {WMEM[arg0] = stats[Math.abs(arg1>>4)];}
     public void _KWGT (int arg0, int arg1, int arg2) {WMEM[arg0] = KMEM[WMEM[arg1].val()].weight;}
-    public void _COST (int arg0, int arg1, int arg2) {WMEM[arg0] = KMEM[WMEM[arg1].val()].cost;}
+    public void _COST (int arg0, int arg1, int arg2) {if(KMEM[WMEM[arg1].val()] != null) WMEM[arg0] = KMEM[WMEM[arg1].val()].cost;}
     // B
 
     // C
@@ -516,7 +542,7 @@ public class Tank extends Entity {
 
     // F
     public void _REP  (int arg0, int arg1, int arg2) {reproduce();}
-    public void _TWK  (int arg0, int arg1, int arg2) {KMEM[arg0].weight = WMEM[arg1];}
+    public void _TWK  (int arg0, int arg1, int arg2) {if(KMEM[arg0] != null) KMEM[arg0].weight = WMEM[arg1];}
     public void _KRAND(int arg0, int arg1, int arg2) {WMEM[arg0] = randomGene();}
     public void _URAND(int arg0, int arg1, int arg2) {WMEM[arg0] = randomExists(UMEM[arg1]);}
     public void _PRAND(int arg0, int arg1, int arg2) {WMEM[arg0] = randomExists(PMEM[arg1]);}
@@ -526,16 +552,9 @@ public class Tank extends Entity {
 
 
     static UByte randomExists(UByte[] memory) {
-        int numEntries = 0;
-        for(UByte b: memory) if(b != ub(0x00)) numEntries++;
 
-        int selection = (int) (Math.random() * numEntries) + 1;
-        int index = -1;
-
-        while (selection > 0) {
-            if(memory[index] != ub(0x00)) selection--;
-            index++;
-        }
+        int index = (int) (Math.random() * 256);
+        while(memory[index] == null || memory[index] == ub(0)) index = (int) (Math.random() * 256);
 
         return ub(index);
     }
