@@ -14,7 +14,7 @@ abstract class Entity {
     //Motion components:
     double x; //X position, in pixels
     double y; //Y position, in pixels
-    double r; //Rotation, in degrees
+    double r; //Rotation, in radians
     double velX; //X velocity, in pixels per tick.
     double velY; //Y velocity, in pixels per tick.
     double velR; //Rotational velocity, in degrees per tick.

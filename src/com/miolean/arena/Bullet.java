@@ -9,32 +9,73 @@ import static com.miolean.arena.Global.BORDER;
 class Bullet extends Entity {
 
     private Tank source;
+    private Tank target;
+    private int damage;
 
     Bullet(Tank source) {
         this.source = source;
 
-        x = source.x;
-        y = source.y;
-        r = source.r;
-        velX = (15 + source.stats[Tank.STAT_BULLET_SPEED].val()) * Math.cos(r + source.stats[Tank.STAT_BULLET_SPREAD].val()/128.0*(Math.random() - .5));
-        velY = (15 + source.stats[Tank.STAT_BULLET_SPEED].val()) * -Math.sin(r + source.stats[Tank.STAT_BULLET_SPREAD].val()/128.0*(Math.random() - .5));
-        velR = 0;
-        accX = 0;
-        accY = 0;
-        accR = 0;
         width = 8;
         height = 8;
 
-        health = 5;
+        if(source != null) {
+            x = source.x;
+            y = source.y;
+            r = source.r;
+            damage = source.stats[Tank.STAT_DAMAGE].val();
+            velX = (15 + source.stats[Tank.STAT_BULLET_SPEED].val()) * Math.cos(r + source.stats[Tank.STAT_BULLET_SPREAD].val() / 128.0 * (Math.random() - .5));
+            velY = (15 + source.stats[Tank.STAT_BULLET_SPEED].val()) * -Math.sin(r + source.stats[Tank.STAT_BULLET_SPREAD].val() / 128.0 * (Math.random() - .5));
+            velR = 0;
+            accX = 0;
+            accY = 0;
+            accR = 0;
+
+            health = 5;
+        } else {
+            x = Global.ARENA_SIZE * Math.random();
+            y = Global.ARENA_SIZE * Math.random();
+
+            health = 5;
+            accX = 1;
+            damage = 5;
+        }
     }
 
 
     @Override
     void render(Graphics g) {
-        g.setColor(new Color(100 + source.stats[Tank.STAT_DAMAGE].val() / 2, 150 - source.stats[Tank.STAT_DAMAGE].val() / 2, 50));
-        g.fillOval((int) x - width / 2, (int) y - height / 2, width, height);
-        g.setColor(Color.black);
-        g.drawOval((int) x - width / 2, (int) y - height / 2, width, height);
+
+        g.setColor(new Color(100 + damage / 2, 150 - damage / 2, 50));
+
+        if(source != null) {
+            g.fillOval((int) x - width / 2, (int) y - height / 2, width, height);
+            g.setColor(Color.black);
+            g.drawOval((int) x - width / 2, (int) y - height / 2, width, height);
+        } else {
+
+            double sinR = Math.sin(r + Math.PI);
+            double cosR = Math.cos(r + Math.PI);
+            double sinExtra = .25867;
+            double cosExtra = .88007;
+
+            //Fun fact: This is stolen from Tank's gun barrel.
+            int[] XPoints = {
+                    (int) (x+width*3*(cosR*cosExtra - sinR*sinExtra)),
+                    (int) (x+width*3*(cosR*cosExtra + sinR*sinExtra)),
+                    (int) (x)
+            };
+
+            int[] YPoints = {
+                    (int) (y-width*4*(sinR*cosExtra + sinExtra*cosR)),
+                    (int) (y-width*3*(sinR*cosExtra - sinExtra*cosR)),
+                    (int) (y)
+
+            };
+
+            g.fillPolygon(XPoints, YPoints, 3);
+            g.setColor(Color.black);
+            g.drawPolygon(XPoints, YPoints, 3);
+        }
     }
 
     @Override

@@ -28,4 +28,7 @@ public final class UByte implements Serializable {
     public static UByte ub(int value) {
         return new UByte(value);
     }
+    public static UByte rand() {
+        return new UByte((int) (256 * Math.random()));
+    }
 }
