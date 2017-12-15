@@ -69,7 +69,9 @@ class Handler {
     }
 
     Entity getByUUID(UByte uuidLeast, UByte uuidMost) {
-        return entities[uuidMost.val()<<8 + uuidLeast.val()];
+        //return entities[uuidMost.val()<<8 + uuidLeast.val()];
+        //TODO: Arena doesn't currently support more than 256 Entities. We'll just use the significant part for now.
+        return entities[uuidMost.val()];
     }
 
     Entity entityAtLocation(int x, int y) {

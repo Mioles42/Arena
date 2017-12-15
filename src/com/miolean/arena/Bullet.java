@@ -8,6 +8,9 @@ import static com.miolean.arena.Global.BORDER;
 
 class Bullet extends Entity {
 
+    private static final int ROGUE_SPEED = 50;
+    private static final int ROGUE_OBSERVATION = 1;
+
     private Tank source;
     private Tank target;
     private int damage;
@@ -80,9 +83,23 @@ class Bullet extends Entity {
 
     @Override
     void update() {
-        applyPhysics();
-        if (Math.abs(velX) < 1 && Math.abs(velY) < 1) health = 0;
-        if ((x > ARENA_SIZE - BORDER) || (x < BORDER) || (y > ARENA_SIZE - BORDER) || (y < BORDER)) health = 0;
+        if(source != null) {
+            applyPhysics();
+            if (Math.abs(velX) < 1 && Math.abs(velY) < 1) health = 0;
+            if ((x > ARENA_SIZE - BORDER) || (x < BORDER) || (y > ARENA_SIZE - BORDER) || (y < BORDER)) health = 0;
+        } else if(target != null){
+            double xdis = target.x - x;
+            double ydis = target.x - x;
+
+            accX = xdis / (xdis + ydis) * ROGUE_SPEED;
+            accX = ydis / (xdis + ydis) * ROGUE_SPEED;
+        } else {
+            for(int i = 0; i < ROGUE_OBSERVATION; i++){
+                System.out.println("Found target");
+                Entity attemptedTarget = handler.getByUUID(UByte.rand(), UByte.rand());
+                if(attemptedTarget != null && attemptedTarget instanceof Tank) target = (Tank) attemptedTarget;
+            }
+        }
     }
 
     @Override
