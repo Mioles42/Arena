@@ -18,11 +18,10 @@ public class MemoryPanel extends JPanel {
 
     Tank source;
 
-    private static final int INDEX_KMEM = 0;
-    private static final int INDEX_UMEM = 1;
-    private static final int INDEX_PMEM = 2;
-    private static final int INDEX_SMEM = 3;
-    private static final int INDEX_WMEM = 4;
+    private static final int INDEX_UMEM = 0;
+    private static final int INDEX_PMEM = 1;
+    private static final int INDEX_SMEM = 2;
+    private static final int INDEX_WMEM = 3;
 
     public MemoryPanel(Tank source) {
 
@@ -47,7 +46,6 @@ public class MemoryPanel extends JPanel {
         this.add(label, c);
 
         comboBox = new JComboBox<>();
-        comboBox.addItem("KMEM");
         comboBox.addItem("UMEM");
         comboBox.addItem("PMEM");
         comboBox.addItem("SMEM");
@@ -106,11 +104,10 @@ public class MemoryPanel extends JPanel {
             catch (BadLocationException e) {}
             String text = "§";
             switch (comboBox.getSelectedIndex()) {
-                case INDEX_KMEM: text = ("[KMEM text unimplemented so far]"); break;
                 case INDEX_UMEM: text = (source.stringUMEM((int) spinner.getValue())); break;
                 case INDEX_PMEM: text = (source.stringPMEM((int) spinner.getValue())); break;
-                case INDEX_SMEM: text = ("[SMEM text unimplemented so far]"); break;
-                case INDEX_WMEM: text = ("[WMEM text unimplemented so far]"); break;
+                case INDEX_SMEM: text = (source.stringSMEM((int) spinner.getValue())); break;
+                case INDEX_WMEM: text = (source.stringWMEM()); break;
             }
 
             Scanner scanner = new Scanner(text);

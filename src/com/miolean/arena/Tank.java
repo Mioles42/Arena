@@ -420,7 +420,7 @@ public class Tank extends Entity {
         }
     }
 
-    private String runnableMemoryToString(UByte[] genes, char identifier) {
+    private String activeMemoryToString(UByte[] genes, char identifier) {
 
         String result = "";
 
@@ -448,8 +448,22 @@ public class Tank extends Entity {
         return result;
     }
 
-    public String stringUMEM(int memory) {return runnableMemoryToString(UMEM[memory], '%');}
-    public String stringPMEM(int memory) {return runnableMemoryToString(PMEM[memory], '@');}
+    private String passiveMemoryToString(UByte[] genes, char identifier) {
+
+        String result = "§b";
+
+        for(int i = 0; i < genes.length; i++) {
+            if(i%4 == 0) result += "\n" + identifier + Integer.toHexString(i/16) + Integer.toHexString(i%16) + "\t";
+            result += "§k|  " + genes[i].val() +"\t§b";
+        }
+
+        return result;
+    }
+
+    public String stringUMEM(int memory) {return activeMemoryToString(UMEM[memory], '%');}
+    public String stringPMEM(int memory) {return activeMemoryToString(PMEM[memory], '@');}
+    public String stringSMEM(int memory) {return passiveMemoryToString(SMEM[memory], '$');}
+    public String stringWMEM() {return passiveMemoryToString(WMEM, '&');}
     /*-----------------------------------------------------------------
      * Reflected methods (genes) are below.
      * Beware. Not intended for human consumption.

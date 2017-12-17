@@ -14,6 +14,9 @@ class Global {
     //Ticks per second
     static int tickSpeed = 20;
 
+    //Displayticks per second
+    static int displayTickSpeed = 1;
+
     //1 pixel= 1 tank-meter
     static final int ARENA_SIZE = 1024;
 
