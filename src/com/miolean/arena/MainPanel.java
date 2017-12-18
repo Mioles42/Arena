@@ -4,6 +4,9 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
+import static com.miolean.arena.Global.ARENA_SIZE;
+import static com.miolean.arena.Global.BORDER;
+
 public class MainPanel extends JPanel implements Runnable, KeyListener, MouseListener, WindowListener, MouseMotionListener {
 
     private Renderer renderer;
@@ -98,8 +101,35 @@ public class MainPanel extends JPanel implements Runnable, KeyListener, MouseLis
         g.drawOval(this.getWidth()/2, this.getHeight()/2, 2, 2);
 
         g.translate((int) (-viewholder.x + this.getWidth()/2), (int) (-viewholder.y + this.getHeight()/2));
+
+        g.setColor(Color.GRAY);
+        for(int i = 0; i < ARENA_SIZE / 64; i++) {
+            g.drawLine(i*64, BORDER, i*64, ARENA_SIZE -BORDER);
+            g.drawLine(BORDER, i*64, ARENA_SIZE - BORDER, i*64);
+        }
+
+        g.setColor(Color.RED);
+        g.drawRect(10, 10, ARENA_SIZE - BORDER, ARENA_SIZE - BORDER);
+
         renderer.render(g);
 
+        g.translate((int) -(-viewholder.x + this.getWidth()/2), (int) -(-viewholder.y + this.getHeight()/2));
+
+        g.setColor(new Color(255, 100, 100, 200));
+        g.fillRect(15, getWidth()-100, viewholder.health, 20);
+        g.setColor(Color.BLACK);
+        g.drawRect(15, getWidth()-100, viewholder.health, 20);
+        if(viewholder.health < 20) g.drawString(viewholder.health + "", 18 + viewholder.health, getWidth()-85);
+        else g.drawString(viewholder.health + "", 18, getWidth()-85);
+
+        if(viewholder instanceof Tank) {
+            g.setColor(new Color(100, 100, 255, 200));
+            g.fillRect(15, getWidth() - 150, ((Tank)viewholder).cogs, 20);
+            g.setColor(Color.BLACK);
+            if(((Tank)viewholder).cogs < 20) g.drawString(((Tank)viewholder).cogs + "", 18 + ((Tank)viewholder).cogs, getWidth()-135);
+            else g.drawString(((Tank)viewholder).cogs + "", 18, getWidth()-135);
+            g.drawRect(15, getWidth() - 150, ((Tank)viewholder).cogs, 20);
+        }
     }
 
     @Override public void keyTyped(KeyEvent e) {}
