@@ -131,7 +131,7 @@ public class Window extends JFrame implements ChangeListener ,KeyListener {
 
     }
 
-    public void update() {
+    public void display() {
         memoryPanel.updateInfo();
     }
 
@@ -185,7 +185,7 @@ public class Window extends JFrame implements ChangeListener ,KeyListener {
     @Override
     public void stateChanged(ChangeEvent e) {
         if(e.getSource() == slider) {
-            Global.tickSpeed = slider.getValue();
+            Global.updateCycle = 1000/slider.getValue();
         }
     }
 

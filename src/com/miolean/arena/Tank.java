@@ -258,6 +258,7 @@ public class Tank extends Entity {
 
         double healthPercent = (((double) health) / stats[STAT_MAX_HEALTH].val());
         if(healthPercent < 0) healthPercent = 0;
+        if(healthPercent > 1) healthPercent = 1;
         g.setColor(new Color((int) (healthPercent * 100 + 100), (int) (healthPercent * 100 + 100), (int) (healthPercent * 100 + 100)));
         g.fillOval((int) x - width/2, (int) y - height/2, width, height); //Body
 

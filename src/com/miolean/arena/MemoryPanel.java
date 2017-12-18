@@ -1,10 +1,7 @@
 package com.miolean.arena;
 
 import javax.swing.*;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.Style;
-import javax.swing.text.StyleConstants;
-import javax.swing.text.StyledDocument;
+import javax.swing.text.*;
 import java.awt.*;
 import java.util.Scanner;
 import java.util.regex.Pattern;
@@ -15,6 +12,7 @@ public class MemoryPanel extends JPanel {
     JSpinner spinner;
     JComboBox<String> comboBox;
     JLabel label;
+    JScrollPane scrollPane;
 
     Tank source;
 
@@ -72,7 +70,7 @@ public class MemoryPanel extends JPanel {
         c.fill = GridBagConstraints.BOTH;
         this.add(spinner, c);
 
-        JScrollPane scrollPane = new JScrollPane();
+        scrollPane = new JScrollPane();
         scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 
@@ -97,11 +95,12 @@ public class MemoryPanel extends JPanel {
     }
 
     void updateInfo() {
+
+        int scrollPosition = scrollPane.getVerticalScrollBar().getValue();
+
         if(source != null) {
 
-            StyledDocument doc = textPane.getStyledDocument();
-            try {doc.remove(0, doc.getLength());}
-            catch (BadLocationException e) {}
+            StyledDocument doc = new DefaultStyledDocument();
             String text = "§";
             switch (comboBox.getSelectedIndex()) {
                 case INDEX_UMEM: text = (source.stringUMEM((int) spinner.getValue())); break;
@@ -131,8 +130,9 @@ public class MemoryPanel extends JPanel {
                 try { doc.insertString(doc.getLength(), next.substring(1), style); }
                 catch (BadLocationException e){}
             }
+            textPane.setDocument(doc);
         }
 
-        repaint();
+        //repaint();
     }
 }

@@ -12,11 +12,11 @@ public class MainPanel extends JPanel implements Runnable, KeyListener, MouseLis
     private Renderer renderer;
     private Handler handler;
     private Distributor distributor;
+    private Window window;
 
     Entity viewholder;
 
     private boolean isRunning = true;
-    private Window window;
 
     //Let's also measure whether we are using the extra tick time to render (if not, adding tick speed will do nothing)
     boolean renderPoint = false;
@@ -44,8 +44,6 @@ public class MainPanel extends JPanel implements Runnable, KeyListener, MouseLis
 
         handler.add(dummy);
 
-
-
         this.setBackground(new Color(170, 170, 160));
 
         this.addKeyListener(this);
@@ -69,32 +67,44 @@ public class MainPanel extends JPanel implements Runnable, KeyListener, MouseLis
     public void run() {
         System.out.println("Running...");
 
-        //How long does a single tick last?
-        double tickTime = 1000 * (1.0 / (double) Global.tickSpeed);
-        System.out.println("[com.miolean.arena.MainPanel.run()] Found " + tickTime + " milliseconds per tick");
-
+        long lastUpdate = System.currentTimeMillis();
+        long lastRender = System.currentTimeMillis();
+        long lastDisplay = System.currentTimeMillis();
+        long lastDistribute = System.currentTimeMillis();
 
         while(isRunning) {
             renderPoint = false;
-            tickTime = 1000 * (1.0 / (double) Global.tickSpeed);
+
             long time = System.currentTimeMillis();
-            handler.update();
-            distributor.distribute();
-            window.update();
 
-            Global.time++;
-            this.repaint();
+            if(time > lastUpdate + Global.updateCycle) {
+                handler.update();
+                lastUpdate = time;
+            }
+            time = System.currentTimeMillis();
 
-            while(System.currentTimeMillis() < time + tickTime) {
-                this.repaint();
-                renderPoint = true;
+            if(time > lastRender + Global.renderCycle) {
+                repaint();
+                lastRender = time;
+            }
+            time = System.currentTimeMillis();
+
+            if(time > lastDisplay + Global.displayCycle) {
+                window.display();
+                lastDisplay = time;
+            }
+            time = System.currentTimeMillis();
+
+            if(time > lastDistribute + Global.distributeCycle) {
+                distributor.distribute();
+                lastDistribute = time;
             }
         }
     }
 
     private void render(Graphics g) {
         g.setColor(Color.BLACK);
-        g.drawString(Global.tickSpeed + "tk/s", 15, 25);
+        g.drawString((int) (1000/Global.updateCycle) + "tk/s", 15, 25);
         g.drawString("Time:" + Global.time + "tks", 15, 45);
         g.drawString("Entities:" + handler.numEntities, 15, 65);
         if(! renderPoint) g.drawString("Tick limit reached", 15, 85);

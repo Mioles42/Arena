@@ -11,11 +11,11 @@ class Global {
     //Number of ticks in-simulation
     static int time;
 
-    //Ticks per second
-    static int tickSpeed = 20;
-
-    //Displayticks per second
-    static int displayTickSpeed = 1;
+    //Ticks per second, for each of the different cycles
+    static int updateCycle = 50;
+    static int displayCycle = 1000;
+    static int renderCycle = 20;
+    static int distributeCycle = 20;
 
     //1 pixel= 1 tank-meter
     static final int ARENA_SIZE = 1024;
