@@ -14,6 +14,7 @@ public class Window extends JFrame implements ChangeListener ,KeyListener {
 
     private JSlider slider;
     MainPanel main;
+    MemoryPanel memoryPanel;
 
 
     Window(MainPanel mainPanel) {
@@ -32,7 +33,7 @@ public class Window extends JFrame implements ChangeListener ,KeyListener {
 
     public void makeMainLayout() {
         JPanel genomePanel = new JPanel();
-        JPanel pmemPanel = new JPanel();
+        memoryPanel = new MemoryPanel(null);
         JPanel usedSetPanel = new JPanel();
 
 
@@ -73,14 +74,14 @@ public class Window extends JFrame implements ChangeListener ,KeyListener {
         c.gridwidth = 1;
         c.ipadx = 5;
         c.ipady = 5;
-        c.weightx = .4;
+        c.weightx = .2;
         c.weighty = .5;
 
         ImageIcon genomeIcon = new ImageIcon(Window.class.getClassLoader().getResource("tex/list.png"));
 
         makeGenomePanel(genomePanel);
 
-        infoPanel.addTab("Program Memory", pmemPanel);
+        infoPanel.addTab("Program Memory", memoryPanel);
         infoPanel.addTab("Used Set", usedSetPanel);
         infoPanel.addTab("Genome", genomeIcon, genomePanel);
 
@@ -104,7 +105,7 @@ public class Window extends JFrame implements ChangeListener ,KeyListener {
         c.gridwidth = 1;
         c.ipadx = 5;
         c.ipady = 5;
-        c.weightx = .4;
+        c.weightx = .2;
         c.weighty = .3;
         controlPanelPanel.setLayout(new BorderLayout());
         controlPanelPanel.add(controlPanel, BorderLayout.CENTER);
@@ -128,6 +129,10 @@ public class Window extends JFrame implements ChangeListener ,KeyListener {
 
 
 
+    }
+
+    public void update() {
+        memoryPanel.updateInfo();
     }
 
     public void makeGenomePanel(JPanel genomePanel) {
@@ -198,5 +203,9 @@ public class Window extends JFrame implements ChangeListener ,KeyListener {
     public void keyReleased(KeyEvent e) {
         main.keyReleased(e);
 
+    }
+
+    public void setActiveTank(Tank tank) {
+        memoryPanel.source = tank;
     }
 }

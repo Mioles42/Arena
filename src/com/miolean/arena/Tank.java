@@ -6,6 +6,7 @@ import java.util.Scanner;
 
 import static com.miolean.arena.Global.ARENA_SIZE;
 import static com.miolean.arena.Global.BORDER;
+import static com.miolean.arena.Global.KEY_R;
 import static com.miolean.arena.UByte.ub;
 
 /**
@@ -80,8 +81,7 @@ public class Tank extends Entity {
     private int viewDistance = 10;
     private long lastFireTime = Global.time;
     private String name = "";
-    static int totalKWeight;
-    String log = "";
+    private static int totalKWeight;
     private boolean generateLog = false;
 
 
@@ -281,28 +281,27 @@ public class Tank extends Entity {
     }
 
     void runGenes(UByte[] genes) {
-        for(int i = 0; i < genes.length-3; i++) {
+
+        index = 0;
+
+        for(; index < genes.length-3; index++) {
             //For every entry in this list of genes (excluding the ones at the end that don't have enough others after them as arguments)
 
-            if(genes[i].val() == 0x00) continue; //Don't even bother with opcode 0x00, standing for "do nothing"
-            if(KMEM[genes[i].val()] == null) continue; //If the opcode doesn't actually stand for something meaningful, skip it too
+            if(genes[index].val() == 0x00) continue; //Don't even bother with opcode 0x00, standing for "do nothing"
+            if(KMEM[genes[index].val()] == null) continue; //If the opcode doesn't actually stand for something meaningful, skip it too
 
             //Since everything appears to be in order, let's try to run that as a gene.
             try {
-                KMEM[genes[i].val()].getMeaning().invoke(this, genes[i+1].val(), genes[i+2].val(), genes[i+3].val());
-                if(generateLog) log += KMEM[genes[i].val()].getMeaning().getName() + "("
-                        + genes[i+1].val() + ", "
-                        + genes[i+2].val() + ", "
-                        + genes[i+3].val() + ")";
-                //System.out.printf(name + " is running command %s(%d, %d, %d)\n", KMEM[genes[i].val()].getMeaning().getName(), genes[i+1].val(), genes[i+2].val(), genes[i+3].val());
+                //System.out.printf(name + " is running command %s(%d, %d, %d)\n", KMEM[genes[index].val()].getMeaning().getName(), genes[index+1].val(), genes[index+2].val(), genes[index+3].val());
+
+                KMEM[genes[index].val()].getMeaning().invoke(this, genes[index+1].val(), genes[index+2].val(), genes[index+3].val());
+
             } catch (IllegalAccessException | InvocationTargetException e) { e.printStackTrace(); }
 
             //Assuming nothing went wrong we've completed a command by now. (If something did go wrong, we'll at least have a stack trace.)
-            i += 3; //We don't want to run the arguments by accident, so let's skip them.
+            index += 3; //We don't want to run the arguments by accident, so let's skip them.
 
-            generateLog = false;
         }
-
     }
     //Instantiate memory number [number] as a UByte[256].
     private void createMemory(UByte[][] memory, UByte number) {
@@ -397,6 +396,7 @@ public class Tank extends Entity {
 
     void onDeath() {
         //Run the loaded U memory!
+        generateLog = true;
         runGenes(UMEM[loadedU]);
     }
 
@@ -420,8 +420,50 @@ public class Tank extends Entity {
         }
     }
 
-    void generateLog() {generateLog = true;}
+    private String activeMemoryToString(UByte[] genes, char identifier) {
 
+        String result = "";
+
+        //You'll notice we stole this from runGenes(). That's intentional.
+
+        for(int i = 0; i < genes.length-3; i++) {
+            //For every entry in this list of genes (excluding the ones at the end that don't have enough others after them as arguments)
+
+            if(genes[i].val() == 0x00) continue; //Don't even bother with opcode 0x00, standing for "do nothing"
+            if(KMEM[genes[i].val()] == null) continue; //If the opcode doesn't actually stand for something meaningful, skip it too
+
+            //Since everything appears to be in order, let's try to parse that as a gene. (Normally we'd run it.)
+            result += "§k" + identifier + Integer.toHexString(i);
+            result += "§g" + KMEM[genes[i].val()].getMeaning().getName() + " §k(";
+            result += "§b" + genes[i+1].val() + " §k[" + WMEM[genes[i+1].val()].val() + "], ";
+            result += "§b" + genes[i+2].val() + " §k[" + WMEM[genes[i+2].val()].val() + "],";
+            result += "§b" + genes[i+3].val() + " §k[" + WMEM[genes[i+3].val()].val() + "]) \n";
+
+
+            //Assuming nothing went wrong we've completed a command by now. (If something did go wrong, we'll at least have a stack trace.)
+            i += 3; //We don't want to run the arguments by accident, so let's skip them.
+
+        }
+
+        return result;
+    }
+
+    private String passiveMemoryToString(UByte[] genes, char identifier) {
+
+        String result = "§b";
+
+        for(int i = 0; i < genes.length; i++) {
+            if(i%4 == 0) result += "\n" + identifier + Integer.toHexString(i/16) + Integer.toHexString(i%16) + "\t";
+            result += "§k|  " + genes[i].val() +"\t§b";
+        }
+
+        return result;
+    }
+
+    public String stringUMEM(int memory) {return activeMemoryToString(UMEM[memory], '%');}
+    public String stringPMEM(int memory) {return activeMemoryToString(PMEM[memory], '@');}
+    public String stringSMEM(int memory) {return passiveMemoryToString(SMEM[memory], '$');}
+    public String stringWMEM() {return passiveMemoryToString(WMEM, '&');}
     /*-----------------------------------------------------------------
      * Reflected methods (genes) are below.
      * Beware. Not intended for human consumption.
@@ -429,7 +471,7 @@ public class Tank extends Entity {
      */
     // 0 (DEV ONLY)
     public void _SNO (int arg0, int arg1, int arg2) {/* Significant nothing */}
-    public void _PRINT(int arg0, int arg1, int arg2) {}//System.out.printf("%s says: %s, %s, %s.\n", name, WMEM[arg0].val(), WMEM[arg1].val(), WMEM[arg2].val());}
+    public void _PRINT(int arg0, int arg1, int arg2) {System.out.printf("%s says: %s, %s, %s.\n", name, WMEM[arg0].val(), WMEM[arg1].val(), WMEM[arg2].val());}
     // 1
     public void _GOTO (int arg0, int arg1, int arg2) {index = WMEM[arg0].val() - 1;}
     public void _GOE  (int arg0, int arg1, int arg2) {if(equal) index = WMEM[arg0].val() - 1;}
@@ -437,7 +479,7 @@ public class Tank extends Entity {
     public void _IGOTO(int arg0, int arg1, int arg2) {index = arg0 - 1;}
     public void _IGOE (int arg0, int arg1, int arg2) {if(equal) index = arg0 - 1;}
     public void _IGOG (int arg0, int arg1, int arg2) {if(greater) index = arg0 - 1;}
-    public void _COMP (int arg0, int arg1, int arg2) {equal = (WMEM[arg0].val() == WMEM[arg1].val()); greater = (WMEM[arg0].val() > WMEM[arg1].val());}
+    public void _COMP (int arg0, int arg1, int arg2) {equal = (WMEM[arg0].val() == WMEM[arg1].val());greater = (WMEM[arg0].val() > WMEM[arg1].val());}
     // 2
     public void _MOV  (int arg0, int arg1, int arg2) {WMEM[arg0] = WMEM[arg1];}
     public void _SSTO (int arg0, int arg1, int arg2) {SMEM[arg0][arg1] = WMEM[arg2];}
@@ -485,16 +527,16 @@ public class Tank extends Entity {
     public void _BWXOR(int arg0, int arg1, int arg2) {WMEM[arg0] = ub(arg1 ^ arg2);}
     public void _INCR (int arg0, int arg1, int arg2) {WMEM[arg0] = ub(WMEM[arg0].val() + 1);}
     // 7
-    public void _OTYPE(int arg0, int arg1, int arg2) {WMEM[arg0] = ub(typeOf(handler.getByUUID(WMEM[arg1],WMEM[arg2])));}
-    public void _OHP  (int arg0, int arg1, int arg2) {WMEM[arg0] = ub(handler.getByUUID(WMEM[arg1],WMEM[arg2]).health);}
-    public void _OCOG (int arg0, int arg1, int arg2) {WMEM[arg0] = ub(((Tank) handler.getByUUID(WMEM[arg1],WMEM[arg2])).cogs);}
+    public void _OTYPE(int arg0, int arg1, int arg2) {if(handler.getByUUID(WMEM[arg1],WMEM[arg2]) instanceof Tank) WMEM[arg0] = ub(typeOf(handler.getByUUID(WMEM[arg1],WMEM[arg2])));}
+    public void _OHP  (int arg0, int arg1, int arg2) {if(handler.getByUUID(WMEM[arg1],WMEM[arg2]) instanceof Tank) WMEM[arg0] = ub(handler.getByUUID(WMEM[arg1],WMEM[arg2]).health);}
+    public void _OCOG (int arg0, int arg1, int arg2) {if(handler.getByUUID(WMEM[arg1],WMEM[arg2]) instanceof Tank) WMEM[arg0] = ub(((Tank) handler.getByUUID(WMEM[arg1],WMEM[arg2])).cogs);}
     // 8
     public void _WALL (int arg0, int arg1, int arg2) {} //TODO Implement _WALL() [when Walls exist]
     public void _SPIT (int arg0, int arg1, int arg2) {} //TODO Implement _SPIT() [when Cogs exist]
     public void _LED (int arg0, int arg1, int arg2) {setLEDR(WMEM[arg0].val());setLEDG(WMEM[arg1].val());setLEDB(WMEM[arg2].val());}
     public void _OLEDR(int arg0, int arg1, int arg2) {if(handler.getByUUID(WMEM[arg1],WMEM[arg2]) instanceof Tank)  WMEM[arg0] = ub(((Tank) handler.getByUUID(WMEM[arg1],WMEM[arg2])).flashR);}
-    public void _OLEDG(int arg0, int arg1, int arg2) {WMEM[arg0] = ub(((Tank) handler.getByUUID(WMEM[arg1],WMEM[arg2])).flashG);}
-    public void _OLEDB(int arg0, int arg1, int arg2) {WMEM[arg0] = ub(((Tank) handler.getByUUID(WMEM[arg1],WMEM[arg2])).flashB);}
+    public void _OLEDG(int arg0, int arg1, int arg2) {if(handler.getByUUID(WMEM[arg1],WMEM[arg2]) instanceof Tank) WMEM[arg0] = ub(((Tank) handler.getByUUID(WMEM[arg1],WMEM[arg2])).flashG);}
+    public void _OLEDB(int arg0, int arg1, int arg2) {if(handler.getByUUID(WMEM[arg1],WMEM[arg2]) instanceof Tank) WMEM[arg0] = ub(((Tank) handler.getByUUID(WMEM[arg1],WMEM[arg2])).flashB);}
     // 9
     public void _UUIDM(int arg0, int arg1, int arg2) {WMEM[arg0] = ub(uuidMost);}
     public void _UUIDL(int arg0, int arg1, int arg2) {WMEM[arg0] = ub(uuidLeast);}

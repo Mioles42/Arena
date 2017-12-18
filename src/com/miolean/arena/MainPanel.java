@@ -10,9 +10,10 @@ public class MainPanel extends JPanel implements Runnable, KeyListener, MouseLis
     private Handler handler;
     private Distributor distributor;
 
-    private Entity viewholder;
+    Entity viewholder;
 
     private boolean isRunning = true;
+    private Window window;
 
     //Let's also measure whether we are using the extra tick time to render (if not, adding tick speed will do nothing)
     boolean renderPoint = false;
@@ -26,6 +27,7 @@ public class MainPanel extends JPanel implements Runnable, KeyListener, MouseLis
 
         Entity[] entities = new Entity[0xFFFF];
 
+        window = new Window(this);
         renderer = new Renderer(entities);
         handler = new Handler(entities);
         distributor = new Distributor(handler);
@@ -33,12 +35,12 @@ public class MainPanel extends JPanel implements Runnable, KeyListener, MouseLis
         handler.add(new ControlledTank(300, 300));
         viewholder = entities[0];
 
-        Entity dummy = new Tank("eve");
+        Tank dummy = new Tank("eve");
+        window.setActiveTank(dummy);
         dummy.health = 256;
 
         handler.add(dummy);
 
-        JFrame window = new Window(this);
 
 
         this.setBackground(new Color(170, 170, 160));
@@ -75,6 +77,8 @@ public class MainPanel extends JPanel implements Runnable, KeyListener, MouseLis
             long time = System.currentTimeMillis();
             handler.update();
             distributor.distribute();
+            window.update();
+
             Global.time++;
             this.repaint();
 
@@ -97,7 +101,6 @@ public class MainPanel extends JPanel implements Runnable, KeyListener, MouseLis
         renderer.render(g);
 
     }
-
 
     @Override public void keyTyped(KeyEvent e) {}
     @Override public void keyPressed(KeyEvent e) {
@@ -128,6 +131,11 @@ public class MainPanel extends JPanel implements Runnable, KeyListener, MouseLis
         }
     }
     @Override public void mouseClicked(MouseEvent e) {
+
+        if(! this.hasFocus()) {
+            this.requestFocus();
+            return;
+        }
         int x = (int) (e.getX() + viewholder.x - this.getWidth()/2);
         int y = (int) (e.getY() + viewholder.y - this.getHeight()/2);
 
@@ -146,6 +154,7 @@ public class MainPanel extends JPanel implements Runnable, KeyListener, MouseLis
             viewholder = newHolder;
         }
 
+        if(viewholder instanceof Tank && !(viewholder instanceof ControlledTank)) window.setActiveTank((Tank) viewholder);
     }
     @Override public void mousePressed(MouseEvent e) {}
     @Override public void mouseReleased(MouseEvent e) {}
