@@ -77,15 +77,15 @@ public class Window extends JFrame implements ChangeListener ,KeyListener {
         c.weightx = .2;
         c.weighty = .5;
 
-        ImageIcon genomeIcon = new ImageIcon(Window.class.getClassLoader().getResource("tex/list.png"));
+        //ImageIcon genomeIcon = new ImageIcon(Window.class.getClassLoader().getResource("tex/list.png"));
 
         makeGenomePanel(genomePanel);
 
         infoPanel.addTab("Program Memory", memoryPanel);
         infoPanel.addTab("Used Set", usedSetPanel);
-        infoPanel.addTab("Genome", genomeIcon, genomePanel);
+        infoPanel.addTab("Genome", genomePanel);
 
-        JLabel genomeLabel = new JLabel("Genome", genomeIcon, JLabel.CENTER);
+        JLabel genomeLabel = new JLabel("Genome", JLabel.CENTER);
         genomeLabel.setVerticalTextPosition(JLabel.BOTTOM);
         genomeLabel.setHorizontalTextPosition(JLabel.CENTER);
         infoPanel.setTabComponentAt(2, genomeLabel);

@@ -421,6 +421,7 @@ public class Tank extends Entity {
     }
 
     private String activeMemoryToString(UByte[] genes, char identifier) {
+        if(genes == null) return "§r No memory exists here.";
 
         String result = "";
 
@@ -449,7 +450,7 @@ public class Tank extends Entity {
     }
 
     private String passiveMemoryToString(UByte[] genes, char identifier) {
-
+        if(genes == null) return "§r No memory exists here.";
         String result = "§b";
 
         for(int i = 0; i < genes.length; i++) {
