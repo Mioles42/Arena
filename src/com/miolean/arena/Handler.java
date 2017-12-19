@@ -15,6 +15,8 @@ class Handler {
     }
 
     void update() {
+        Global.time++;
+
         for(Entity e: entities) {
             if(e == null) continue;
             e.update();

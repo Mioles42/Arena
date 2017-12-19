@@ -4,16 +4,19 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
+import static com.miolean.arena.Global.ARENA_SIZE;
+import static com.miolean.arena.Global.BORDER;
+
 public class MainPanel extends JPanel implements Runnable, KeyListener, MouseListener, WindowListener, MouseMotionListener {
 
     private Renderer renderer;
     private Handler handler;
     private Distributor distributor;
+    private Window window;
 
     Entity viewholder;
 
     private boolean isRunning = true;
-    private Window window;
 
     //Let's also measure whether we are using the extra tick time to render (if not, adding tick speed will do nothing)
     boolean renderPoint = false;
@@ -41,8 +44,6 @@ public class MainPanel extends JPanel implements Runnable, KeyListener, MouseLis
 
         handler.add(dummy);
 
-
-
         this.setBackground(new Color(170, 170, 160));
 
         this.addKeyListener(this);
@@ -66,40 +67,79 @@ public class MainPanel extends JPanel implements Runnable, KeyListener, MouseLis
     public void run() {
         System.out.println("Running...");
 
-        //How long does a single tick last?
-        double tickTime = 1000 * (1.0 / (double) Global.tickSpeed);
-        System.out.println("[com.miolean.arena.MainPanel.run()] Found " + tickTime + " milliseconds per tick");
-
+        long lastUpdate = System.currentTimeMillis();
+        long lastRender = System.currentTimeMillis();
+        long lastDisplay = System.currentTimeMillis();
+        long lastDistribute = System.currentTimeMillis();
 
         while(isRunning) {
             renderPoint = false;
-            tickTime = 1000 * (1.0 / (double) Global.tickSpeed);
+
             long time = System.currentTimeMillis();
-            handler.update();
-            distributor.distribute();
-            window.update();
 
-            Global.time++;
-            this.repaint();
+            if(time > lastUpdate + Global.updateCycle) {
+                handler.update();
+                lastUpdate = time;
+            }
+            time = System.currentTimeMillis();
 
-            while(System.currentTimeMillis() < time + tickTime) {
-                this.repaint();
-                renderPoint = true;
+            if(time > lastRender + Global.renderCycle) {
+                repaint();
+                lastRender = time;
+            }
+            time = System.currentTimeMillis();
+
+            if(time > lastDisplay + Global.displayCycle) {
+                window.display();
+                lastDisplay = time;
+            }
+            time = System.currentTimeMillis();
+
+            if(time > lastDistribute + Global.distributeCycle) {
+                distributor.distribute();
+                lastDistribute = time;
             }
         }
     }
 
     private void render(Graphics g) {
         g.setColor(Color.BLACK);
-        g.drawString(Global.tickSpeed + "tk/s", 15, 25);
+        g.drawString((int) (1000/Global.updateCycle) + "tk/s", 15, 25);
         g.drawString("Time:" + Global.time + "tks", 15, 45);
         g.drawString("Entities:" + handler.numEntities, 15, 65);
         if(! renderPoint) g.drawString("Tick limit reached", 15, 85);
         g.drawOval(this.getWidth()/2, this.getHeight()/2, 2, 2);
 
         g.translate((int) (-viewholder.x + this.getWidth()/2), (int) (-viewholder.y + this.getHeight()/2));
+
+        g.setColor(Color.GRAY);
+        for(int i = 0; i < ARENA_SIZE / 64; i++) {
+            g.drawLine(i*64, BORDER, i*64, ARENA_SIZE -BORDER);
+            g.drawLine(BORDER, i*64, ARENA_SIZE - BORDER, i*64);
+        }
+
+        g.setColor(Color.RED);
+        g.drawRect(10, 10, ARENA_SIZE - BORDER, ARENA_SIZE - BORDER);
+
         renderer.render(g);
 
+        g.translate((int) -(-viewholder.x + this.getWidth()/2), (int) -(-viewholder.y + this.getHeight()/2));
+
+        g.setColor(new Color(255, 100, 100, 200));
+        g.fillRect(15, getHeight()-60, viewholder.health, 20);
+        g.setColor(Color.BLACK);
+        g.drawRect(15, getHeight()-60, viewholder.health, 20);
+        if(viewholder.health < 20) g.drawString(viewholder.health + "", 18 + viewholder.health, getHeight()-45);
+        else g.drawString(viewholder.health + "", 18, getHeight()-45);
+
+        if(viewholder instanceof Tank) {
+            g.setColor(new Color(100, 100, 255, 200));
+            g.fillRect(15, getHeight() - 90, ((Tank)viewholder).cogs, 20);
+            g.setColor(Color.BLACK);
+            if(((Tank)viewholder).cogs < 20) g.drawString(((Tank)viewholder).cogs + "", 18 + ((Tank)viewholder).cogs, getHeight()-75);
+            else g.drawString(((Tank)viewholder).cogs + "", 18, getHeight()-75);
+            g.drawRect(15, getHeight() - 90, ((Tank)viewholder).cogs, 20);
+        }
     }
 
     @Override public void keyTyped(KeyEvent e) {}
