@@ -126,19 +126,19 @@ public class MainPanel extends JPanel implements Runnable, KeyListener, MouseLis
         g.translate((int) -(-viewholder.x + this.getWidth()/2), (int) -(-viewholder.y + this.getHeight()/2));
 
         g.setColor(new Color(255, 100, 100, 200));
-        g.fillRect(15, getWidth()-100, viewholder.health, 20);
+        g.fillRect(15, getHeight()-60, viewholder.health, 20);
         g.setColor(Color.BLACK);
-        g.drawRect(15, getWidth()-100, viewholder.health, 20);
-        if(viewholder.health < 20) g.drawString(viewholder.health + "", 18 + viewholder.health, getWidth()-85);
-        else g.drawString(viewholder.health + "", 18, getWidth()-85);
+        g.drawRect(15, getHeight()-60, viewholder.health, 20);
+        if(viewholder.health < 20) g.drawString(viewholder.health + "", 18 + viewholder.health, getHeight()-45);
+        else g.drawString(viewholder.health + "", 18, getHeight()-45);
 
         if(viewholder instanceof Tank) {
             g.setColor(new Color(100, 100, 255, 200));
-            g.fillRect(15, getWidth() - 150, ((Tank)viewholder).cogs, 20);
+            g.fillRect(15, getHeight() - 90, ((Tank)viewholder).cogs, 20);
             g.setColor(Color.BLACK);
-            if(((Tank)viewholder).cogs < 20) g.drawString(((Tank)viewholder).cogs + "", 18 + ((Tank)viewholder).cogs, getWidth()-135);
-            else g.drawString(((Tank)viewholder).cogs + "", 18, getWidth()-135);
-            g.drawRect(15, getWidth() - 150, ((Tank)viewholder).cogs, 20);
+            if(((Tank)viewholder).cogs < 20) g.drawString(((Tank)viewholder).cogs + "", 18 + ((Tank)viewholder).cogs, getHeight()-75);
+            else g.drawString(((Tank)viewholder).cogs + "", 18, getHeight()-75);
+            g.drawRect(15, getHeight() - 90, ((Tank)viewholder).cogs, 20);
         }
     }
 

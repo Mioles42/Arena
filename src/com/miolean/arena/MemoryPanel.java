@@ -130,7 +130,12 @@ public class MemoryPanel extends JPanel {
                 try { doc.insertString(doc.getLength(), next.substring(1), style); }
                 catch (BadLocationException e){}
             }
-            textPane.setDocument(doc);
+            //Sometimes we can't get to the text pane, which is a problem.
+            try {
+                textPane.setDocument(doc);
+            } catch (Exception e) {
+                System.err.println("Error caught from Swing internals");
+            }
         }
 
         //repaint();

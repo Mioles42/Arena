@@ -136,6 +136,7 @@ public class Tank extends Entity {
         //Stats
         for(int i = 0; i < stats.length; i++) stats[i] = ub(10);
         health = 11;
+        cogs = 40;
 
         int maxOffset = Global.ARENA_SIZE / 8;
         x = parent.x + maxOffset * (Math.random()*2-1);
@@ -201,8 +202,6 @@ public class Tank extends Entity {
         g.setColor(Color.black);
         g.drawOval((int) (x - width/2), (int) (y - height/2), width, height);
 
-        //Body! (This part's easy)
-        //(There's actually no calculation necessary for this.)
 
         //Trigonometric functions are expensive so let's use math to minimize
         //how many times we have to calculate them.
