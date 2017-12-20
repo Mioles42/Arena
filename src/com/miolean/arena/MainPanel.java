@@ -53,7 +53,7 @@ public class MainPanel extends JPanel implements Runnable, KeyListener, MouseLis
 
         window.setSize(1200, 700);
         window.setName("Arena");
-        window.setLocation(300, 300);
+        window.setLocation(50, 200);
         window.setVisible(true);
 
         requestFocus();
