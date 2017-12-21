@@ -29,6 +29,7 @@ class Handler {
 
     void remove(int uuid) {
         entities[uuid].onDeath();
+        entities[uuid].handler = null;
         entities[uuid] = null;
         numEntities--;
     }

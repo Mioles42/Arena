@@ -292,7 +292,7 @@ public class Tank extends Entity {
 
             //Since everything appears to be in order, let's try to run that as a gene.
             try {
-                System.out.printf("%s(%d, %d, %d)\n", KMEM[genes[index].val()].getMeaning().getName(), genes[index+1].val(), genes[index+2].val(), genes[index+3].val());
+                //System.out.printf("%s(%d, %d, %d)\n", KMEM[genes[index].val()].getMeaning().getName(), genes[index+1].val(), genes[index+2].val(), genes[index+3].val());
                 KMEM[genes[index].val()].getMeaning().invoke(this, genes[index+1].val(), genes[index+2].val(), genes[index+3].val());
 
             } catch (IllegalAccessException | InvocationTargetException e) { e.printStackTrace(); }
@@ -482,12 +482,12 @@ public class Tank extends Entity {
     public void _COMP (int arg0, int arg1, int arg2) {equal = (WMEM[arg0].val() == WMEM[arg1].val());greater = (WMEM[arg0].val() > WMEM[arg1].val());}
     // 2
     public void _MOV  (int arg0, int arg1, int arg2) {WMEM[arg0] = WMEM[arg1];}
-    public void _SSTO (int arg0, int arg1, int arg2) {SMEM[arg0][arg1] = WMEM[arg2];}
-    public void _PSTO (int arg0, int arg1, int arg2) {PMEM[arg0][arg1] = WMEM[arg2];}
-    public void _USTO (int arg0, int arg1, int arg2) {UMEM[arg0][arg1] = WMEM[arg2];}
-    public void _SGET (int arg0, int arg1, int arg2) {WMEM[arg0] = SMEM[arg1][arg2];}
-    public void _PGET (int arg0, int arg1, int arg2) {WMEM[arg0] = PMEM[arg1][arg2];}
-    public void _UGET (int arg0, int arg1, int arg2) {WMEM[arg0] = UMEM[arg1][arg2];}
+    public void _SSTO (int arg0, int arg1, int arg2) {if(SMEM[WMEM[arg0].val()] != null) SMEM[WMEM[arg0].val()][WMEM[arg1].val()] = WMEM[arg2];}
+    public void _PSTO (int arg0, int arg1, int arg2) {if(PMEM[WMEM[arg0].val()] != null) PMEM[WMEM[arg0].val()][WMEM[arg1].val()] = WMEM[arg2];}
+    public void _USTO (int arg0, int arg1, int arg2) {if(UMEM[WMEM[arg0].val()] != null) UMEM[WMEM[arg0].val()][WMEM[arg1].val()] = WMEM[arg2];}
+    public void _SGET (int arg0, int arg1, int arg2) {if(SMEM[WMEM[arg1].val()] != null) WMEM[arg0] = SMEM[WMEM[arg1].val()][WMEM[arg2].val()];}
+    public void _PGET (int arg0, int arg1, int arg2) {if(PMEM[WMEM[arg1].val()] != null) WMEM[arg0] = PMEM[WMEM[arg1].val()][WMEM[arg2].val()];}
+    public void _UGET (int arg0, int arg1, int arg2) {if(UMEM[WMEM[arg1].val()] != null) WMEM[arg0] = UMEM[WMEM[arg1].val()][WMEM[arg2].val()];}
     public void _IMOV (int arg0, int arg1, int arg2) {WMEM[arg0] = ub(arg1);}
     public void _ISSTO(int arg0, int arg1, int arg2) {SMEM[arg0][arg1] = ub(arg2);}
     public void _IPSTO(int arg0, int arg1, int arg2) {PMEM[arg0][arg1] = ub(arg2);}
