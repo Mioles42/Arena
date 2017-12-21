@@ -292,8 +292,7 @@ public class Tank extends Entity {
 
             //Since everything appears to be in order, let's try to run that as a gene.
             try {
-                //System.out.printf(name + " is running command %s(%d, %d, %d)\n", KMEM[genes[index].val()].getMeaning().getName(), genes[index+1].val(), genes[index+2].val(), genes[index+3].val());
-
+                System.out.printf("%s(%d, %d, %d)\n", KMEM[genes[index].val()].getMeaning().getName(), genes[index+1].val(), genes[index+2].val(), genes[index+3].val());
                 KMEM[genes[index].val()].getMeaning().invoke(this, genes[index+1].val(), genes[index+2].val(), genes[index+3].val());
 
             } catch (IllegalAccessException | InvocationTargetException e) { e.printStackTrace(); }
@@ -434,7 +433,7 @@ public class Tank extends Entity {
             if(KMEM[genes[i].val()] == null) continue; //If the opcode doesn't actually stand for something meaningful, skip it too
 
             //Since everything appears to be in order, let's try to parse that as a gene. (Normally we'd run it.)
-            result += "§k" + identifier + Integer.toHexString(i);
+            result += "§k" + identifier + Integer.toHexString(i) + " ";
             result += "§g" + KMEM[genes[i].val()].getMeaning().getName() + " §k(";
             result += "§b" + genes[i+1].val() + " §k[" + WMEM[genes[i+1].val()].val() + "], ";
             result += "§b" + genes[i+2].val() + " §k[" + WMEM[genes[i+2].val()].val() + "],";
@@ -547,7 +546,7 @@ public class Tank extends Entity {
     // A
     public void _UPG  (int arg0, int arg1, int arg2) {upgrade(WMEM[arg0], WMEM[arg1].val());}
     public void _STAT (int arg0, int arg1, int arg2) {WMEM[arg0] = stats[Math.abs(arg1>>4)];}
-    public void _KWGT (int arg0, int arg1, int arg2) {WMEM[arg0] = KMEM[WMEM[arg1].val()].weight;}
+    public void _KWGT (int arg0, int arg1, int arg2) {if(KMEM[WMEM[arg1].val()] != null) WMEM[arg0] = KMEM[WMEM[arg1].val()].weight;}
     public void _COST (int arg0, int arg1, int arg2) {if(KMEM[WMEM[arg1].val()] != null) WMEM[arg0] = KMEM[WMEM[arg1].val()].cost;}
     // B
 
