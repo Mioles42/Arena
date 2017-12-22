@@ -33,7 +33,7 @@ abstract class Entity {
     int health = 1;
 
     //Other things:
-    Handler handler; //The Handler which manages this Entity and which can be asked to destroy it.
+    Handler handler; //The Handler which manages this Entity and which can be asked to destroy it. Null if dead.
     int uuidMost; //A Universally Unique ID for use by other Entities (namely Tanks) to reference it. Can totally be negative.
     int uuidLeast;
 

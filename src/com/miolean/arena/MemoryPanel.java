@@ -96,46 +96,56 @@ public class MemoryPanel extends JPanel {
 
     void updateInfo() {
 
-        int scrollPosition = scrollPane.getVerticalScrollBar().getValue();
+
+        StyledDocument doc = new DefaultStyledDocument();
+        String text = "§";
 
         if(source != null) {
 
-            StyledDocument doc = new DefaultStyledDocument();
-            String text = "§";
-            switch (comboBox.getSelectedIndex()) {
-                case INDEX_UMEM: text = (source.stringUMEM((int) spinner.getValue())); break;
-                case INDEX_PMEM: text = (source.stringPMEM((int) spinner.getValue())); break;
-                case INDEX_SMEM: text = (source.stringSMEM((int) spinner.getValue())); break;
-                case INDEX_WMEM: text = (source.stringWMEM()); break;
+            text += "c\n\nTank " + source.name;
+
+                switch (comboBox.getSelectedIndex()) {
+                case INDEX_UMEM:
+                    text = (source.stringUMEM((int) spinner.getValue()));
+                    break;
+                case INDEX_PMEM:
+                    text = (source.stringPMEM((int) spinner.getValue()));
+                    break;
+                case INDEX_SMEM:
+                    text = (source.stringSMEM((int) spinner.getValue()));
+                    break;
+                case INDEX_WMEM:
+                    text = (source.stringWMEM());
+                    break;
+            }
+        } else text += "rNo Tank selected.";
+
+        Scanner scanner = new Scanner(text);
+        scanner.useDelimiter(Pattern.compile("§"));
+        while(scanner.hasNext()) {
+
+            Style style = textPane.addStyle("current", null);
+
+            String next = scanner.next();
+            switch(next.substring(0,1)){
+                case "r": StyleConstants.setForeground(style, Color.RED.darker()); break;
+                case "b": StyleConstants.setForeground(style, Color.BLUE.darker()); break;
+                case "g": StyleConstants.setForeground(style, Color.GREEN.darker()); break;
+                case "y": StyleConstants.setForeground(style, Color.YELLOW.darker()); break;
+                case "m": StyleConstants.setForeground(style, Color.MAGENTA.darker()); break;
+                case "c": StyleConstants.setForeground(style, Color.CYAN.darker()); break;
+                case "k": StyleConstants.setForeground(style, Color.BLACK.darker()); break;
+
             }
 
-            Scanner scanner = new Scanner(text);
-            scanner.useDelimiter(Pattern.compile("§"));
-            while(scanner.hasNext()) {
+            try { doc.insertString(doc.getLength(), next.substring(1), style); }
+            catch (BadLocationException e){}
+        }
 
-                Style style = textPane.addStyle("current", null);
-
-                String next = scanner.next();
-                switch(next.substring(0,1)){
-                    case "r": StyleConstants.setForeground(style, Color.RED.darker()); break;
-                    case "b": StyleConstants.setForeground(style, Color.BLUE.darker()); break;
-                    case "g": StyleConstants.setForeground(style, Color.GREEN.darker()); break;
-                    case "y": StyleConstants.setForeground(style, Color.YELLOW.darker()); break;
-                    case "m": StyleConstants.setForeground(style, Color.MAGENTA.darker()); break;
-                    case "c": StyleConstants.setForeground(style, Color.CYAN.darker()); break;
-                    case "k": StyleConstants.setForeground(style, Color.BLACK.darker()); break;
-
-                }
-
-                try { doc.insertString(doc.getLength(), next.substring(1), style); }
-                catch (BadLocationException e){}
-            }
-            //Sometimes we can't get to the text pane, which is a problem.
-            try {
-                textPane.setDocument(doc);
-            } catch (Exception e) {
-                System.err.println("Error caught from Swing internals");
-            }
+        try {
+            textPane.setDocument(doc);
+        } catch (Exception e) {
+            System.err.println("Error caught from Swing internals");
         }
 
         //repaint();

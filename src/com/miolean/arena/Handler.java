@@ -29,6 +29,7 @@ class Handler {
 
     void remove(int uuid) {
         entities[uuid].onDeath();
+        entities[uuid].handler = null;
         entities[uuid] = null;
         numEntities--;
     }
@@ -70,8 +71,9 @@ class Handler {
         return count;
     }
 
+    //TODO more than 256 entity support
     Entity getByUUID(UByte uuidLeast, UByte uuidMost) {
-        return entities[uuidMost.val()<<8 + uuidLeast.val()];
+        return entities[uuidLeast.val()];
     }
 
     Entity entityAtLocation(int x, int y) {

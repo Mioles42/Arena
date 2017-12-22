@@ -80,9 +80,11 @@ public class Tank extends Entity {
     int cogs = 0;
     private int viewDistance = 10;
     private long lastFireTime = Global.time;
-    private String name = "";
+    String name = "";
     private static int totalKWeight;
     private boolean generateLog = false;
+
+    Tank lastChild = null;
 
 
 
@@ -145,55 +147,178 @@ public class Tank extends Entity {
 
     //Create a Tank from a file
     Tank(String file) {
-        //Todo: This is totally a placeholder
-        //0: Initial values for testing.
+
+        //0: Initial values.
         x = 100;
         y = 100;
         r = 0;
         width = 40;
         height = 40;
         name = file;
+        flashR = 0;
+        flashG = 0;
+        flashB = 0;
 
         //1: Initialize memories.
         UMEM = new UByte[256][];
         PMEM = new UByte[256][];
         SMEM = new UByte[256][];
         WMEM = new UByte[256];
-        createMemory(UMEM, ub(0));
-        createMemory(PMEM, ub(0));
-        createMemory(SMEM, ub(0));
 
-        for(int i = 0; i < 256; i++) WMEM[i] = ub(0);
+        UMEM[0] = new UByte[256];
+        PMEM[0] = new UByte[256];
+        SMEM[0] = new UByte[256];
+
 
         //2: Initialize stats.
         for(int i = 0; i < stats.length; i++) stats[i] = ub(10);
 
         //3: Grab memories from file.
-        Scanner in = new Scanner(Tank.class.getClassLoader().getResourceAsStream("gen/" + file + ".txt"));
+        Scanner in = new Scanner(Tank.class.getClassLoader().getResourceAsStream("gen/" + file + ".atnk"));
         String next;
-        String value;
+
+        int loadIndex = 0;
+        int loadMode = 0;
+        int loadMemory = 0;
+
         while(in.hasNext()) {
-            next = in.next().trim();
-            value = in.next().trim();
-            if(value.startsWith("_")) {
+            next = undecorate(in.next()).trim();
+
+            //If next is a comment: Run through it until it ends
+            if(next.equals("##")) {
+                do next = in.next().trim();
+                while (! next.equals("#/"));
+                next = undecorate(in.next()).trim();
+            }
+
+            //If next is a command: Translate it into its number
+            if(next.startsWith("_")) {
+                if(loadMode < 2) throwCompileError("Command in passive memory.");
                 for(int i = 0; i < KMEM.length; i++) {
-                    Gene g = KMEM[i];
-                    if(g == null) continue;
-                    if(g.getMeaning().getName().equals(value)) value = Integer.toHexString(i);
+                    if(KMEM[i] != null && KMEM[i].getMeaning().getName().equals(next)) next = i + "";
                 }
             }
-            if(next.substring(0,1).equals("~")){
-                if(next.substring(1).equals("$")) loadedS = Integer.parseInt(value.substring(0,2), 16);
-                if(next.substring(1).equals("@")) loadedP = Integer.parseInt(value.substring(0,2), 16);
-                if(next.substring(1).equals("%")) loadedU = Integer.parseInt(value.substring(0,2), 16);
+
+            if(next.charAt(0) == '-') next = "0";
+
+            //If next is a define statement, define a new memory
+            if(next.equals("define")) {
+                next = undecorate(in.next()).trim();
+                int defMemory;
+                int defLength;
+
+                try {
+                    defMemory = Integer.parseInt(in.next().trim());
+                    defLength = Integer.parseInt(in.next().trim());
+
+                    switch(next) {
+                        case "registry":
+                            throwCompileError("Cannot define new registry.");
+                            break;
+                        case "storage":
+                            SMEM[defMemory] = new UByte[defLength];
+                            break;
+                        case "program":
+                            PMEM[defMemory] = new UByte[defLength];
+                            break;
+                        case "meta":
+                            UMEM[defMemory] = new UByte[defLength];
+                            break;
+                    }
+
+                } catch(NumberFormatException e) {throwCompileError("Memory and length expected after \"define\"");}
             }
-            if(next.substring(0,1).equals("&")) WMEM[Integer.parseInt(next.substring(1), 16)] = ub(Integer.parseInt(value, 16));
-            if(next.substring(0,1).equals("$")) SMEM[loadedS][Integer.parseInt(next.substring(1), 16)] = ub(Integer.parseInt(value, 16));
-            if(next.substring(0,1).equals("@")) PMEM[loadedP][Integer.parseInt(next.substring(1), 16)] = ub(Integer.parseInt(value, 16));
-            if(next.substring(0,1).equals("%")) UMEM[loadedU][Integer.parseInt(next.substring(1), 16)] = ub(Integer.parseInt(value, 16));
+
+            //If next is a edit statement: load the memory it specifies, and reset the index
+            else if(next.equals("edit")) {
+                loadIndex = 0;
+                next = undecorate(in.next()).trim();
+                switch(next) {
+                    case "registry": loadMode = 0; break;
+                    case "storage": loadMode = 1; break;
+                    case "program": loadMode = 2; break;
+                    case "meta": loadMode = 3; break;
+                }
+
+                //Load multi-memory if it's that kind of memory
+                if(! next.equals("registry")) {
+                    next = undecorate(in.next()).trim();
+                    loadMemory = Integer.parseInt(next);
+
+                    if(loadMemory > 255) throwCompileError("Memory number out of bounds; must be between 0 and 255");
+
+                    switch (loadMode) {
+                        case 1:
+                            if(SMEM[loadMemory] == null) throwCompileError("No storage defined at " + loadMemory);
+                            break;
+                        case 2:
+                            if(PMEM[loadMemory] == null) throwCompileError("No program defined at " + loadMemory);
+                            break;
+                        case 3:
+                            if(UMEM[loadMemory] == null) throwCompileError("No meta defined at " + loadMemory);
+                            break;
+
+                    }
+                }
+            }
+
+            //If next is an at statement: move the index to what is specified
+            else if(next.equals(("at"))) {
+                next = undecorate(in.next()).trim();
+                try {loadIndex = Integer.parseInt(next);}
+                catch (NumberFormatException e) {throwCompileError("Index expected after \"at\"; instead received \"" + next + "\"");}
+                if(loadIndex > 255) throwCompileError("\"at\" index invalid (must be between 0 and 255)");
+            }
+
+            //If next is a direct command other than "define"
+            else if(next.equals("name")) {
+                next = undecorate(in.next()).trim();
+                this.name = next;
+            }
+
+            //At this point this is pretty clearly an entry.
+            else {
+                try {
+                    switch (loadMode) {
+                        case 0:
+                            if(WMEM[loadIndex] != null) throwCompileError("Registry at " + loadIndex + " already defined.");
+                            WMEM[loadIndex] = ub(Integer.parseInt(next));
+                            break;
+                        case 1:
+                            if(SMEM[loadMemory][loadIndex] != null) throwCompileError("Storage " + loadMemory + " at " + loadIndex + " already defined.");
+                            if(loadIndex >= SMEM[loadMemory].length) throwCompileError("Storage " + loadMemory + " index out of bounds.");
+                            SMEM[loadMemory][loadIndex] = ub(Integer.parseInt(next));
+                            break;
+                        case 2:
+                            if(PMEM[loadMemory][loadIndex] != null) throwCompileError("Program " + loadMemory + " at " + loadIndex + " already defined.");
+                            if(loadIndex >= PMEM[loadMemory].length) throwCompileError("Program " + loadMemory + " index out of bounds.");
+                            PMEM[loadMemory][loadIndex] = ub(Integer.parseInt(next));
+                            break;
+                        case 3:
+                            if(UMEM[loadMemory][loadIndex] != null) throwCompileError("Meta " + loadMemory + " at " + loadIndex + " already defined.");
+                            if(loadIndex >= UMEM[loadMemory].length) throwCompileError("Meta " + loadMemory + " index out of bounds.");
+                            UMEM[loadMemory][loadIndex] = ub(Integer.parseInt(next));
+                            break;
+                    }
+                    loadIndex++;
+                } catch(NumberFormatException e) {throwCompileError("Entry expected; instead received \"" + next + "\"");}
+            }
         }
 
+        for(int i = 0; i < 256; i++) if(WMEM[i] == null) WMEM[i] = ub(0);
+        for(int i = 0; i < 256; i++) if(SMEM[0][i] == null) SMEM[0][i] = ub(0);
+        for(int i = 0; i < 256; i++) if(PMEM[0][i] == null) PMEM[0][i] = ub(0);
+        for(int i = 0; i < 256; i++) if(UMEM[0][i] == null) UMEM[0][i] = ub(0);
+
         health = 11;
+    }
+    private String undecorate(String input) {
+        input = input.replace(';', ' ');
+        input = input.replace(':', ' ');
+        input = input.replace(',', ' ');
+        input = input.replace('{', ' ');
+        input = input.replace('}', ' ');
+        return input;
     }
 
     @Override
@@ -292,7 +417,7 @@ public class Tank extends Entity {
 
             //Since everything appears to be in order, let's try to run that as a gene.
             try {
-                System.out.printf("%s(%d, %d, %d)\n", KMEM[genes[index].val()].getMeaning().getName(), genes[index+1].val(), genes[index+2].val(), genes[index+3].val());
+                //System.out.printf("%s(%d, %d, %d)\n", KMEM[genes[index].val()].getMeaning().getName(), genes[index+1].val(), genes[index+2].val(), genes[index+3].val());
                 KMEM[genes[index].val()].getMeaning().invoke(this, genes[index+1].val(), genes[index+2].val(), genes[index+3].val());
 
             } catch (IllegalAccessException | InvocationTargetException e) { e.printStackTrace(); }
@@ -302,6 +427,13 @@ public class Tank extends Entity {
 
         }
     }
+
+    private void throwCompileError(String reason) {
+        System.err.println("Error compiling Tank " + name + ":");
+        System.err.println(reason);
+        System.exit(0);
+    }
+
     //Instantiate memory number [number] as a UByte[256].
     private void createMemory(UByte[][] memory, UByte number) {
         memory[number.val()] = new UByte[256];
@@ -391,6 +523,7 @@ public class Tank extends Entity {
     void reproduce() {
         Tank offspring = new Tank(this);
         handler.add(offspring);
+        lastChild = offspring;
     }
 
     void onDeath() {
@@ -402,24 +535,10 @@ public class Tank extends Entity {
     void onBirth() {
 
         System.out.println(name + " loaded ================================");
-
-        int numZeroes = 0;
-
-        for(UByte u: PMEM[loadedP]) {
-            if(u.val() == 0) numZeroes++;
-
-            if(u.val() != 0) {
-                System.out.println(u);
-                numZeroes = 0;
-            }
-
-            if(u.val() == 0 && numZeroes < 4) System.out.println("0");
-
-            if(numZeroes == 4) System.out.println("[...]");
-        }
+        System.out.println(activeMemoryToString(PMEM[0], false));
     }
 
-    private String activeMemoryToString(UByte[] genes, char identifier) {
+    private String activeMemoryToString(UByte[] genes, boolean color) {
         if(genes == null) return "§r No memory exists here.";
 
         String result = "";
@@ -433,7 +552,7 @@ public class Tank extends Entity {
             if(KMEM[genes[i].val()] == null) continue; //If the opcode doesn't actually stand for something meaningful, skip it too
 
             //Since everything appears to be in order, let's try to parse that as a gene. (Normally we'd run it.)
-            result += "§k" + identifier + Integer.toHexString(i) + " ";
+            result += "§k" + Integer.toHexString(i) + " ";
             result += "§g" + KMEM[genes[i].val()].getMeaning().getName() + " §k(";
             result += "§b" + genes[i+1].val() + " §k[" + WMEM[genes[i+1].val()].val() + "], ";
             result += "§b" + genes[i+2].val() + " §k[" + WMEM[genes[i+2].val()].val() + "],";
@@ -448,22 +567,22 @@ public class Tank extends Entity {
         return result;
     }
 
-    private String passiveMemoryToString(UByte[] genes, char identifier) {
+    private String passiveMemoryToString(UByte[] genes, boolean color) {
         if(genes == null) return "§r No memory exists here.";
         String result = "§b";
 
         for(int i = 0; i < genes.length; i++) {
-            if(i%4 == 0) result += "\n" + identifier + Integer.toHexString(i/16) + Integer.toHexString(i%16) + "\t";
+            if(i%4 == 0) result += "\n" + Integer.toHexString(i/16) + Integer.toHexString(i%16) + "\t";
             result += "§k|  " + genes[i].val() +"\t§b";
         }
 
         return result;
     }
 
-    public String stringUMEM(int memory) {return activeMemoryToString(UMEM[memory], '%');}
-    public String stringPMEM(int memory) {return activeMemoryToString(PMEM[memory], '@');}
-    public String stringSMEM(int memory) {return passiveMemoryToString(SMEM[memory], '$');}
-    public String stringWMEM() {return passiveMemoryToString(WMEM, '&');}
+    public String stringUMEM(int memory) {return activeMemoryToString(UMEM[memory], true);}
+    public String stringPMEM(int memory) {return activeMemoryToString(PMEM[memory], true);}
+    public String stringSMEM(int memory) {return passiveMemoryToString(SMEM[memory], true);}
+    public String stringWMEM() {return passiveMemoryToString(WMEM, true);}
     /*-----------------------------------------------------------------
      * Reflected methods (genes) are below.
      * Beware. Not intended for human consumption.
@@ -482,20 +601,20 @@ public class Tank extends Entity {
     public void _COMP (int arg0, int arg1, int arg2) {equal = (WMEM[arg0].val() == WMEM[arg1].val());greater = (WMEM[arg0].val() > WMEM[arg1].val());}
     // 2
     public void _MOV  (int arg0, int arg1, int arg2) {WMEM[arg0] = WMEM[arg1];}
-    public void _SSTO (int arg0, int arg1, int arg2) {SMEM[arg0][arg1] = WMEM[arg2];}
-    public void _PSTO (int arg0, int arg1, int arg2) {PMEM[arg0][arg1] = WMEM[arg2];}
-    public void _USTO (int arg0, int arg1, int arg2) {UMEM[arg0][arg1] = WMEM[arg2];}
-    public void _SGET (int arg0, int arg1, int arg2) {WMEM[arg0] = SMEM[arg1][arg2];}
-    public void _PGET (int arg0, int arg1, int arg2) {WMEM[arg0] = PMEM[arg1][arg2];}
-    public void _UGET (int arg0, int arg1, int arg2) {WMEM[arg0] = UMEM[arg1][arg2];}
+    public void _SSTO (int arg0, int arg1, int arg2) {if(SMEM[WMEM[arg0].val()] != null) SMEM[WMEM[arg0].val()][WMEM[arg1].val()] = WMEM[arg2];}
+    public void _PSTO (int arg0, int arg1, int arg2) {if(PMEM[WMEM[arg0].val()] != null) PMEM[WMEM[arg0].val()][WMEM[arg1].val()] = WMEM[arg2];}
+    public void _USTO (int arg0, int arg1, int arg2) {if(UMEM[WMEM[arg0].val()] != null) UMEM[WMEM[arg0].val()][WMEM[arg1].val()] = WMEM[arg2];}
+    public void _SGET (int arg0, int arg1, int arg2) {if(SMEM[WMEM[arg1].val()] != null) WMEM[arg0] = SMEM[WMEM[arg1].val()][WMEM[arg2].val()];}
+    public void _PGET (int arg0, int arg1, int arg2) {if(PMEM[WMEM[arg1].val()] != null) WMEM[arg0] = PMEM[WMEM[arg1].val()][WMEM[arg2].val()];}
+    public void _UGET (int arg0, int arg1, int arg2) {if(UMEM[WMEM[arg1].val()] != null) WMEM[arg0] = UMEM[WMEM[arg1].val()][WMEM[arg2].val()];}
     public void _IMOV (int arg0, int arg1, int arg2) {WMEM[arg0] = ub(arg1);}
     public void _ISSTO(int arg0, int arg1, int arg2) {SMEM[arg0][arg1] = ub(arg2);}
     public void _IPSTO(int arg0, int arg1, int arg2) {PMEM[arg0][arg1] = ub(arg2);}
     public void _IUSTO(int arg0, int arg1, int arg2) {UMEM[arg0][arg1] = ub(arg2);}
     public void _WCLR (int arg0, int arg1, int arg2) {for(; arg1 < arg2 && arg1 < 256; arg1++) WMEM[arg1] = ub(0);}
-    public void _SCLR (int arg0, int arg1, int arg2) {for(; arg1 < arg2 && arg1 < 256; arg1++) SMEM[arg0][arg1] = ub(0);}
-    public void _PCLR (int arg0, int arg1, int arg2) {for(; arg1 < arg2 && arg1 < 256; arg1++) PMEM[arg0][arg1] = ub(0);}
-    public void _UCLR (int arg0, int arg1, int arg2) {for(; arg1 < arg2 && arg1 < 256; arg1++) UMEM[arg0][arg1] = ub(0);}
+    public void _SCLR (int arg0, int arg1, int arg2) {if(SMEM[WMEM[arg0].val()] != null) for(; arg1 < arg2 && arg1 < 256; arg1++) SMEM[arg0][arg1] = ub(0);}
+    public void _PCLR (int arg0, int arg1, int arg2) {if(PMEM[WMEM[arg0].val()] != null) for(; arg1 < arg2 && arg1 < 256; arg1++) PMEM[arg0][arg1] = ub(0);}
+    public void _UCLR (int arg0, int arg1, int arg2) {if(UMEM[WMEM[arg0].val()] != null) for(; arg1 < arg2 && arg1 < 256; arg1++) UMEM[arg0][arg1] = ub(0);}
     // 3
     public void _POSX (int arg0, int arg1, int arg2) {WMEM[arg0] = ub((int) (x/ARENA_SIZE*255));}
     public void _VELX (int arg0, int arg1, int arg2) {WMEM[arg0] = ub((int) velX);}
