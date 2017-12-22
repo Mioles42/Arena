@@ -145,55 +145,178 @@ public class Tank extends Entity {
 
     //Create a Tank from a file
     Tank(String file) {
-        //Todo: This is totally a placeholder
-        //0: Initial values for testing.
+
+        //0: Initial values.
         x = 100;
         y = 100;
         r = 0;
         width = 40;
         height = 40;
         name = file;
+        flashR = 0;
+        flashG = 0;
+        flashB = 0;
 
         //1: Initialize memories.
         UMEM = new UByte[256][];
         PMEM = new UByte[256][];
         SMEM = new UByte[256][];
         WMEM = new UByte[256];
-        createMemory(UMEM, ub(0));
-        createMemory(PMEM, ub(0));
-        createMemory(SMEM, ub(0));
 
-        for(int i = 0; i < 256; i++) WMEM[i] = ub(0);
+        UMEM[0] = new UByte[256];
+        PMEM[0] = new UByte[256];
+        SMEM[0] = new UByte[256];
+
 
         //2: Initialize stats.
         for(int i = 0; i < stats.length; i++) stats[i] = ub(10);
 
         //3: Grab memories from file.
-        Scanner in = new Scanner(Tank.class.getClassLoader().getResourceAsStream("gen/" + file + ".txt"));
+        Scanner in = new Scanner(Tank.class.getClassLoader().getResourceAsStream("gen/" + file + ".atnk"));
         String next;
-        String value;
+
+        int loadIndex = 0;
+        int loadMode = 0;
+        int loadMemory = 0;
+
         while(in.hasNext()) {
-            next = in.next().trim();
-            value = in.next().trim();
-            if(value.startsWith("_")) {
+            next = undecorate(in.next()).trim();
+
+            //If next is a comment: Run through it until it ends
+            if(next.equals("##")) {
+                do next = in.next().trim();
+                while (! next.equals("#/"));
+                next = undecorate(in.next()).trim();
+            }
+
+            //If next is a command: Translate it into its number
+            if(next.startsWith("_")) {
+                if(loadMode < 2) throwCompileError("Command in passive memory.");
                 for(int i = 0; i < KMEM.length; i++) {
-                    Gene g = KMEM[i];
-                    if(g == null) continue;
-                    if(g.getMeaning().getName().equals(value)) value = Integer.toHexString(i);
+                    if(KMEM[i] != null && KMEM[i].getMeaning().getName().equals(next)) next = i + "";
                 }
             }
-            if(next.substring(0,1).equals("~")){
-                if(next.substring(1).equals("$")) loadedS = Integer.parseInt(value.substring(0,2), 16);
-                if(next.substring(1).equals("@")) loadedP = Integer.parseInt(value.substring(0,2), 16);
-                if(next.substring(1).equals("%")) loadedU = Integer.parseInt(value.substring(0,2), 16);
+
+            if(next.charAt(0) == '-') next = "0";
+
+            //If next is a define statement, define a new memory
+            if(next.equals("define")) {
+                next = undecorate(in.next()).trim();
+                int defMemory;
+                int defLength;
+
+                try {
+                    defMemory = Integer.parseInt(in.next().trim());
+                    defLength = Integer.parseInt(in.next().trim());
+
+                    switch(next) {
+                        case "registry":
+                            throwCompileError("Cannot define new registry.");
+                            break;
+                        case "storage":
+                            SMEM[defMemory] = new UByte[defLength];
+                            break;
+                        case "program":
+                            PMEM[defMemory] = new UByte[defLength];
+                            break;
+                        case "meta":
+                            UMEM[defMemory] = new UByte[defLength];
+                            break;
+                    }
+
+                } catch(NumberFormatException e) {throwCompileError("Memory and length expected after \"define\"");}
             }
-            if(next.substring(0,1).equals("&")) WMEM[Integer.parseInt(next.substring(1), 16)] = ub(Integer.parseInt(value, 16));
-            if(next.substring(0,1).equals("$")) SMEM[loadedS][Integer.parseInt(next.substring(1), 16)] = ub(Integer.parseInt(value, 16));
-            if(next.substring(0,1).equals("@")) PMEM[loadedP][Integer.parseInt(next.substring(1), 16)] = ub(Integer.parseInt(value, 16));
-            if(next.substring(0,1).equals("%")) UMEM[loadedU][Integer.parseInt(next.substring(1), 16)] = ub(Integer.parseInt(value, 16));
+
+            //If next is a edit statement: load the memory it specifies, and reset the index
+            else if(next.equals("edit")) {
+                loadIndex = 0;
+                next = undecorate(in.next()).trim();
+                switch(next) {
+                    case "registry": loadMode = 0; break;
+                    case "storage": loadMode = 1; break;
+                    case "program": loadMode = 2; break;
+                    case "meta": loadMode = 3; break;
+                }
+
+                //Load multi-memory if it's that kind of memory
+                if(! next.equals("registry")) {
+                    next = undecorate(in.next()).trim();
+                    loadMemory = Integer.parseInt(next);
+
+                    if(loadMemory > 255) throwCompileError("Memory number out of bounds; must be between 0 and 255");
+
+                    switch (loadMode) {
+                        case 1:
+                            if(SMEM[loadMemory] == null) throwCompileError("No storage defined at " + loadMemory);
+                            break;
+                        case 2:
+                            if(PMEM[loadMemory] == null) throwCompileError("No program defined at " + loadMemory);
+                            break;
+                        case 3:
+                            if(UMEM[loadMemory] == null) throwCompileError("No meta defined at " + loadMemory);
+                            break;
+
+                    }
+                }
+            }
+
+            //If next is an at statement: move the index to what is specified
+            else if(next.equals(("at"))) {
+                next = undecorate(in.next()).trim();
+                try {loadIndex = Integer.parseInt(next);}
+                catch (NumberFormatException e) {throwCompileError("Index expected after \"at\"; instead received \"" + next + "\"");}
+                if(loadIndex > 255) throwCompileError("\"at\" index invalid (must be between 0 and 255)");
+            }
+
+            //If next is a direct command other than "define"
+            else if(next.equals("name")) {
+                next = undecorate(in.next()).trim();
+                this.name = next;
+            }
+
+            //At this point this is pretty clearly an entry.
+            else {
+                try {
+                    switch (loadMode) {
+                        case 0:
+                            if(WMEM[loadIndex] != null) throwCompileError("Registry at " + loadIndex + " already defined.");
+                            WMEM[loadIndex] = ub(Integer.parseInt(next));
+                            break;
+                        case 1:
+                            if(SMEM[loadMemory][loadIndex] != null) throwCompileError("Storage " + loadMemory + " at " + loadIndex + " already defined.");
+                            if(loadIndex >= SMEM[loadMemory].length) throwCompileError("Storage " + loadMemory + " index out of bounds.");
+                            SMEM[loadMemory][loadIndex] = ub(Integer.parseInt(next));
+                            break;
+                        case 2:
+                            if(PMEM[loadMemory][loadIndex] != null) throwCompileError("Program " + loadMemory + " at " + loadIndex + " already defined.");
+                            if(loadIndex >= PMEM[loadMemory].length) throwCompileError("Program " + loadMemory + " index out of bounds.");
+                            PMEM[loadMemory][loadIndex] = ub(Integer.parseInt(next));
+                            break;
+                        case 3:
+                            if(UMEM[loadMemory][loadIndex] != null) throwCompileError("Meta " + loadMemory + " at " + loadIndex + " already defined.");
+                            if(loadIndex >= UMEM[loadMemory].length) throwCompileError("Meta " + loadMemory + " index out of bounds.");
+                            UMEM[loadMemory][loadIndex] = ub(Integer.parseInt(next));
+                            break;
+                    }
+                    loadIndex++;
+                } catch(NumberFormatException e) {throwCompileError("Entry expected; instead received \"" + next + "\"");}
+            }
         }
 
+        for(int i = 0; i < 256; i++) if(WMEM[i] == null) WMEM[i] = ub(0);
+        for(int i = 0; i < 256; i++) if(SMEM[0][i] == null) SMEM[0][i] = ub(0);
+        for(int i = 0; i < 256; i++) if(PMEM[0][i] == null) PMEM[0][i] = ub(0);
+        for(int i = 0; i < 256; i++) if(UMEM[0][i] == null) UMEM[0][i] = ub(0);
+
         health = 11;
+    }
+    private String undecorate(String input) {
+        input = input.replace(';', ' ');
+        input = input.replace(':', ' ');
+        input = input.replace(',', ' ');
+        input = input.replace('{', ' ');
+        input = input.replace('}', ' ');
+        return input;
     }
 
     @Override
@@ -302,6 +425,13 @@ public class Tank extends Entity {
 
         }
     }
+
+    private void throwCompileError(String reason) {
+        System.err.println("Error compiling Tank " + name + ":");
+        System.err.println(reason);
+        System.exit(0);
+    }
+
     //Instantiate memory number [number] as a UByte[256].
     private void createMemory(UByte[][] memory, UByte number) {
         memory[number.val()] = new UByte[256];

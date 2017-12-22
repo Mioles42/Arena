@@ -38,7 +38,7 @@ public class MainPanel extends JPanel implements Runnable, KeyListener, MouseLis
         handler.add(new ControlledTank(300, 300));
         viewholder = entities[0];
 
-        Tank dummy = new Tank("eve");
+        Tank dummy = new Tank("cain");
         window.setActiveTank(dummy);
         dummy.health = 256;
 
