@@ -18,8 +18,6 @@ public class MainPanel extends JPanel implements Runnable, KeyListener, MouseLis
 
     private boolean isRunning = true;
 
-    //Let's also measure whether we are using the extra tick time to render (if not, adding tick speed will do nothing)
-    boolean renderPoint = false;
 
     public static void main(String[] args) {
         Thread gameThread = new Thread(new MainPanel());
@@ -73,7 +71,6 @@ public class MainPanel extends JPanel implements Runnable, KeyListener, MouseLis
         long lastDistribute = System.currentTimeMillis();
 
         while(isRunning) {
-            renderPoint = false;
 
             long time = System.currentTimeMillis();
 
@@ -107,7 +104,6 @@ public class MainPanel extends JPanel implements Runnable, KeyListener, MouseLis
         g.drawString((int) (1000/Global.updateCycle) + "tk/s", 15, 25);
         g.drawString("Time:" + Global.time + "tks", 15, 45);
         g.drawString("Entities:" + handler.numEntities, 15, 65);
-        if(! renderPoint) g.drawString("Tick limit reached", 15, 85);
         g.drawOval(this.getWidth()/2, this.getHeight()/2, 2, 2);
 
         g.translate((int) (-viewholder.x + this.getWidth()/2), (int) (-viewholder.y + this.getHeight()/2));

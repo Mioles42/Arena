@@ -71,8 +71,9 @@ class Handler {
         return count;
     }
 
+    //TODO more than 256 entity support
     Entity getByUUID(UByte uuidLeast, UByte uuidMost) {
-        return entities[uuidMost.val()<<8 + uuidLeast.val()];
+        return entities[uuidLeast.val()];
     }
 
     Entity entityAtLocation(int x, int y) {

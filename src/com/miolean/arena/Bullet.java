@@ -16,8 +16,8 @@ class Bullet extends Entity {
         x = source.x;
         y = source.y;
         r = source.r;
-        velX = (15 + source.stats[Tank.STAT_BULLET_SPEED].val()) * Math.cos(r + source.stats[Tank.STAT_BULLET_SPREAD].val()/128.0*(Math.random() - .5));
-        velY = (15 + source.stats[Tank.STAT_BULLET_SPEED].val()) * -Math.sin(r + source.stats[Tank.STAT_BULLET_SPREAD].val()/128.0*(Math.random() - .5));
+        velX = source.velX + (15 + source.stats[Tank.STAT_BULLET_SPEED].val()) * Math.cos(r + source.stats[Tank.STAT_BULLET_SPREAD].val()/128.0*(Math.random() - .5));
+        velY = source.velY + (15 + source.stats[Tank.STAT_BULLET_SPEED].val()) * -Math.sin(r + source.stats[Tank.STAT_BULLET_SPREAD].val()/128.0*(Math.random() - .5));
         velR = 0;
         accX = 0;
         accY = 0;

@@ -80,9 +80,11 @@ public class Tank extends Entity {
     int cogs = 0;
     private int viewDistance = 10;
     private long lastFireTime = Global.time;
-    private String name = "";
+    String name = "";
     private static int totalKWeight;
     private boolean generateLog = false;
+
+    Tank lastChild = null;
 
 
 
@@ -521,6 +523,7 @@ public class Tank extends Entity {
     void reproduce() {
         Tank offspring = new Tank(this);
         handler.add(offspring);
+        lastChild = offspring;
     }
 
     void onDeath() {
@@ -532,24 +535,10 @@ public class Tank extends Entity {
     void onBirth() {
 
         System.out.println(name + " loaded ================================");
-
-        int numZeroes = 0;
-
-        for(UByte u: PMEM[loadedP]) {
-            if(u.val() == 0) numZeroes++;
-
-            if(u.val() != 0) {
-                System.out.println(u);
-                numZeroes = 0;
-            }
-
-            if(u.val() == 0 && numZeroes < 4) System.out.println("0");
-
-            if(numZeroes == 4) System.out.println("[...]");
-        }
+        System.out.println(activeMemoryToString(PMEM[0], false));
     }
 
-    private String activeMemoryToString(UByte[] genes, char identifier) {
+    private String activeMemoryToString(UByte[] genes, boolean color) {
         if(genes == null) return "§r No memory exists here.";
 
         String result = "";
@@ -563,7 +552,7 @@ public class Tank extends Entity {
             if(KMEM[genes[i].val()] == null) continue; //If the opcode doesn't actually stand for something meaningful, skip it too
 
             //Since everything appears to be in order, let's try to parse that as a gene. (Normally we'd run it.)
-            result += "§k" + identifier + Integer.toHexString(i) + " ";
+            result += "§k" + Integer.toHexString(i) + " ";
             result += "§g" + KMEM[genes[i].val()].getMeaning().getName() + " §k(";
             result += "§b" + genes[i+1].val() + " §k[" + WMEM[genes[i+1].val()].val() + "], ";
             result += "§b" + genes[i+2].val() + " §k[" + WMEM[genes[i+2].val()].val() + "],";
@@ -578,22 +567,22 @@ public class Tank extends Entity {
         return result;
     }
 
-    private String passiveMemoryToString(UByte[] genes, char identifier) {
+    private String passiveMemoryToString(UByte[] genes, boolean color) {
         if(genes == null) return "§r No memory exists here.";
         String result = "§b";
 
         for(int i = 0; i < genes.length; i++) {
-            if(i%4 == 0) result += "\n" + identifier + Integer.toHexString(i/16) + Integer.toHexString(i%16) + "\t";
+            if(i%4 == 0) result += "\n" + Integer.toHexString(i/16) + Integer.toHexString(i%16) + "\t";
             result += "§k|  " + genes[i].val() +"\t§b";
         }
 
         return result;
     }
 
-    public String stringUMEM(int memory) {return activeMemoryToString(UMEM[memory], '%');}
-    public String stringPMEM(int memory) {return activeMemoryToString(PMEM[memory], '@');}
-    public String stringSMEM(int memory) {return passiveMemoryToString(SMEM[memory], '$');}
-    public String stringWMEM() {return passiveMemoryToString(WMEM, '&');}
+    public String stringUMEM(int memory) {return activeMemoryToString(UMEM[memory], true);}
+    public String stringPMEM(int memory) {return activeMemoryToString(PMEM[memory], true);}
+    public String stringSMEM(int memory) {return passiveMemoryToString(SMEM[memory], true);}
+    public String stringWMEM() {return passiveMemoryToString(WMEM, true);}
     /*-----------------------------------------------------------------
      * Reflected methods (genes) are below.
      * Beware. Not intended for human consumption.
@@ -623,9 +612,9 @@ public class Tank extends Entity {
     public void _IPSTO(int arg0, int arg1, int arg2) {PMEM[arg0][arg1] = ub(arg2);}
     public void _IUSTO(int arg0, int arg1, int arg2) {UMEM[arg0][arg1] = ub(arg2);}
     public void _WCLR (int arg0, int arg1, int arg2) {for(; arg1 < arg2 && arg1 < 256; arg1++) WMEM[arg1] = ub(0);}
-    public void _SCLR (int arg0, int arg1, int arg2) {for(; arg1 < arg2 && arg1 < 256; arg1++) SMEM[arg0][arg1] = ub(0);}
-    public void _PCLR (int arg0, int arg1, int arg2) {for(; arg1 < arg2 && arg1 < 256; arg1++) PMEM[arg0][arg1] = ub(0);}
-    public void _UCLR (int arg0, int arg1, int arg2) {for(; arg1 < arg2 && arg1 < 256; arg1++) UMEM[arg0][arg1] = ub(0);}
+    public void _SCLR (int arg0, int arg1, int arg2) {if(SMEM[WMEM[arg0].val()] != null) for(; arg1 < arg2 && arg1 < 256; arg1++) SMEM[arg0][arg1] = ub(0);}
+    public void _PCLR (int arg0, int arg1, int arg2) {if(PMEM[WMEM[arg0].val()] != null) for(; arg1 < arg2 && arg1 < 256; arg1++) PMEM[arg0][arg1] = ub(0);}
+    public void _UCLR (int arg0, int arg1, int arg2) {if(UMEM[WMEM[arg0].val()] != null) for(; arg1 < arg2 && arg1 < 256; arg1++) UMEM[arg0][arg1] = ub(0);}
     // 3
     public void _POSX (int arg0, int arg1, int arg2) {WMEM[arg0] = ub((int) (x/ARENA_SIZE*255));}
     public void _VELX (int arg0, int arg1, int arg2) {WMEM[arg0] = ub((int) velX);}
