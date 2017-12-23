@@ -15,7 +15,7 @@ class Global {
     static int updateCycle = 50;
     static int displayCycle = 100;
     static int renderCycle = 20;
-    static int distributeCycle = 20;
+    static int distributeCycle = 50;
 
     //1 pixel= 1 tank-meter, I suppose
     static final int ARENA_SIZE = 1024;

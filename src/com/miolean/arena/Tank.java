@@ -145,7 +145,7 @@ public class Tank extends Entity {
         health = 11;
         cogs = INITIAL_COGS;
 
-        int maxOffset = Global.ARENA_SIZE / 8;
+        int maxOffset = Global.ARENA_SIZE / 4;
         x = parent.x + maxOffset * (Math.random()*2-1);
         y = parent.y + maxOffset * (Math.random()*2-1);
     }
@@ -208,26 +208,25 @@ public class Tank extends Entity {
 
             //If next is a define statement, define a new memory
             if(next.equals("define")) {
-                next = undecorate(in.next()).trim();
                 int defMemory;
                 int defLength;
 
                 try {
-                    defMemory = Integer.parseInt(in.next().trim());
-                    defLength = Integer.parseInt(in.next().trim());
+                    next = undecorate(in.next()).trim();
+                    defMemory = Integer.parseInt(undecorate(in.next()).trim());
 
                     switch(next) {
                         case "registry":
                             throwCompileError("Cannot define new registry.");
                             break;
                         case "storage":
-                            SMEM[defMemory] = new UByte[defLength];
+                            SMEM[defMemory] = new UByte[256];
                             break;
                         case "program":
-                            PMEM[defMemory] = new UByte[defLength];
+                            PMEM[defMemory] = new UByte[256];
                             break;
                         case "meta":
-                            UMEM[defMemory] = new UByte[defLength];
+                            UMEM[defMemory] = new UByte[256];
                             break;
                     }
 
@@ -275,10 +274,18 @@ public class Tank extends Entity {
                 if(loadIndex > 255) throwCompileError("\"at\" index invalid (must be between 0 and 255)");
             }
 
-            //If next is a direct command other than "define"
+            //If next is the "name" command: name the tank
             else if(next.equals("name")) {
                 next = undecorate(in.next()).trim();
                 this.name = next;
+            }
+            //If next is the "print" command: print everything up to the next "#"
+            else if(next.equals("print")) {
+                do {
+                    next = in.next().trim();
+                    System.out.print(next + " ");
+                } while (! next.equals("#"));
+                System.out.println();
             }
 
             //At this point this is pretty clearly an entry.
@@ -311,9 +318,18 @@ public class Tank extends Entity {
         }
 
         for(int i = 0; i < 256; i++) if(WMEM[i] == null) WMEM[i] = ub(0);
-        for(int i = 0; i < 256; i++) if(SMEM[0][i] == null) SMEM[0][i] = ub(0);
-        for(int i = 0; i < 256; i++) if(PMEM[0][i] == null) PMEM[0][i] = ub(0);
-        for(int i = 0; i < 256; i++) if(UMEM[0][i] == null) UMEM[0][i] = ub(0);
+
+        for(UByte[] a: SMEM) if(a != null) {
+            for(int i = 0; i < 255; i++) if (a[i] == null) a[i] = ub(0);
+        }
+
+        for(UByte[] a: PMEM) if(a != null) {
+            for(int i = 0; i < 255; i++) if (a[i] == null) a[i] = ub(0);
+        }
+
+        for(UByte[] a: UMEM) if(a != null) {
+            for(int i = 0; i < 255; i++) if (a[i] == null) a[i] = ub(0);
+        }
 
         health = 11;
         cogs = INITIAL_COGS;
@@ -409,10 +425,12 @@ public class Tank extends Entity {
 
         //Make sure health is valid
         if(health > stats[STAT_MAX_HEALTH].val()) health = stats[STAT_MAX_HEALTH].val();
-        if(cogs < 0) health--;
+        if(cogs <= 0) health--;
     }
 
     void runGenes(UByte[] genes) {
+
+        System.out.println("Running " + loadedP);
 
         if(Math.random() < DIFFICULTY) cogs--;
 
@@ -430,6 +448,11 @@ public class Tank extends Entity {
             try {
                 //System.out.printf("%s(%d, %d, %d)\n", KMEM[genes[index].val()].getMeaning().getName(), genes[index+1].val(), genes[index+2].val(), genes[index+3].val());
 
+                if(KMEM[genes[index].val()].cost > cogs) {
+                    index += 3;
+                    continue;
+                }
+
                 if(Math.random() < DIFFICULTY) cogs -= KMEM[genes[index].val()].cost;
 
                 KMEM[genes[index].val()].getMeaning().invoke(this, genes[index+1].val(), genes[index+2].val(), genes[index+3].val());
@@ -437,7 +460,6 @@ public class Tank extends Entity {
 
             } catch (IllegalAccessException | InvocationTargetException e) { e.printStackTrace(); }
 
-            if(cogs < HARD_COG_DEFICIT_LIMIT) break;
 
             //Assuming nothing went wrong we've completed a command by now. (If something did go wrong, we'll at least have a stack trace.)
             index += 3; //We don't want to run the arguments by accident, so let's skip them.
@@ -546,12 +568,11 @@ public class Tank extends Entity {
     }
 
     void onDeath() {
-        //Run the loaded U memory!
-        generateLog = true;
-        runGenes(UMEM[loadedU]);
     }
 
     void onBirth() {
+        //Run the loaded U memory!
+        runGenes(UMEM[loadedU]);
 
         System.out.println(name + " loaded ================================");
         System.out.println("Total K weight: " + totalKWeight);
@@ -628,9 +649,9 @@ public class Tank extends Entity {
     public void _PGET (int arg0, int arg1, int arg2) {if(PMEM[WMEM[arg1].val()] != null) WMEM[arg0] = PMEM[WMEM[arg1].val()][WMEM[arg2].val()];}
     public void _UGET (int arg0, int arg1, int arg2) {if(UMEM[WMEM[arg1].val()] != null) WMEM[arg0] = UMEM[WMEM[arg1].val()][WMEM[arg2].val()];}
     public void _IMOV (int arg0, int arg1, int arg2) {WMEM[arg0] = ub(arg1);}
-    public void _ISSTO(int arg0, int arg1, int arg2) {SMEM[arg0][arg1] = ub(arg2);}
-    public void _IPSTO(int arg0, int arg1, int arg2) {PMEM[arg0][arg1] = ub(arg2);}
-    public void _IUSTO(int arg0, int arg1, int arg2) {UMEM[arg0][arg1] = ub(arg2);}
+    public void _ISSTO(int arg0, int arg1, int arg2) {if(SMEM[arg0] != null) SMEM[arg0][arg1] = ub(arg2);}
+    public void _IPSTO(int arg0, int arg1, int arg2) {if(PMEM[arg0] != null) PMEM[arg0][arg1] = ub(arg2);}
+    public void _IUSTO(int arg0, int arg1, int arg2) {if(UMEM[arg0] != null) UMEM[arg0][arg1] = ub(arg2);}
     public void _WCLR (int arg0, int arg1, int arg2) {for(; arg1 < arg2 && arg1 < 256; arg1++) WMEM[arg1] = ub(0);}
     public void _SCLR (int arg0, int arg1, int arg2) {if(SMEM[WMEM[arg0].val()] != null) for(; arg1 < arg2 && arg1 < 256; arg1++) SMEM[WMEM[arg0].val()][WMEM[arg1].val()] = ub(0);}
     public void _PCLR (int arg0, int arg1, int arg2) {if(PMEM[WMEM[arg0].val()] != null) for(; arg1 < arg2 && arg1 < 256; arg1++) PMEM[WMEM[arg0].val()][WMEM[arg1].val()] = ub(0);}
@@ -702,19 +723,19 @@ public class Tank extends Entity {
     // D
     public void _LSMEM(int arg0, int arg1, int arg2) {}
     public void _SMEMX(int arg0, int arg1, int arg2) {}
-    public void _DEFS (int arg0, int arg1, int arg2) {}
+    public void _DEFS (int arg0, int arg1, int arg2) {if(SMEM[arg0] == null) createMemory(SMEM, ub(arg0));}
     public void _SDEL (int arg0, int arg1, int arg2) {}
     public void _LPMEM(int arg0, int arg1, int arg2) {}
     public void _PMEMX(int arg0, int arg1, int arg2) {}
-    public void _DEFP (int arg0, int arg1, int arg2) {}
+    public void _DEFP (int arg0, int arg1, int arg2) {if(PMEM[arg0] == null) createMemory(PMEM, ub(arg0));}
     public void _PDEL (int arg0, int arg1, int arg2) {}
     public void _LUMEM(int arg0, int arg1, int arg2) {}
     public void _UMEMX(int arg0, int arg1, int arg2) {}
-    public void _DEFU (int arg0, int arg1, int arg2) {}
+    public void _DEFU (int arg0, int arg1, int arg2) {if(UMEM[arg0] == null) createMemory(UMEM, ub(arg0));}
     public void _UDEP (int arg0, int arg1, int arg2) {}
-    public void _SSWAP(int arg0, int arg1, int arg2) {}
-    public void _PSWAP(int arg0, int arg1, int arg2) {}
-    public void _USWAP(int arg0, int arg1, int arg2) {}
+    public void _SSWAP(int arg0, int arg1, int arg2) {if(SMEM[arg0] != null) loadedS = arg0; index = arg1;}
+    public void _PSWAP(int arg0, int arg1, int arg2) {if(PMEM[arg0] != null) loadedP = arg0; index = arg1;}
+    public void _USWAP(int arg0, int arg1, int arg2) {if(UMEM[arg0] != null) loadedU = arg0; index = arg1;}
     // E
     public void _TARG(int arg0, int arg1, int arg2) {}
     public void _SCOPY(int arg0, int arg1, int arg2) {}

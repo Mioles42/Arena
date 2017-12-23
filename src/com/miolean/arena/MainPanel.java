@@ -11,7 +11,6 @@ public class MainPanel extends JPanel implements Runnable, KeyListener, MouseLis
 
     private Renderer renderer;
     private Handler handler;
-    private Distributor distributor;
     private Window window;
 
     Entity viewholder;
@@ -31,7 +30,6 @@ public class MainPanel extends JPanel implements Runnable, KeyListener, MouseLis
         window = new Window(this);
         renderer = new Renderer(entities);
         handler = new Handler(entities);
-        distributor = new Distributor(handler);
 
         handler.add(new ControlledTank(300, 300));
         viewholder = entities[0];
@@ -93,7 +91,7 @@ public class MainPanel extends JPanel implements Runnable, KeyListener, MouseLis
             time = System.currentTimeMillis();
 
             if(time > lastDistribute + Global.distributeCycle) {
-                distributor.distribute();
+                handler.distribute();
                 lastDistribute = time;
             }
         }

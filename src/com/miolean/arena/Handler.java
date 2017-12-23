@@ -5,8 +5,14 @@ package com.miolean.arena;
  */
 class Handler {
 
+    final static int MAX_COGS = 128;
+    final static int MAX_TANKS = 32;
+
     private Entity[] entities;
     int numEntities;
+
+    int numCogs;
+    int numTanks;
 
     private int lastUUIDUsed = 0;
 
@@ -32,9 +38,17 @@ class Handler {
         entities[uuid].handler = null;
         entities[uuid] = null;
         numEntities--;
+
+        if(entities[uuid] instanceof Cog) numCogs--;
+        if(entities[uuid] instanceof Tank) numTanks--;
+
     }
 
     void add(Entity e) {
+
+        if(e instanceof Cog && numCogs >= MAX_COGS) return;
+        if(e instanceof Tank && numTanks >= MAX_TANKS) return;
+
         while(entities[lastUUIDUsed] != null) {
             lastUUIDUsed++;
             lastUUIDUsed %= entities.length;
@@ -45,6 +59,9 @@ class Handler {
         e.handler = this;
         numEntities++;
         e.onBirth();
+
+        if(e instanceof Cog) numCogs++;
+        if(e instanceof Tank) numTanks++;
     }
 
 
@@ -86,5 +103,16 @@ class Handler {
         }
 
         return null;
+    }
+
+    void distribute() {
+
+        if(Math.random() < 0.05) {
+            Cog cog = new Cog(1 + (int) (5 * Math.random()));
+            cog.x = Math.random() * Global.ARENA_SIZE;
+            cog.y = Math.random() * Global.ARENA_SIZE;
+            cog.r = Math.random() * Global.ARENA_SIZE;
+            add(cog);
+        }
     }
 }

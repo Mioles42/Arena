@@ -1,8 +1,9 @@
 
 name Cain;
+define program 1;
 
 edit registry:
-    at 01: 1, 255, 255
+    at 01: 1, 254, 255
     at 41: 00
     at 45: 255
 
@@ -10,22 +11,41 @@ edit storage 0:
     at 01: 85, 10
 
 edit program 0 at 0:
+    _PSWAP 01 00 --
     _FORWD 02 -- --
     _LED 02 02 01
     _IMOV 01 00 --
     _IMOV 02 255 --
     _KWGT 05 54 --
 
-edit meta 0 at 0:
-    _IMOV 44 16 --
-    _IMOV 43 00 --
+edit program 1 at 0:
+    _COG 33 -- --
+    _PRINT 33 -- --
+    _IMOV 34 50 --
+    _HP 35 -- --
+    _IMOV 36 10 --
+    _COMP 34 33 --
+    _IGOG 64 -- --
     _REP -- -- --
-    _IRAND 41 01 01
-    _KRAND 42 01 01
-    _PSTO 01 41 42
-    _INCR 41 01 01
-    _INCR 43 01 01
-    _SGET 44 01 02
-    _COMP 44 43 --
-    _IGOG 16 -- --
-    _PRINT 05 -- --
+
+    at 64:
+    _COMP 35 36 --
+    _IGOG 96 -- --
+    _HEAL 01 -- --
+
+    at 96:
+    _PSWAP 00 04 --
+
+edit meta 0 at 0:
+    _IMOV 42 3 --
+    _IMOV 43 00 --
+    _IRAND 44 -- --
+    _ADD 45 44 42
+
+    at 64:
+    _KRAND 45 -- --
+    _PSTO 01 44 45
+    _INCR 44 -- --
+    _WRAND 45 -- --
+    _COMP 44 45 --
+    _IGOG 64 -- --

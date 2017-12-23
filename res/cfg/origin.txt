@@ -104,8 +104,8 @@
     /DA/ DEFU   / "Define U memory"             /1  /32 /
     /DB/ UDEP   / "Delete U memory"             /1  /64 /
     /DC/ SSWAP  / "Change S memory"             /10 /1  /
-    /DD/ PSWAP  / "Change U memory"             /1  /4  /
-    /DE/ USWAP  / "Change P memory"             /10 /2  /
+    /DD/ PSWAP  / "Change P memory"             /10 /2  /
+    /DE/ USWAP  / "Change U memory"             /1  /4  /
 ^E Crossing
     /E0/ TARG   / "Set copy target"             /15 /0  /
     /E1/ SCOPY  / "Copy S memory from other"    /10 /0  /
