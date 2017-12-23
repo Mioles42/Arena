@@ -67,6 +67,8 @@ abstract class Entity {
         return uuid;
     }
 
+    boolean isAlive() {return ! (handler == null);}
+
     abstract void onBirth();
     abstract void onDeath();
 }

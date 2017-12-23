@@ -13,7 +13,7 @@ class Global {
 
     //Milliseconds per tick, for each of the different cycles
     static int updateCycle = 50;
-    static int displayCycle = 1000;
+    static int displayCycle = 100;
     static int renderCycle = 20;
     static int distributeCycle = 20;
 

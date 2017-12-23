@@ -112,7 +112,9 @@ public class Tank extends Entity {
             opcode = (short) Integer.parseInt(in.next().trim(), 16);
         }
 
-//        for(Gene g: KMEM) totalKWeight += g.weight.val();
+        for(Gene g: KMEM) {
+            if(g != null) totalKWeight += g.weight.val();
+        }
     }
 
     //Create a totally blank Tank
@@ -509,7 +511,7 @@ public class Tank extends Entity {
 
     private void upgrade(UByte stat, int amount) {
         //TODO manage conversion problems with signed UBytes
-        stats[Math.abs(stat.val()>>4)] = ub(amount + stats[Math.abs(stat.val()>>4)].val());
+        stats[Math.abs(stat.val()>>5)] = ub(amount + stats[Math.abs(stat.val()>>5)].val());
     }
 
     private int typeOf(Entity entity) {
@@ -535,6 +537,7 @@ public class Tank extends Entity {
     void onBirth() {
 
         System.out.println(name + " loaded ================================");
+        System.out.println("Total K weight: " + totalKWeight);
         System.out.println(activeMemoryToString(PMEM[0], false));
     }
 
@@ -705,9 +708,9 @@ public class Tank extends Entity {
     public void _REP  (int arg0, int arg1, int arg2) {reproduce();}
     public void _TWK  (int arg0, int arg1, int arg2) {if(KMEM[arg0] != null) KMEM[arg0].weight = WMEM[arg1];}
     public void _KRAND(int arg0, int arg1, int arg2) {WMEM[arg0] = randomGene();}
-    public void _URAND(int arg0, int arg1, int arg2) {WMEM[arg0] = randomExists(UMEM[arg1]);}
-    public void _PRAND(int arg0, int arg1, int arg2) {WMEM[arg0] = randomExists(PMEM[arg1]);}
-    public void _SRAND(int arg0, int arg1, int arg2) {WMEM[arg0] = randomExists(SMEM[arg1]);}
+    public void _URAND(int arg0, int arg1, int arg2) {if(UMEM[WMEM[arg1].val()] != null) WMEM[arg0] = randomExists(UMEM[arg1]);}
+    public void _PRAND(int arg0, int arg1, int arg2) {if(PMEM[WMEM[arg1].val()] != null) WMEM[arg0] = randomExists(PMEM[arg1]);}
+    public void _SRAND(int arg0, int arg1, int arg2) {if(SMEM[WMEM[arg1].val()] != null) WMEM[arg0] = randomExists(SMEM[arg1]);}
     public void _WRAND(int arg0, int arg1, int arg2) {WMEM[arg0] = randomExists(WMEM);}
     public void _IRAND(int arg0, int arg1, int arg2) {WMEM[arg0] = ub((int) (Math.random() * 255));}
 
@@ -721,12 +724,6 @@ public class Tank extends Entity {
     }
 
     static UByte randomGene() {
-
-        if(totalKWeight == 0) { //not set up yet
-            for(Gene g: KMEM) {
-                if(g != null) totalKWeight += g.weight.val();
-            }
-        }
 
         int rand = (int) (Math.random() * totalKWeight);
         int selection = -1;

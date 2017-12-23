@@ -3,6 +3,7 @@ name Cain;
 
 edit registry:
     at 01: 1, 255, 255
+    at 41: 00
     at 45: 255
 
 edit storage 0:
@@ -13,8 +14,7 @@ edit program 0 at 0:
     _LED 02 02 01
     _IMOV 01 00 --
     _IMOV 02 255 --
-
-
+    _KWGT 05 54 --
 
 edit meta 0 at 0:
     _IMOV 44 16 --
@@ -22,10 +22,11 @@ edit meta 0 at 0:
     _REP -- -- --
     _IRAND 41 01 01
     _KRAND 42 01 01
-    _PRINT 42 43 41
+    ## _PRINT 42 43 41 #/
     _PSTO 01 41 42
     _INCR 41 01 01
     _INCR 43 01 01
     _SGET 44 01 02
     _COMP 44 43 --
     _IGOG 16 -- --
+    _PRINT 05 -- --

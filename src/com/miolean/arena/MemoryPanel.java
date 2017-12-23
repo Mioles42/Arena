@@ -48,6 +48,7 @@ public class MemoryPanel extends JPanel {
         comboBox.addItem("PMEM");
         comboBox.addItem("SMEM");
         comboBox.addItem("WMEM");
+        comboBox.setSelectedItem("PMEM");
         c = new GridBagConstraints();
         c.gridx = 1;
         c.gridy = 0;
@@ -102,21 +103,24 @@ public class MemoryPanel extends JPanel {
 
         if(source != null) {
 
-            text += "c\n\nTank " + source.name;
+            if(! source.isAlive()) source = source.lastChild;
 
-                switch (comboBox.getSelectedIndex()) {
-                case INDEX_UMEM:
-                    text = (source.stringUMEM((int) spinner.getValue()));
-                    break;
-                case INDEX_PMEM:
-                    text = (source.stringPMEM((int) spinner.getValue()));
-                    break;
-                case INDEX_SMEM:
-                    text = (source.stringSMEM((int) spinner.getValue()));
-                    break;
-                case INDEX_WMEM:
-                    text = (source.stringWMEM());
-                    break;
+            text += "c\nTank \"" + source.name + "\"\n\n";
+
+            switch (comboBox.getSelectedIndex()) {
+            case INDEX_UMEM:
+                text += (source.stringUMEM((int) spinner.getValue()));
+                break;
+            case INDEX_PMEM:
+                text += (source.stringPMEM((int) spinner.getValue()));
+                break;
+            case INDEX_SMEM:
+                text += (source.stringSMEM((int) spinner.getValue()));
+                break;
+            case INDEX_WMEM:
+                text += (source.stringWMEM());
+                break;
+
             }
         } else text += "rNo Tank selected.";
 

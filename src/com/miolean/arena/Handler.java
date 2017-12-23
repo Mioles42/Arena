@@ -63,6 +63,7 @@ class Handler {
 //    }
 
     public int withinDistance(double x, double y, int distance) {
+
         int count = 0x0000;
         for(Entity e: entities) {
             if(e == null) continue;
