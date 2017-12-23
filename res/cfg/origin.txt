@@ -46,7 +46,7 @@
     /52/ REVRS  / "Reverse"                     /100/0  /
     /53/ FIRE   / "Fire"                        /110/4  /
     /54/ TURNL  / "Counterclockwise"            /250/0  /
-    /55/ TURNR  / "Clockwise"                   /250 /0  /
+    /55/ TURNR  / "Clockwise"                   /250/0  /
 ^6 Math
     /60/ ADD    / "Add"                         /20 /0  /
     /61/ SUB    / "Subtract"                    /20 /0  /

@@ -7,6 +7,7 @@ public final class UByte implements Serializable {
     private byte value;
 
     public UByte(int in) {
+        if(in > 255 || in < 0) throw new NumberFormatException("UByte out of bounds");
         value = (byte) (in - 128);
     }
     public UByte(short in) {

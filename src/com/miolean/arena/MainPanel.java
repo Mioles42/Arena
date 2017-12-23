@@ -100,6 +100,13 @@ public class MainPanel extends JPanel implements Runnable, KeyListener, MouseLis
     }
 
     private void render(Graphics g) {
+
+        if(! viewholder.isAlive()
+                && viewholder instanceof Tank
+                && ((Tank) viewholder).lastChild != null) {
+            viewholder = ((Tank) viewholder).lastChild;
+        }
+
         g.setColor(Color.BLACK);
         g.drawString((int) (1000/Global.updateCycle) + "tk/s", 15, 25);
         g.drawString("Time:" + Global.time + "tks", 15, 45);

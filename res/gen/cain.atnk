@@ -22,7 +22,6 @@ edit meta 0 at 0:
     _REP -- -- --
     _IRAND 41 01 01
     _KRAND 42 01 01
-    ## _PRINT 42 43 41 #/
     _PSTO 01 41 42
     _INCR 41 01 01
     _INCR 43 01 01

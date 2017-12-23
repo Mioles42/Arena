@@ -16,5 +16,8 @@ public class Distributor {
             cog.r = Math.random() * Global.ARENA_SIZE;
             handler.add(cog);
         }
+
+
     }
+
 }
