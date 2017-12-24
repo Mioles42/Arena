@@ -10,8 +10,11 @@ edit registry:
 edit storage 0:
     at 01: 85, 10
 
-edit program 0 at 0:
-    _PSWAP 01 00 --
+edit program 0 at 4:
+    _SWAP 01 00 --
+
+    at 16:
+    _PRINT -- -- --
     _FORWD 02 -- --
     _LED 02 02 01
     _IMOV 01 00 --
@@ -20,21 +23,20 @@ edit program 0 at 0:
 
 edit program 1 at 0:
     _COG 33 -- --
-    _PRINT 33 -- --
-    _IMOV 34 50 --
+    _IMOV 34 90 --
     _HP 35 -- --
-    _IMOV 36 10 --
+    _IMOV 36 9 --
     _COMP 34 33 --
-    _IGOG 64 -- --
+    _IGOG 128 -- --
     _REP -- -- --
 
-    at 64:
+    at 128:
     _COMP 35 36 --
-    _IGOG 96 -- --
+    _IGOG 152 -- --
     _HEAL 01 -- --
 
-    at 96:
-    _PSWAP 00 04 --
+    at 156:
+    _SWAP 00 16 --
 
 edit meta 0 at 0:
     _IMOV 42 3 --

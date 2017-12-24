@@ -26,7 +26,7 @@ class Handler {
         for(Entity e: entities) {
             if(e == null) continue;
             e.update();
-            for(Entity j: entities) {
+            for(Entity j: entities) { if (j == null) continue;
                 if(e.intersectsWith(j) && e != j) e.intersect(j);
             }
             if(e.health <= 0) remove(e.getUUID());

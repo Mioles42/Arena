@@ -8,6 +8,7 @@ import static com.miolean.arena.Global.ARENA_SIZE;
 import static com.miolean.arena.Global.BORDER;
 import static com.miolean.arena.Global.KEY_R;
 import static com.miolean.arena.UByte.ub;
+import static com.miolean.arena.UByte.ubDeepCopy;
 
 /**
  * Created by commandm on 5/13/17.
@@ -28,10 +29,10 @@ import static com.miolean.arena.UByte.ub;
 public class Tank extends Entity {
 
     //General constants
-    private final int MAX_BULLET_RECHARGE = 40;
-    private final int INITIAL_COGS = 40;
-    private final int HARD_COG_DEFICIT_LIMIT = -40;
-    private final double DIFFICULTY = 0.1;
+    private static final int MAX_BULLET_RECHARGE = 40;
+    private static final int INITIAL_COGS = 40;
+    private static final int HARD_COG_DEFICIT_LIMIT = -40;
+    private static final double DIFFICULTY = 0.05;
 
     //Memories
     static final Gene[] KMEM;
@@ -42,11 +43,9 @@ public class Tank extends Entity {
 
     //Program index:
     private int index = 0;
+    private int loaded = 0;
 
     //Loaded memory:
-    private int loadedU = 0;
-    private int loadedP = 0;
-    private int loadedS = 0; //not that you can run SMEM, but it's used in other places
     private int totalMemories = 0;
 
     //Comparison flags:
@@ -80,7 +79,7 @@ public class Tank extends Entity {
 
     //General variables:
     int fitness = 0;
-    int cogs = 0;
+    double cogs = 0;
     private int viewDistance = 10;
     private long lastFireTime = Global.time;
     String name = "";
@@ -100,14 +99,14 @@ public class Tank extends Entity {
         short opcode = (short) Integer.parseInt(in.next().trim(), 16);
         String method;
         String description;
-        int cost;
+        double cost;
         int weight;
 
         while(opcode < 0xFF) {
             method = in.next().trim();
             description = in.next().trim();
-            weight = Integer.parseInt(in.next().trim(), 16);
-            cost = Integer.parseInt(in.next().trim(), 16);
+            weight = Integer.parseInt(in.next().trim());
+            cost = Double.parseDouble(in.next().trim());
 
             KMEM[opcode] = new Gene(method, description, cost, weight);
 
@@ -132,9 +131,9 @@ public class Tank extends Entity {
         height = 40;
         name = parent.name + "+";
 
-        UMEM = parent.UMEM.clone();
-        PMEM = parent.PMEM.clone();
-        SMEM = parent.SMEM.clone();
+        UMEM = ubDeepCopy(parent.UMEM);
+        PMEM = ubDeepCopy(parent.PMEM);
+        SMEM = ubDeepCopy(parent.SMEM);
         WMEM = new UByte[256];
         for(int i = 0; i < 256; i++) WMEM[i] = ub(0);
         //KMEM is immutable
@@ -142,8 +141,6 @@ public class Tank extends Entity {
 
         //Stats
         for(int i = 0; i < stats.length; i++) stats[i] = ub(10);
-        health = 11;
-        cogs = INITIAL_COGS;
 
         int maxOffset = Global.ARENA_SIZE / 4;
         x = parent.x + maxOffset * (Math.random()*2-1);
@@ -334,6 +331,7 @@ public class Tank extends Entity {
         health = 11;
         cogs = INITIAL_COGS;
     }
+
     private String undecorate(String input) {
         input = input.replace(';', ' ');
         input = input.replace(':', ' ');
@@ -419,43 +417,44 @@ public class Tank extends Entity {
 
     @Override
     void update() {
+
         applyPhysics();
         //Run the loaded P memory!
-        runGenes(PMEM[loadedP]);
+        runGenes(PMEM);
 
         //Make sure health is valid
         if(health > stats[STAT_MAX_HEALTH].val()) health = stats[STAT_MAX_HEALTH].val();
         if(cogs <= 0) health--;
     }
 
-    void runGenes(UByte[] genes) {
+    void runGenes(UByte[][] genes) {
 
-        System.out.println("Running " + loadedP);
-
-        if(Math.random() < DIFFICULTY) cogs--;
+        cogs -= DIFFICULTY;
 
         greater = false;
         equal = false;
+
         index = 0;
+        loaded = 0;
 
         for(; index < genes.length-3; index++) {
             //For every entry in this list of genes (excluding the ones at the end that don't have enough others after them as arguments)
 
-            if(genes[index].val() == 0x00) continue; //Don't even bother with opcode 0x00, standing for "do nothing"
-            if(KMEM[genes[index].val()] == null) continue; //If the opcode doesn't actually stand for something meaningful, skip it too
+            if(genes[loaded][index].val() == 0x00) continue; //Don't even bother with opcode 0x00, standing for "do nothing"
+            if(KMEM[genes[loaded][index].val()] == null) continue; //If the opcode doesn't actually stand for something meaningful, skip it too
 
             //Since everything appears to be in order, let's try to run that as a gene.
             try {
                 //System.out.printf("%s(%d, %d, %d)\n", KMEM[genes[index].val()].getMeaning().getName(), genes[index+1].val(), genes[index+2].val(), genes[index+3].val());
 
-                if(KMEM[genes[index].val()].cost > cogs) {
+                if(KMEM[genes[loaded][index].val()].cost > cogs) {
                     index += 3;
                     continue;
                 }
 
-                if(Math.random() < DIFFICULTY) cogs -= KMEM[genes[index].val()].cost;
+                cogs -= KMEM[genes[loaded][index].val()].cost;
 
-                KMEM[genes[index].val()].getMeaning().invoke(this, genes[index+1].val(), genes[index+2].val(), genes[index+3].val());
+                KMEM[genes[loaded][index].val()].getMeaning().invoke(this, genes[loaded][index+1].val(), genes[loaded][index+2].val(), genes[loaded][index+3].val());
 
 
             } catch (IllegalAccessException | InvocationTargetException e) { e.printStackTrace(); }
@@ -488,8 +487,7 @@ public class Tank extends Entity {
             memory[number.val()] = null;
             totalMemories--;
         }
-        if(memory == PMEM && number.val() == loadedP) loadedP = 0;
-        if(memory == UMEM && number.val() == loadedU) loadedU = 0;
+        if(number.val() == loaded) loaded = 0;
     }
 
     @Override
@@ -525,6 +523,7 @@ public class Tank extends Entity {
             lastFireTime = Global.time;
         }
     }
+
     void forward(int force) {
         //Essentially, accelerate the tank in the direction it's facing.
         //This will typically take a tank to its max speed (based on drag.)
@@ -536,15 +535,13 @@ public class Tank extends Entity {
         this.accX = force * Math.cos(r) / 16; //Scaling!
         this.accY = force * -Math.sin(r) / 16;
     }
+
     void rotate(int force) {
         if(force > stats[STAT_ROTATE_SPEED].val()) force = stats[STAT_ROTATE_SPEED].val(); //Tanks can't rotate faster than a certain limit
         if(force < -stats[STAT_ROTATE_SPEED].val()) force = -stats[STAT_ROTATE_SPEED].val(); //Tanks can't rotate faster than a certain limit
 
         this.accR = ((double) force ) / 128;
     }
-    private void setLEDR(int value) { flashR = value;}
-    private void setLEDG(int value) { flashG = value;}
-    private void setLEDB(int value) { flashB = value;}
 
     private void upgrade(UByte stat, int amount) {
         //TODO manage conversion problems with signed UBytes
@@ -571,12 +568,15 @@ public class Tank extends Entity {
     }
 
     void onBirth() {
-        //Run the loaded U memory!
-        runGenes(UMEM[loadedU]);
 
-        System.out.println(name + " loaded ================================");
-        System.out.println("Total K weight: " + totalKWeight);
-        System.out.println(activeMemoryToString(PMEM[0], false));
+        cogs = INITIAL_COGS;
+
+        //Run the loaded U memory!
+        runGenes(UMEM);
+
+        cogs = INITIAL_COGS;
+        health = stats[STAT_MAX_HEALTH].val();
+
     }
 
     private String activeMemoryToString(UByte[] genes, boolean color) {
@@ -631,15 +631,18 @@ public class Tank extends Entity {
      */
     // 0 (DEV ONLY)
     public void _SNO (int arg0, int arg1, int arg2) {/* Significant nothing */}
-    public void _PRINT(int arg0, int arg1, int arg2) {System.out.printf("%s says: %s, %s, %s.\n", name, WMEM[arg0].val(), WMEM[arg1].val(), WMEM[arg2].val());}
+    public void _PRINT(int arg0, int arg1, int arg2) {/*System.out.printf("%s says: %s, %s, %s.\n", name, WMEM[arg0].val(), WMEM[arg1].val(), WMEM[arg2].val());*/}
     // 1
-    public void _GOTO (int arg0, int arg1, int arg2) {index = WMEM[arg0].val() - 1;}
-    public void _GOE  (int arg0, int arg1, int arg2) {if(equal) index = WMEM[arg0].val() - 1;}
-    public void _GOG  (int arg0, int arg1, int arg2) {if(greater) index = WMEM[arg0].val() - 1;}
-    public void _IGOTO(int arg0, int arg1, int arg2) {index = arg0 - 1;}
-    public void _IGOE (int arg0, int arg1, int arg2) {if(equal) index = arg0 - 1;}
-    public void _IGOG (int arg0, int arg1, int arg2) {if(greater) index = arg0 - 1;}
-    public void _COMP (int arg0, int arg1, int arg2) {equal = (WMEM[arg0].val() == WMEM[arg1].val());greater = (WMEM[arg0].val() > WMEM[arg1].val());}
+    public void _GOTO (int arg0, int arg1, int arg2) {index = WMEM[arg0].val() - 4;}
+    public void _GOE  (int arg0, int arg1, int arg2) {if(equal) index = WMEM[arg0].val() - 4;}
+    public void _GOG  (int arg0, int arg1, int arg2) {if(greater) index = WMEM[arg0].val() - 4;}
+    public void _IGOTO(int arg0, int arg1, int arg2) {index = arg0 - 4;}
+    public void _IGOE (int arg0, int arg1, int arg2) {if(equal) index = arg0 - 4;}
+    public void _IGOG (int arg0, int arg1, int arg2) { if(greater) index = arg0 - 4;}
+    public void _COMP (int arg0, int arg1, int arg2) {
+        equal = (WMEM[arg0].val() == WMEM[arg1].val());
+        greater = (WMEM[arg0].val() > WMEM[arg1].val());
+    }
     // 2
     public void _MOV  (int arg0, int arg1, int arg2) {WMEM[arg0] = WMEM[arg1];}
     public void _SSTO (int arg0, int arg1, int arg2) {if(SMEM[WMEM[arg0].val()] != null) SMEM[WMEM[arg0].val()][WMEM[arg1].val()] = WMEM[arg2];}
@@ -671,7 +674,7 @@ public class Tank extends Entity {
     public void _NEAR (int arg0, int arg1, int arg2) {WMEM[arg0] = ub(handler.withinDistance(x, y, viewDistance));}
     public void _NRST (int arg0, int arg1, int arg2) {}
     // 5
-    public void _HEAL (int arg0, int arg1, int arg2) {if(health + WMEM[arg0].val() < 256) health += WMEM[arg0].val();}
+    public void _HEAL (int arg0, int arg1, int arg2) {health++;}
     public void _FORWD(int arg0, int arg1, int arg2) {forward(WMEM[arg0].val());}
     public void _REVRS(int arg0, int arg1, int arg2) {forward(-WMEM[arg0].val());}
     public void _FIRE (int arg0, int arg1, int arg2) {} //TODO Implmement _FIRE()
@@ -689,11 +692,11 @@ public class Tank extends Entity {
     // 7
     public void _OTYPE(int arg0, int arg1, int arg2) {if(handler.getByUUID(WMEM[arg1],WMEM[arg2]) instanceof Tank) WMEM[arg0] = ub(typeOf(handler.getByUUID(WMEM[arg1],WMEM[arg2])));}
     public void _OHP  (int arg0, int arg1, int arg2) {if(handler.getByUUID(WMEM[arg1],WMEM[arg2]) instanceof Tank) WMEM[arg0] = ub(handler.getByUUID(WMEM[arg1],WMEM[arg2]).health);}
-    public void _OCOG (int arg0, int arg1, int arg2) {if(handler.getByUUID(WMEM[arg1],WMEM[arg2]) instanceof Tank) WMEM[arg0] = ub(((Tank) handler.getByUUID(WMEM[arg1],WMEM[arg2])).cogs);}
+    public void _OCOG (int arg0, int arg1, int arg2) {if(handler.getByUUID(WMEM[arg1],WMEM[arg2]) instanceof Tank) WMEM[arg0] = ub((int)((Tank) handler.getByUUID(WMEM[arg1],WMEM[arg2])).cogs);}
     // 8
     public void _WALL (int arg0, int arg1, int arg2) {} //TODO Implement _WALL() [when Walls exist]
     public void _SPIT (int arg0, int arg1, int arg2) {} //TODO Implement _SPIT() [when Cogs exist]
-    public void _LED (int arg0, int arg1, int arg2) {setLEDR(WMEM[arg0].val());setLEDG(WMEM[arg1].val());setLEDB(WMEM[arg2].val());}
+    public void _LED (int arg0, int arg1, int arg2) {flashR = (WMEM[arg0].val()); flashG = (WMEM[arg1].val()); flashB = (WMEM[arg2].val());}
     public void _OLEDR(int arg0, int arg1, int arg2) {if(handler.getByUUID(WMEM[arg1],WMEM[arg2]) instanceof Tank)  WMEM[arg0] = ub(((Tank) handler.getByUUID(WMEM[arg1],WMEM[arg2])).flashR);}
     public void _OLEDG(int arg0, int arg1, int arg2) {if(handler.getByUUID(WMEM[arg1],WMEM[arg2]) instanceof Tank) WMEM[arg0] = ub(((Tank) handler.getByUUID(WMEM[arg1],WMEM[arg2])).flashG);}
     public void _OLEDB(int arg0, int arg1, int arg2) {if(handler.getByUUID(WMEM[arg1],WMEM[arg2]) instanceof Tank) WMEM[arg0] = ub(((Tank) handler.getByUUID(WMEM[arg1],WMEM[arg2])).flashB);}
@@ -701,13 +704,13 @@ public class Tank extends Entity {
     public void _UUIDM(int arg0, int arg1, int arg2) {WMEM[arg0] = ub(uuidMost);}
     public void _UUIDL(int arg0, int arg1, int arg2) {WMEM[arg0] = ub(uuidLeast);}
     public void _HP   (int arg0, int arg1, int arg2) {WMEM[arg0] = ub(health);}
-    public void _COG  (int arg0, int arg1, int arg2) {WMEM[arg0] = ub(cogs);}
+    public void _COG  (int arg0, int arg1, int arg2) {WMEM[arg0] = ub((int) cogs);}
     public void _PNT  (int arg0, int arg1, int arg2) {WMEM[arg0] = ub(fitness);}
     // A
     public void _UPG  (int arg0, int arg1, int arg2) {upgrade(WMEM[arg0], WMEM[arg1].val());}
     public void _STAT (int arg0, int arg1, int arg2) {WMEM[arg0] = stats[Math.abs(arg1>>4)];}
     public void _KWGT (int arg0, int arg1, int arg2) {if(KMEM[WMEM[arg1].val()] != null) WMEM[arg0] = ub(KMEM[WMEM[arg1].val()].weight);}
-    public void _COST (int arg0, int arg1, int arg2) {if(KMEM[WMEM[arg1].val()] != null) WMEM[arg0] = ub(KMEM[WMEM[arg1].val()].cost);}
+    public void _COST (int arg0, int arg1, int arg2) {if(KMEM[WMEM[arg1].val()] != null) WMEM[arg0] = ub((int)(KMEM[WMEM[arg1].val()].cost*4));}
     // B
 
     // C
@@ -733,9 +736,9 @@ public class Tank extends Entity {
     public void _UMEMX(int arg0, int arg1, int arg2) {}
     public void _DEFU (int arg0, int arg1, int arg2) {if(UMEM[arg0] == null) createMemory(UMEM, ub(arg0));}
     public void _UDEP (int arg0, int arg1, int arg2) {}
-    public void _SSWAP(int arg0, int arg1, int arg2) {if(SMEM[arg0] != null) loadedS = arg0; index = arg1;}
-    public void _PSWAP(int arg0, int arg1, int arg2) {if(PMEM[arg0] != null) loadedP = arg0; index = arg1;}
-    public void _USWAP(int arg0, int arg1, int arg2) {if(UMEM[arg0] != null) loadedU = arg0; index = arg1;}
+    public void _SWAP(int arg0, int arg1, int arg2) {
+        if(PMEM[arg0] != null) {loaded = arg0; index = arg1 - 4; }
+    }
     // E
     public void _TARG(int arg0, int arg1, int arg2) {}
     public void _SCOPY(int arg0, int arg1, int arg2) {}
@@ -774,4 +777,9 @@ public class Tank extends Entity {
 
 
     }
+
+    int umemAt(int memory, int address) {return UMEM[memory][address].val();}
+    int pmemAt(int memory, int address) {return PMEM[memory][address].val();}
+    int smemAt(int memory, int address) {return SMEM[memory][address].val();}
+    int wmemAt(int address) {return WMEM[address].val();}
 }

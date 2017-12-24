@@ -8,7 +8,7 @@ public class Gene {
 
     private Method meaning;
     private String description;
-    int cost;
+    double cost;
     int weight;
 
     static final String[] GENE_CATEGORIES = {
@@ -30,7 +30,7 @@ public class Gene {
             "Generation"
     };
 
-    Gene(String meaning, String description, int cost, int weight) {
+    Gene(String meaning, String description, double cost, int weight) {
         this.description = description;
         this.cost = cost;
         this.weight = weight;

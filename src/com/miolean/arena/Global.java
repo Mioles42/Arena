@@ -13,9 +13,9 @@ class Global {
 
     //Milliseconds per tick, for each of the different cycles
     static int updateCycle = 50;
-    static int displayCycle = 100;
-    static int renderCycle = 20;
-    static int distributeCycle = 50;
+    static int displayCycle = 50;
+    static int renderCycle = 10;
+    static int distributeCycle = 500;
 
     //1 pixel= 1 tank-meter, I suppose
     static final int ARENA_SIZE = 1024;
