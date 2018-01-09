@@ -8,8 +8,9 @@ import static com.miolean.arena.Global.BORDER;
 
 class Bullet extends Entity {
 
-    private static final int ROGUE_SPEED = 50;
-    private static final int ROGUE_OBSERVATION = 1;
+    private static final int ROGUE_SPEED = 8;
+    private static final double ROGUE_TURN_SPEED = 0.1;
+    private static final int ROGUE_OBSERVATION = 100;
 
     private Tank source;
     private Tank target;
@@ -32,14 +33,12 @@ class Bullet extends Entity {
             accX = 0;
             accY = 0;
             accR = 0;
-
-            health = 5;
+            health = 1;
         } else {
             x = Global.ARENA_SIZE * Math.random();
             y = Global.ARENA_SIZE * Math.random();
 
-            health = 5;
-            accX = 1;
+            health = 1;
             damage = 5;
         }
     }
@@ -69,7 +68,7 @@ class Bullet extends Entity {
             };
 
             int[] YPoints = {
-                    (int) (y-width*4*(sinR*cosExtra + sinExtra*cosR)),
+                    (int) (y-width*3*(sinR*cosExtra + sinExtra*cosR)),
                     (int) (y-width*3*(sinR*cosExtra - sinExtra*cosR)),
                     (int) (y)
 
@@ -81,23 +80,46 @@ class Bullet extends Entity {
         }
     }
 
+    void forward(int force) {
+       //Translate polar force into cartesian vector
+        this.accX = force * Math.cos(r) / 16; //Scaling!
+        this.accY = force * -Math.sin(r) / 16;
+    }
+
+
     @Override
     void update() {
+
+        applyPhysics();
+
         if(source != null) {
-            applyPhysics();
             if (Math.abs(velX) < 1 && Math.abs(velY) < 1) health = 0;
             if ((x > ARENA_SIZE - BORDER) || (x < BORDER) || (y > ARENA_SIZE - BORDER) || (y < BORDER)) health = 0;
         } else if(target != null){
             double xdis = target.x - x;
-            double ydis = target.x - x;
+            double ydis = target.y - y;
 
-            accX = xdis / (xdis + ydis) * ROGUE_SPEED;
-            accX = ydis / (xdis + ydis) * ROGUE_SPEED;
+
+            double targetR = Math.atan(xdis/ydis) + Math.PI/2;
+
+            if(ydis > 0) targetR += Math.PI;
+
+            // (A - B) mod C = (A mod C - B mod C) mod C
+            double rdis = (r - targetR) % (2*Math.PI);
+            if(rdis < -Math.PI) rdis += (2*Math.PI);
+
+            if(rdis > 0.03) accR = -ROGUE_TURN_SPEED;
+            else if(rdis < -0.03) accR = ROGUE_TURN_SPEED;
+            else accR = 0;
+
+            forward(ROGUE_SPEED);
         } else {
             for(int i = 0; i < ROGUE_OBSERVATION; i++){
-                System.out.println("Found target");
                 Entity attemptedTarget = handler.getByUUID(UByte.rand(), UByte.rand());
-                if(attemptedTarget != null && attemptedTarget instanceof Tank) target = (Tank) attemptedTarget;
+                if(attemptedTarget != null && attemptedTarget instanceof ControlledTank) {
+                    target = (Tank) attemptedTarget;
+                    System.out.println("Found target");
+                }
             }
         }
     }
@@ -129,7 +151,7 @@ class Bullet extends Entity {
 
     @Override
     void intersect(Entity e) {
-        e.health -= source.stats[Tank.STAT_DAMAGE].val();
+        e.health -= damage;
         health = 0;
     }
 

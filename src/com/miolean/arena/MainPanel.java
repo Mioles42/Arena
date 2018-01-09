@@ -24,6 +24,8 @@ public class MainPanel extends JPanel implements Runnable, KeyListener, MouseLis
 
     private MainPanel() {
 
+        requestFocus();
+
         Entity[] entities = new Entity[0xFFFF];
 
         renderer = new Renderer(entities);
@@ -55,7 +57,7 @@ public class MainPanel extends JPanel implements Runnable, KeyListener, MouseLis
 
         window.setSize(1200, 700);
         window.setName("Arena");
-        window.setLocation(300, 300);
+        window.setLocation(20, 200);
         window.setVisible(true);
 
         requestFocus();
@@ -133,6 +135,8 @@ public class MainPanel extends JPanel implements Runnable, KeyListener, MouseLis
         }
     }
     @Override public void mouseClicked(MouseEvent e) {
+        requestFocus();
+
         int x = (int) (e.getX() + viewholder.x - this.getWidth()/2);
         int y = (int) (e.getY() + viewholder.y - this.getHeight()/2);
 
