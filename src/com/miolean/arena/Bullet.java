@@ -108,15 +108,32 @@ class Bullet extends Entity {
             double rdis = (r - targetR) % (2*Math.PI);
             if(rdis < -Math.PI) rdis += (2*Math.PI);
 
-            if(rdis > 0.03) accR = -ROGUE_TURN_SPEED;
-            else if(rdis < -0.03) accR = ROGUE_TURN_SPEED;
+            if(rdis > -velR) accR = -ROGUE_TURN_SPEED;
+            else if(rdis < velR) accR = ROGUE_TURN_SPEED;
             else accR = 0;
 
             forward(ROGUE_SPEED);
+
+            //Meanwhile, look for closer targets
+
+            for(int i = 0; i < ROGUE_OBSERVATION; i++) {
+
+                Entity attemptedTarget = handler.getByUUID(UByte.rand(), UByte.rand());
+
+                if (attemptedTarget != null && attemptedTarget instanceof Tank) {
+                    double axdis = attemptedTarget.x - x;
+                    double aydis = attemptedTarget.y - y;
+
+                    if(axdis*axdis + aydis*aydis < xdis*xdis + ydis*ydis) {
+                        target = (Tank) attemptedTarget;
+                    }
+                }
+            }
+
         } else {
             for(int i = 0; i < ROGUE_OBSERVATION; i++){
                 Entity attemptedTarget = handler.getByUUID(UByte.rand(), UByte.rand());
-                if(attemptedTarget != null && attemptedTarget instanceof ControlledTank) {
+                if(attemptedTarget != null && attemptedTarget instanceof Tank) {
                     target = (Tank) attemptedTarget;
                     System.out.println("Found target");
                 }

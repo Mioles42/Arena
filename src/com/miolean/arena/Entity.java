@@ -67,6 +67,13 @@ abstract class Entity {
         return uuid;
     }
 
+    double distanceTo(Entity e) {
+        double xdis = e.x - x;
+        double ydis = e.y - y;
+
+        return Math.sqrt(xdis * xdis + ydis * ydis);
+    }
+
     abstract void onBirth();
     abstract void onDeath();
 }
