@@ -10,7 +10,7 @@ class Bullet extends Entity {
 
     private static final int ROGUE_SPEED = 8;
     private static final double ROGUE_TURN_SPEED = 0.1;
-    private static final int ROGUE_OBSERVATION = 100;
+    private static final int ROGUE_OBSERVATION = 1;
 
     private Tank source;
     private Tank target;
@@ -38,7 +38,7 @@ class Bullet extends Entity {
             x = Global.ARENA_SIZE * Math.random();
             y = Global.ARENA_SIZE * Math.random();
 
-            health = 1;
+            health = 3;
             damage = 5;
         }
     }
@@ -47,7 +47,9 @@ class Bullet extends Entity {
     @Override
     void render(Graphics g) {
 
-        g.setColor(new Color(100 + damage / 2, 150 - damage / 2, 50));
+
+        if(target != null || source != null) g.setColor(new Color(100 + damage / 2, 150 - damage / 2, 50));
+        else g.setColor(new Color(100, 100, 255));
 
         if(source != null) {
             g.fillOval((int) x - width / 2, (int) y - height / 2, width, height);
@@ -131,6 +133,9 @@ class Bullet extends Entity {
             }
 
         } else {
+
+            velR = 0.1;
+
             for(int i = 0; i < ROGUE_OBSERVATION; i++){
                 Entity attemptedTarget = handler.getByUUID(UByte.rand(), UByte.rand());
                 if(attemptedTarget != null && attemptedTarget instanceof Tank) {
@@ -169,7 +174,7 @@ class Bullet extends Entity {
     @Override
     void intersect(Entity e) {
         e.health -= damage;
-        health = 0;
+        health--;
     }
 
     @Override
