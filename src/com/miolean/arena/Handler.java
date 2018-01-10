@@ -34,13 +34,14 @@ class Handler {
     }
 
     void remove(int uuid) {
+        if(entities[uuid] instanceof Cog) numCogs--;
+        if(entities[uuid] instanceof Tank) numTanks--;
+
         entities[uuid].onDeath();
         entities[uuid].handler = null;
         entities[uuid] = null;
         numEntities--;
 
-        if(entities[uuid] instanceof Cog) numCogs--;
-        if(entities[uuid] instanceof Tank) numTanks--;
 
     }
 

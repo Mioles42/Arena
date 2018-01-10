@@ -109,7 +109,7 @@ public class MainPanel extends JPanel implements Runnable, KeyListener, MouseLis
         g.setColor(Color.BLACK);
         g.drawString((int) (1000.0/Global.updateCycle) + "tk/s", 15, 25);
         g.drawString("Time:" + Global.time + "tks", 15, 45);
-        g.drawString("Entities:" + handler.numEntities, 15, 65);
+        g.drawString("Entities: " + handler.numEntities + " (Cogs: " + handler.numCogs + ", Tanks: " + handler.numTanks + ")", 15, 65);
         g.drawOval(this.getWidth()/2, this.getHeight()/2, 2, 2);
 
         g.translate((int) (-viewholder.x + this.getWidth()/2), (int) (-viewholder.y + this.getHeight()/2));
@@ -203,7 +203,7 @@ public class MainPanel extends JPanel implements Runnable, KeyListener, MouseLis
         }
 
         if(e.getButton() == MouseEvent.BUTTON3) {
-            Cog cog = new Cog(10);
+            Cog cog = new Cog(100);
             cog.x = (int) (e.getX() + viewholder.x - this.getWidth() / 2); 
             cog.y = (int) (e.getY() + viewholder.y - this.getHeight() / 2);
             handler.add(cog);

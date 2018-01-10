@@ -19,7 +19,8 @@ edit program 0 at 4:
     _LED 02 02 01
     _IMOV 01 00 --
     _IMOV 02 255 --
-    _KWGT 05 54 --
+
+
 
 edit program 1 at 0:
     _COG 33 -- --

@@ -429,6 +429,7 @@ public class Tank extends Entity {
 
     void runGenes(UByte[][] genes) {
 
+
         cogs -= DIFFICULTY;
 
         greater = false;
@@ -440,6 +441,7 @@ public class Tank extends Entity {
         for(; index < genes.length-3; index++) {
             //For every entry in this list of genes (excluding the ones at the end that don't have enough others after them as arguments)
 
+            if(genes[loaded] == null) loaded = 0;
             if(genes[loaded][index].val() == 0x00) continue; //Don't even bother with opcode 0x00, standing for "do nothing"
             if(KMEM[genes[loaded][index].val()] == null) continue; //If the opcode doesn't actually stand for something meaningful, skip it too
 
@@ -677,7 +679,7 @@ public class Tank extends Entity {
     public void _HEAL (int arg0, int arg1, int arg2) {health++;}
     public void _FORWD(int arg0, int arg1, int arg2) {forward(WMEM[arg0].val());}
     public void _REVRS(int arg0, int arg1, int arg2) {forward(-WMEM[arg0].val());}
-    public void _FIRE (int arg0, int arg1, int arg2) {} //TODO Implmement _FIRE()
+    public void _FIRE (int arg0, int arg1, int arg2) {fire();}
     public void _TURNL(int arg0, int arg1, int arg2) {rotate(WMEM[arg0].val());}
     public void _TURNR(int arg0, int arg1, int arg2) {rotate(-WMEM[arg0].val());}
     // 6
@@ -708,7 +710,7 @@ public class Tank extends Entity {
     public void _PNT  (int arg0, int arg1, int arg2) {WMEM[arg0] = ub(fitness);}
     // A
     public void _UPG  (int arg0, int arg1, int arg2) {upgrade(WMEM[arg0], WMEM[arg1].val());}
-    public void _STAT (int arg0, int arg1, int arg2) {WMEM[arg0] = stats[Math.abs(arg1>>4)];}
+    public void _STAT (int arg0, int arg1, int arg2) {WMEM[arg0] = stats[Math.abs(arg1>>5)];}
     public void _KWGT (int arg0, int arg1, int arg2) {if(KMEM[WMEM[arg1].val()] != null) WMEM[arg0] = ub(KMEM[WMEM[arg1].val()].weight);}
     public void _COST (int arg0, int arg1, int arg2) {if(KMEM[WMEM[arg1].val()] != null) WMEM[arg0] = ub((int)(KMEM[WMEM[arg1].val()].cost*4));}
     // B
@@ -737,7 +739,7 @@ public class Tank extends Entity {
     public void _DEFU (int arg0, int arg1, int arg2) {if(UMEM[arg0] == null) createMemory(UMEM, ub(arg0));}
     public void _UDEP (int arg0, int arg1, int arg2) {}
     public void _SWAP(int arg0, int arg1, int arg2) {
-        if(PMEM[arg0] != null) {loaded = arg0; index = arg1 - 4; }
+        loaded = arg0; index = arg1 - 4;
     }
     // E
     public void _TARG(int arg0, int arg1, int arg2) {}
@@ -749,19 +751,25 @@ public class Tank extends Entity {
     public void _REP  (int arg0, int arg1, int arg2) {reproduce();}
     public void _TWK  (int arg0, int arg1, int arg2) {if(KMEM[arg0] != null) KMEM[arg0].weight = WMEM[arg1].val();}
     public void _KRAND(int arg0, int arg1, int arg2) {WMEM[arg0] = randomGene();}
-    public void _URAND(int arg0, int arg1, int arg2) {if(UMEM[WMEM[arg1].val()] != null) WMEM[arg0] = randomExists(UMEM[WMEM[arg1].val()]);}
-    public void _PRAND(int arg0, int arg1, int arg2) {if(PMEM[WMEM[arg1].val()] != null) WMEM[arg0] = randomExists(PMEM[WMEM[arg1].val()]);}
-    public void _SRAND(int arg0, int arg1, int arg2) {if(SMEM[WMEM[arg1].val()] != null) WMEM[arg0] = randomExists(SMEM[WMEM[arg1].val()]);}
+    public void _URAND(int arg0, int arg1, int arg2) {if(UMEM[arg1] != null) WMEM[arg0] = randomExists(UMEM[arg1]);}
+    public void _PRAND(int arg0, int arg1, int arg2) {if(PMEM[arg1] != null) WMEM[arg0] = randomExists(PMEM[arg1]);}
+    public void _SRAND(int arg0, int arg1, int arg2) {if(SMEM[arg1] != null) WMEM[arg0] = randomExists(SMEM[arg1]);}
     public void _WRAND(int arg0, int arg1, int arg2) {WMEM[arg0] = randomExists(WMEM);}
     public void _IRAND(int arg0, int arg1, int arg2) {WMEM[arg0] = ub((int) (Math.random() * 255));}
 
 
     static UByte randomExists(UByte[] memory) {
 
-        int index = (int) (Math.random() * 256);
-        while(memory[index] == null || memory[index] == ub(0)) index = (int) (Math.random() * 256);
+        int totalExist = 0;
+        for(UByte u: memory) if(u != ub(0)) totalExist++;
 
-        return ub(index);
+        int selection = (int) (totalExist * Math.random());
+        int i;
+        for(i = 0; selection > 0; i++) {
+            if(memory[i] != ub(0)) selection--;
+        }
+
+        return ub(i);
     }
 
     static UByte randomGene() {
