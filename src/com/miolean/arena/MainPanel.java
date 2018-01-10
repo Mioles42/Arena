@@ -3,6 +3,8 @@ package com.miolean.arena;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.FileNotFoundException;
+import java.io.PrintStream;
 
 import static com.miolean.arena.Global.ARENA_SIZE;
 import static com.miolean.arena.Global.BORDER;
@@ -29,9 +31,9 @@ public class MainPanel extends JPanel implements Runnable, KeyListener, MouseLis
 
         Entity[] entities = new Entity[256];
 
-        window = new Window(this);
         renderer = new Renderer(entities);
         handler = new Handler(entities);
+        window = new Window(this, entities, handler.getTanks());
 
         handler.add(new ControlledTank(300, 300));
         viewholder = entities[0];
@@ -102,6 +104,26 @@ public class MainPanel extends JPanel implements Runnable, KeyListener, MouseLis
                 lastDistribute = time;
             }
         }
+    }
+
+    private void setViewholder(Entity e, int x, int y) {
+        if (e == null) {
+            if (viewholder instanceof ControlledTank) {
+                viewholder.x = x;
+                viewholder.y = y;
+            } else {
+                e = new ControlledTank(x, y);
+                handler.add(e);
+                viewholder = e;
+            }
+
+        } else {
+            if (viewholder instanceof ControlledTank) viewholder.health = 0;
+            viewholder = e;
+        }
+
+        if (viewholder instanceof Tank && !(viewholder instanceof ControlledTank))
+            window.setActiveTank((Tank) viewholder);
     }
 
     private void render(Graphics g) {
@@ -192,23 +214,7 @@ public class MainPanel extends JPanel implements Runnable, KeyListener, MouseLis
             int y = (int) (e.getY() + viewholder.y - this.getHeight() / 2);
 
             Entity newHolder = handler.entityAtLocation(x, y);
-            if (newHolder == null) {
-                if (viewholder instanceof ControlledTank) {
-                    viewholder.x = x;
-                    viewholder.y = y;
-                } else {
-                    newHolder = new ControlledTank(x, y);
-                    handler.add(newHolder);
-                    viewholder = newHolder;
-                }
-              
-            } else {
-                if (viewholder instanceof ControlledTank) viewholder.health = 0;
-                viewholder = newHolder;
-            }
-
-            if (viewholder instanceof Tank && !(viewholder instanceof ControlledTank))
-                window.setActiveTank((Tank) viewholder);
+            setViewholder(newHolder, x, y);
         }
 
         if(e.getButton() == MouseEvent.BUTTON3) {

@@ -505,11 +505,6 @@ public class Tank extends Entity {
     void intersect(Entity e) {
     }
 
-    @Override
-    public String toString() {
-        return super.toString() + "{x: " + x + ", y: " + y + "}";
-    }
-
     public void applyPhysics() {
         super.applyPhysics();
         if(x > ARENA_SIZE - BORDER) x = ARENA_SIZE - BORDER;
