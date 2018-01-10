@@ -101,9 +101,9 @@ public class MemoryPanel extends JPanel {
         StyledDocument doc = new DefaultStyledDocument();
         String text = "§";
 
-        if(source != null) {
+        if(source != null && ! source.isAlive()) source = source.lastChild;
 
-            if(! source.isAlive()) source = source.lastChild;
+        if(source != null) {
 
             text += "c\nTank \"" + source.name + "\"\n\n";
 

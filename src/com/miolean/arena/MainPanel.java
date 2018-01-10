@@ -11,7 +11,6 @@ public class MainPanel extends JPanel implements Runnable, KeyListener, MouseLis
 
     private Renderer renderer;
     private Handler handler;
-    private Distributor distributor;
     private Window window;
 
     Entity viewholder;
@@ -26,12 +25,11 @@ public class MainPanel extends JPanel implements Runnable, KeyListener, MouseLis
 
     private MainPanel() {
 
-        Entity[] entities = new Entity[0xFFFF];
+        Entity[] entities = new Entity[256];
 
         window = new Window(this);
         renderer = new Renderer(entities);
         handler = new Handler(entities);
-        distributor = new Distributor(handler);
 
         handler.add(new ControlledTank(300, 300));
         viewholder = entities[0];
@@ -51,7 +49,7 @@ public class MainPanel extends JPanel implements Runnable, KeyListener, MouseLis
 
         window.setSize(1200, 700);
         window.setName("Arena");
-        window.setLocation(50, 200);
+        window.setLocation(200, 200);
         window.setVisible(true);
 
         requestFocus();
@@ -93,17 +91,25 @@ public class MainPanel extends JPanel implements Runnable, KeyListener, MouseLis
             time = System.currentTimeMillis();
 
             if(time > lastDistribute + Global.distributeCycle) {
-                distributor.distribute();
+                handler.distribute();
                 lastDistribute = time;
             }
         }
     }
 
     private void render(Graphics g) {
+
+        if(! viewholder.isAlive()
+                && viewholder instanceof Tank
+                && ((Tank) viewholder).lastChild != null) {
+            viewholder = ((Tank) viewholder).lastChild;
+        }
+
+
         g.setColor(Color.BLACK);
-        g.drawString((int) (1000/Global.updateCycle) + "tk/s", 15, 25);
+        g.drawString((int) (1000.0/Global.updateCycle) + "tk/s", 15, 25);
         g.drawString("Time:" + Global.time + "tks", 15, 45);
-        g.drawString("Entities:" + handler.numEntities, 15, 65);
+        g.drawString("Entities: " + handler.numEntities + " (Cogs: " + handler.numCogs + ", Tanks: " + handler.numTanks + ")", 15, 65);
         g.drawOval(this.getWidth()/2, this.getHeight()/2, 2, 2);
 
         g.translate((int) (-viewholder.x + this.getWidth()/2), (int) (-viewholder.y + this.getHeight()/2));
@@ -130,11 +136,12 @@ public class MainPanel extends JPanel implements Runnable, KeyListener, MouseLis
 
         if(viewholder instanceof Tank) {
             g.setColor(new Color(100, 100, 255, 200));
-            g.fillRect(15, getHeight() - 90, ((Tank)viewholder).cogs, 20);
+            g.fillRect(15, getHeight() - 90, (int)((Tank)viewholder).cogs, 20);
             g.setColor(Color.BLACK);
-            if(((Tank)viewholder).cogs < 20) g.drawString(((Tank)viewholder).cogs + "", 18 + ((Tank)viewholder).cogs, getHeight()-75);
-            else g.drawString(((Tank)viewholder).cogs + "", 18, getHeight()-75);
-            g.drawRect(15, getHeight() - 90, ((Tank)viewholder).cogs, 20);
+            String label = String.format("%2.2f", ((Tank)viewholder).cogs);
+            if(((Tank)viewholder).cogs < 20) g.drawString(label, 18 + (int) ((Tank)viewholder).cogs, getHeight()-75);
+            else g.drawString(label, 18, getHeight()-75);
+            g.drawRect(15, getHeight() - 90, (int) ((Tank)viewholder).cogs, 20);
         }
     }
 
@@ -168,29 +175,39 @@ public class MainPanel extends JPanel implements Runnable, KeyListener, MouseLis
     }
     @Override public void mouseClicked(MouseEvent e) {
 
-        if(! this.hasFocus()) {
-            this.requestFocus();
-            return;
-        }
-        int x = (int) (e.getX() + viewholder.x - this.getWidth()/2);
-        int y = (int) (e.getY() + viewholder.y - this.getHeight()/2);
+        if(e.getButton() == MouseEvent.BUTTON1) {
+            if (!this.hasFocus()) {
+                this.requestFocus();
+                return;
+            }
+            int x = (int) (e.getX() + viewholder.x - this.getWidth() / 2);
+            int y = (int) (e.getY() + viewholder.y - this.getHeight() / 2);
 
-        Entity newHolder = handler.entityAtLocation(x, y);
-        if(newHolder == null) {
-            if (viewholder instanceof ControlledTank) {
-                viewholder.x = x;
-                viewholder.y = y;
+            Entity newHolder = handler.entityAtLocation(x, y);
+            if (newHolder == null) {
+                if (viewholder instanceof ControlledTank) {
+                    viewholder.x = x;
+                    viewholder.y = y;
+                } else {
+                    newHolder = new ControlledTank(x, y);
+                    handler.add(newHolder);
+                    viewholder = newHolder;
+                }
             } else {
-                newHolder = new ControlledTank(x, y);
-                handler.add(newHolder);
+                if (viewholder instanceof ControlledTank) viewholder.health = 0;
                 viewholder = newHolder;
             }
-        } else {
-            if (viewholder instanceof ControlledTank) viewholder.health = 0;
-            viewholder = newHolder;
+
+            if (viewholder instanceof Tank && !(viewholder instanceof ControlledTank))
+                window.setActiveTank((Tank) viewholder);
         }
 
-        if(viewholder instanceof Tank && !(viewholder instanceof ControlledTank)) window.setActiveTank((Tank) viewholder);
+        if(e.getButton() == MouseEvent.BUTTON3) {
+            Cog cog = new Cog(100);
+            cog.x = (int) (e.getX() + viewholder.x - this.getWidth() / 2); 
+            cog.y = (int) (e.getY() + viewholder.y - this.getHeight() / 2);
+            handler.add(cog);
+        }
     }
     @Override public void mousePressed(MouseEvent e) {}
     @Override public void mouseReleased(MouseEvent e) {}
