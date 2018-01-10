@@ -14,7 +14,7 @@ abstract class Entity {
     //Motion components:
     double x; //X position, in pixels
     double y; //Y position, in pixels
-    double r; //Rotation, in degrees
+    double r; //Rotation, in radians
     double velX; //X velocity, in pixels per tick.
     double velY; //Y velocity, in pixels per tick.
     double velR; //Rotational velocity, in degrees per tick.
@@ -67,7 +67,15 @@ abstract class Entity {
         return uuid;
     }
 
+    double distanceTo(Entity e) {
+        double xdis = e.x - x;
+        double ydis = e.y - y;
+
+        return Math.sqrt(xdis * xdis + ydis * ydis);
+    }
+  
     boolean isAlive() {return ! (handler == null);}
+  
 
     abstract void onBirth();
     abstract void onDeath();

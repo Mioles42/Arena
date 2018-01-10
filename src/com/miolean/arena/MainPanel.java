@@ -25,6 +25,8 @@ public class MainPanel extends JPanel implements Runnable, KeyListener, MouseLis
 
     private MainPanel() {
 
+        requestFocus();
+
         Entity[] entities = new Entity[256];
 
         window = new Window(this);
@@ -33,6 +35,11 @@ public class MainPanel extends JPanel implements Runnable, KeyListener, MouseLis
 
         handler.add(new ControlledTank(300, 300));
         viewholder = entities[0];
+
+        Bullet rogue = new Bullet(null);
+        handler.add(rogue);
+        rogue.x = 200;
+        rogue.y = 200;
 
         Tank dummy = new Tank("cain");
         window.setActiveTank(dummy);
@@ -49,7 +56,7 @@ public class MainPanel extends JPanel implements Runnable, KeyListener, MouseLis
 
         window.setSize(1200, 700);
         window.setName("Arena");
-        window.setLocation(200, 200);
+        window.setLocation(20, 200);
         window.setVisible(true);
 
         requestFocus();
@@ -175,6 +182,7 @@ public class MainPanel extends JPanel implements Runnable, KeyListener, MouseLis
     }
     @Override public void mouseClicked(MouseEvent e) {
 
+
         if(e.getButton() == MouseEvent.BUTTON1) {
             if (!this.hasFocus()) {
                 this.requestFocus();
@@ -193,6 +201,7 @@ public class MainPanel extends JPanel implements Runnable, KeyListener, MouseLis
                     handler.add(newHolder);
                     viewholder = newHolder;
                 }
+              
             } else {
                 if (viewholder instanceof ControlledTank) viewholder.health = 0;
                 viewholder = newHolder;

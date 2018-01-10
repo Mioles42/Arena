@@ -191,6 +191,7 @@ public class Window extends JFrame implements ChangeListener ,KeyListener {
 
     @Override
     public void keyTyped(KeyEvent e) {
+        main.requestFocus();
         main.keyTyped(e);
     }
 
