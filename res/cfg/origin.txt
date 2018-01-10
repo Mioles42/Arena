@@ -1,28 +1,28 @@
 
 ^0 Reserved
-    /01/ SNO    / "Significant nothing"         /0  /0  /
-    /02/ PRINT  / "Debug - print args"          /0  /0  /
+    /02/ SNO    / "Significant nothing"         /0  /0  /
+    /03/ PRINT  / "Debug - print args"          /0  /0  /
 
 ^1 Branching
-    /10/ GOTO   / "Goto"                        /40 /1  /
-    /11/ GOE    / "Goto if equal"               /40 /1  /
-    /12/ GOG    / "Goto if greater"             /40 /1  /
-    /13/ IGOTO  / "Goto immed"                  /50 /1  /
-    /14/ IGOE   / "Goto immed if equal"         /50 /1  /
-    /15/ IGOG   / "Goto immed if greater"       /50 /1  /
-    /16/ COMP   / "Compare"                     /70 /0  /
+    /10/ GOTO   / "Goto"                        /40 /0.2/
+    /11/ GOE    / "Goto if equal"               /40 /0.01/
+    /12/ GOG    / "Goto if greater"             /40 /0.01/
+    /13/ IGOTO  / "Goto immed"                  /50 /0.01/
+    /14/ IGOE   / "Goto immed if equal"         /50 /0.01/
+    /15/ IGOG   / "Goto immed if greater"       /50 /0.01/
+    /16/ COMP   / "Compare"                     /70 /0.01/
 ^2 Memory
     /20/ MOV    / "Move into REG"               /150/0  /
     /21/ SSTO   / "Store in SMEM"               /150/0  /
-    /22/ PSTO   / "Store in PMEM"               /50 /4  /
-    /23/ USTO   / "Store in UMEM"               /20 /32 /
+    /22/ PSTO   / "Store in PMEM"               /50 /0.1/
+    /23/ USTO   / "Store in UMEM"               /20 /0.2/
     /24/ SGET   / "Get from SMEM"               /150/0  /
     /25/ PGET   / "Get from PMEM"               /50 /0  /
     /26/ UGET   / "Get from UMEM"               /20 /0  /
     /27/ IMOV   / "Move immed into REG"         /200/0  /
     /28/ ISSTO  / "Move immed into SMEM"        /100/0  /
-    /29/ IPSTO  / "Move immed into PMEM"        /50 /8  /
-    /2A/ IUSTO  / "Move immed into UMEM"        /20 /32 /
+    /29/ IPSTO  / "Move immed into PMEM"        /50 /0.1/
+    /2A/ IUSTO  / "Move immed into UMEM"        /20 /0.2/
     /2B/ WCLR   / "W range clear"               /20 /0  /
     /2C/ SCLR   / "S range clear"               /10 /0  /
     /2D/ PCLR   / "P range clear"               /6  /0  /
@@ -38,15 +38,15 @@
     /37/ VELR   /"R Velocity"                   /10 /0  /
     /38/ ACCR   /"R Acceleration"               /10 /0  /
 ^4 Sight
-    /40/ VIEW   /"Set sight range"              /30 /4  /
+    /40/ VIEW   /"Set sight range"              /30 /0.1/
     /41/ NEAR   /"Number nearby"                /30 /0  /
 ^5 Action
-    /50/ HEAL   / "Heal"                        /100/4  /
-    /51/ FORWD  / "Forwards"                    /150/0  /
+    /50/ HEAL   / "Heal"                        /100/1  /
+    /51/ FORWD  / "Forwards"                    /250/0  /
     /52/ REVRS  / "Reverse"                     /100/0  /
-    /53/ FIRE   / "Fire"                        /110/4  /
-    /54/ TURNL  / "Counterclockwise"            /120/0  /
-    /55/ TURNR  / "Clockwise"                   /120/0  /
+    /53/ FIRE   / "Fire"                        /110/0  /
+    /54/ TURNL  / "Counterclockwise"            /400/0  /
+    /55/ TURNR  / "Clockwise"                   /400/0  /
 ^6 Math
     /60/ ADD    / "Add"                         /20 /0  /
     /61/ SUB    / "Subtract"                    /20 /0  /
@@ -61,8 +61,8 @@
     /71/ OHP    / "Health of other"             /30 /0  /
     /72/ OCOG   / "Cogs of other"               /30 /0  /
 ^8 Interaction
-    /80/ WALL   / "Place wall"                  /40 /4  /
-    /81/ SPIT   / "Spit out cogs"               /20 /4  /
+    /80/ WALL   / "Place wall"                  /40 /1  /
+    /81/ SPIT   / "Spit out cogs"               /20 /0  /
     /82/ LED    / "Set beacon"                  /30 /0  /
     /85/ OLEDR  / "Get beacon R"                /30 /0  /
     /86/ OLEDG  / "Get beacon G"                /30 /0  /
@@ -74,7 +74,7 @@
     /93/ COG    / "Own cogs"                    /40 /0  /
     /94/ PNT    / "Own points"                  /40 /0  /
 ^A Stats
-    /A0/ UPG    / "Upgrade"                     /70 /4  /
+    /A0/ UPG    / "Upgrade"                     /70 /.5 /
     /A1/ STAT   / "Value of stat"               /20 /0  /
     /A2/ KWGT   / "K weight (0 if invalid)"     /5  /0  /
     /A3/ COST   / "Cost"                        /40 /0  /
@@ -103,9 +103,7 @@
     /D9/ UMEMX  / "Loaded U length"             /1  /0  /
     /DA/ DEFU   / "Define U memory"             /1  /32 /
     /DB/ UDEP   / "Delete U memory"             /1  /64 /
-    /DC/ SSWAP  / "Change S memory"             /10 /1  /
-    /DD/ PSWAP  / "Change U memory"             /1  /4  /
-    /DE/ USWAP  / "Change P memory"             /10 /2  /
+    /DC/ SWAP   / "Change loaded memory"        /10 /0.01/
 ^E Crossing
     /E0/ TARG   / "Set copy target"             /15 /0  /
     /E1/ SCOPY  / "Copy S memory from other"    /10 /0  /

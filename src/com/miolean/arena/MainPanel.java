@@ -4,18 +4,19 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
+import static com.miolean.arena.Global.ARENA_SIZE;
+import static com.miolean.arena.Global.BORDER;
+
 public class MainPanel extends JPanel implements Runnable, KeyListener, MouseListener, WindowListener, MouseMotionListener {
 
     private Renderer renderer;
     private Handler handler;
-    private Distributor distributor;
+    private Window window;
 
-    private Entity viewholder;
+    Entity viewholder;
 
     private boolean isRunning = true;
 
-    //Let's also measure whether we are using the extra tick time to render (if not, adding tick speed will do nothing)
-    boolean renderPoint = false;
 
     public static void main(String[] args) {
         Thread gameThread = new Thread(new MainPanel());
@@ -26,11 +27,11 @@ public class MainPanel extends JPanel implements Runnable, KeyListener, MouseLis
 
         requestFocus();
 
-        Entity[] entities = new Entity[0xFFFF];
+        Entity[] entities = new Entity[256];
 
+        window = new Window(this);
         renderer = new Renderer(entities);
         handler = new Handler(entities);
-        distributor = new Distributor(handler);
 
         handler.add(new ControlledTank(300, 300));
         viewholder = entities[0];
@@ -40,13 +41,11 @@ public class MainPanel extends JPanel implements Runnable, KeyListener, MouseLis
         rogue.x = 200;
         rogue.y = 200;
 
-        Entity dummy = new Tank("eve");
+        Tank dummy = new Tank("cain");
+        window.setActiveTank(dummy);
         dummy.health = 256;
 
         handler.add(dummy);
-
-        JFrame window = new Window(this);
-
 
         this.setBackground(new Color(170, 170, 160));
 
@@ -71,40 +70,87 @@ public class MainPanel extends JPanel implements Runnable, KeyListener, MouseLis
     public void run() {
         System.out.println("Running...");
 
-        //How long does a single tick last?
-        double tickTime = 1000 * (1.0 / (double) Global.tickSpeed);
-        System.out.println("[com.miolean.arena.MainPanel.run()] Found " + tickTime + " milliseconds per tick");
-
+        long lastUpdate = System.currentTimeMillis();
+        long lastRender = System.currentTimeMillis();
+        long lastDisplay = System.currentTimeMillis();
+        long lastDistribute = System.currentTimeMillis();
 
         while(isRunning) {
-            renderPoint = false;
-            tickTime = 1000 * (1.0 / (double) Global.tickSpeed);
-            long time = System.currentTimeMillis();
-            handler.update();
-            distributor.distribute();
-            Global.time++;
-            this.repaint();
 
-            while(System.currentTimeMillis() < time + tickTime) {
-                this.repaint();
-                renderPoint = true;
+            long time = System.currentTimeMillis();
+
+            if(time > lastUpdate + Global.updateCycle) {
+                handler.update();
+                lastUpdate = time;
+            }
+            time = System.currentTimeMillis();
+
+            if(time > lastRender + Global.renderCycle) {
+                repaint();
+                lastRender = time;
+            }
+            time = System.currentTimeMillis();
+
+            if(time > lastDisplay + Global.displayCycle) {
+                window.display();
+                lastDisplay = time;
+            }
+            time = System.currentTimeMillis();
+
+            if(time > lastDistribute + Global.distributeCycle) {
+                handler.distribute();
+                lastDistribute = time;
             }
         }
     }
 
     private void render(Graphics g) {
+
+        if(! viewholder.isAlive()
+                && viewholder instanceof Tank
+                && ((Tank) viewholder).lastChild != null) {
+            viewholder = ((Tank) viewholder).lastChild;
+        }
+
+
         g.setColor(Color.BLACK);
-        g.drawString(Global.tickSpeed + "tk/s", 15, 25);
+        g.drawString((int) (1000.0/Global.updateCycle) + "tk/s", 15, 25);
         g.drawString("Time:" + Global.time + "tks", 15, 45);
-        g.drawString("Entities:" + handler.numEntities, 15, 65);
-        if(! renderPoint) g.drawString("Tick limit reached", 15, 85);
+        g.drawString("Entities: " + handler.numEntities + " (Cogs: " + handler.numCogs + ", Tanks: " + handler.numTanks + ")", 15, 65);
         g.drawOval(this.getWidth()/2, this.getHeight()/2, 2, 2);
 
         g.translate((int) (-viewholder.x + this.getWidth()/2), (int) (-viewholder.y + this.getHeight()/2));
+
+        g.setColor(Color.GRAY);
+        for(int i = 0; i < ARENA_SIZE / 64; i++) {
+            g.drawLine(i*64, BORDER, i*64, ARENA_SIZE -BORDER);
+            g.drawLine(BORDER, i*64, ARENA_SIZE - BORDER, i*64);
+        }
+
+        g.setColor(Color.RED);
+        g.drawRect(10, 10, ARENA_SIZE - BORDER, ARENA_SIZE - BORDER);
+
         renderer.render(g);
 
-    }
+        g.translate((int) -(-viewholder.x + this.getWidth()/2), (int) -(-viewholder.y + this.getHeight()/2));
 
+        g.setColor(new Color(255, 100, 100, 200));
+        g.fillRect(15, getHeight()-60, viewholder.health, 20);
+        g.setColor(Color.BLACK);
+        g.drawRect(15, getHeight()-60, viewholder.health, 20);
+        if(viewholder.health < 20) g.drawString(viewholder.health + "", 18 + viewholder.health, getHeight()-45);
+        else g.drawString(viewholder.health + "", 18, getHeight()-45);
+
+        if(viewholder instanceof Tank) {
+            g.setColor(new Color(100, 100, 255, 200));
+            g.fillRect(15, getHeight() - 90, (int)((Tank)viewholder).cogs, 20);
+            g.setColor(Color.BLACK);
+            String label = String.format("%2.2f", ((Tank)viewholder).cogs);
+            if(((Tank)viewholder).cogs < 20) g.drawString(label, 18 + (int) ((Tank)viewholder).cogs, getHeight()-75);
+            else g.drawString(label, 18, getHeight()-75);
+            g.drawRect(15, getHeight() - 90, (int) ((Tank)viewholder).cogs, 20);
+        }
+    }
 
     @Override public void keyTyped(KeyEvent e) {}
     @Override public void keyPressed(KeyEvent e) {
@@ -135,26 +181,42 @@ public class MainPanel extends JPanel implements Runnable, KeyListener, MouseLis
         }
     }
     @Override public void mouseClicked(MouseEvent e) {
-        requestFocus();
 
-        int x = (int) (e.getX() + viewholder.x - this.getWidth()/2);
-        int y = (int) (e.getY() + viewholder.y - this.getHeight()/2);
 
-        Entity newHolder = handler.entityAtLocation(x, y);
-        if(newHolder == null) {
-            if (viewholder instanceof ControlledTank) {
-                viewholder.x = x;
-                viewholder.y = y;
+        if(e.getButton() == MouseEvent.BUTTON1) {
+            if (!this.hasFocus()) {
+                this.requestFocus();
+                return;
+            }
+            int x = (int) (e.getX() + viewholder.x - this.getWidth() / 2);
+            int y = (int) (e.getY() + viewholder.y - this.getHeight() / 2);
+
+            Entity newHolder = handler.entityAtLocation(x, y);
+            if (newHolder == null) {
+                if (viewholder instanceof ControlledTank) {
+                    viewholder.x = x;
+                    viewholder.y = y;
+                } else {
+                    newHolder = new ControlledTank(x, y);
+                    handler.add(newHolder);
+                    viewholder = newHolder;
+                }
+              
             } else {
-                newHolder = new ControlledTank(x, y);
-                handler.add(newHolder);
+                if (viewholder instanceof ControlledTank) viewholder.health = 0;
                 viewholder = newHolder;
             }
-        } else {
-            if (viewholder instanceof ControlledTank) viewholder.health = 0;
-            viewholder = newHolder;
+
+            if (viewholder instanceof Tank && !(viewholder instanceof ControlledTank))
+                window.setActiveTank((Tank) viewholder);
         }
 
+        if(e.getButton() == MouseEvent.BUTTON3) {
+            Cog cog = new Cog(100);
+            cog.x = (int) (e.getX() + viewholder.x - this.getWidth() / 2); 
+            cog.y = (int) (e.getY() + viewholder.y - this.getHeight() / 2);
+            handler.add(cog);
+        }
     }
     @Override public void mousePressed(MouseEvent e) {}
     @Override public void mouseReleased(MouseEvent e) {}

@@ -19,9 +19,16 @@ class Bullet extends Entity {
     Bullet(Tank source) {
         this.source = source;
 
-        width = 8;
-        height = 8;
-
+        x = source.x;
+        y = source.y;
+        r = source.r;
+        velX = source.velX + (15 + source.stats[Tank.STAT_BULLET_SPEED].val()) * Math.cos(r + source.stats[Tank.STAT_BULLET_SPREAD].val()/128.0*(Math.random() - .5));
+        velY = source.velY + (15 + source.stats[Tank.STAT_BULLET_SPEED].val()) * -Math.sin(r + source.stats[Tank.STAT_BULLET_SPREAD].val()/128.0*(Math.random() - .5));
+        velR = 0;
+        accX = 0;
+        accY = 0;
+        accR = 0;
+      
         if(source != null) {
             x = source.x;
             y = source.y;

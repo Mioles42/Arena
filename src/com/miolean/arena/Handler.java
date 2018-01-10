@@ -5,8 +5,14 @@ package com.miolean.arena;
  */
 class Handler {
 
+    final static int MAX_COGS = 128;
+    final static int MAX_TANKS = 32;
+
     private Entity[] entities;
     int numEntities;
+
+    int numCogs;
+    int numTanks;
 
     private int lastUUIDUsed = 0;
 
@@ -15,10 +21,12 @@ class Handler {
     }
 
     void update() {
+        Global.time++;
+
         for(Entity e: entities) {
             if(e == null) continue;
             e.update();
-            for(Entity j: entities) {
+            for(Entity j: entities) { if (j == null) continue;
                 if(e.intersectsWith(j) && e != j) e.intersect(j);
             }
             if(e.health <= 0) remove(e.getUUID());
@@ -26,12 +34,22 @@ class Handler {
     }
 
     void remove(int uuid) {
+        if(entities[uuid] instanceof Cog) numCogs--;
+        if(entities[uuid] instanceof Tank) numTanks--;
+
         entities[uuid].onDeath();
+        entities[uuid].handler = null;
         entities[uuid] = null;
         numEntities--;
+
+
     }
 
     void add(Entity e) {
+
+        if(e instanceof Cog && numCogs >= MAX_COGS) return;
+        if(e instanceof Tank && numTanks >= MAX_TANKS) return;
+
         while(entities[lastUUIDUsed] != null) {
             lastUUIDUsed++;
             lastUUIDUsed %= entities.length;
@@ -42,6 +60,9 @@ class Handler {
         e.handler = this;
         numEntities++;
         e.onBirth();
+
+        if(e instanceof Cog) numCogs++;
+        if(e instanceof Tank) numTanks++;
     }
 
 
@@ -60,6 +81,7 @@ class Handler {
 //    }
 
     public int withinDistance(double x, double y, int distance) {
+
         int count = 0x0000;
         for(Entity e: entities) {
             if(e == null) continue;
@@ -68,10 +90,9 @@ class Handler {
         return count;
     }
 
+    //TODO more than 256 entity support
     Entity getByUUID(UByte uuidLeast, UByte uuidMost) {
-        //return entities[uuidMost.val()<<8 + uuidLeast.val()];
-        //TODO: Arena doesn't currently support more than 256 Entities. We'll just use the significant part for now.
-        return entities[uuidMost.val()];
+        return entities[uuidLeast.val()];
     }
 
     Entity entityAtLocation(int x, int y) {
@@ -83,5 +104,16 @@ class Handler {
         }
 
         return null;
+    }
+
+    void distribute() {
+
+        if(Math.random() < 0.05) {
+            Cog cog = new Cog(1 + (int) (5 * Math.random()));
+            cog.x = Math.random() * Global.ARENA_SIZE;
+            cog.y = Math.random() * Global.ARENA_SIZE;
+            cog.r = Math.random() * Global.ARENA_SIZE;
+            add(cog);
+        }
     }
 }
