@@ -190,7 +190,6 @@ public class MainPanel extends JPanel implements Runnable, KeyListener, MouseLis
     }
     @Override public void mouseClicked(MouseEvent e) {
 
-
         if(e.getButton() == MouseEvent.BUTTON1) {
             if (!this.hasFocus()) {
                 this.requestFocus();

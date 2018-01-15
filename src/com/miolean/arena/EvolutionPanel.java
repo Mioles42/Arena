@@ -1,5 +1,7 @@
 package com.miolean.arena;
 
+import javafx.scene.control.Hyperlink;
+
 import javax.swing.*;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
@@ -8,7 +10,7 @@ import java.awt.*;
 import java.util.Scanner;
 import java.util.regex.Pattern;
 
-public class EvolutionPanel extends JPanel implements HyperlinkListener{
+public class EvolutionPanel extends JPanel{
 
     JTextPane textPane;
     JLabel label;
@@ -52,7 +54,6 @@ public class EvolutionPanel extends JPanel implements HyperlinkListener{
         textPane = new JTextPane();
         textPane.setEditable(false);
         textPane.setHighlighter(null);
-        textPane.addHyperlinkListener(this);
         textPane.setContentType("text/html");
         c = new GridBagConstraints();
         c.gridx = 0;
@@ -77,9 +78,10 @@ public class EvolutionPanel extends JPanel implements HyperlinkListener{
             Tank t = tanks.get(i);
 
             result += "<p><b>[" + (i+1) + "]</b>  ";
-            if(!t.isAlive()) result += "<s>";
-            result += t.name + " [Fitness: " + t.fitness + "]";
-            if(!t.isAlive()) result += "</s>";
+            if(!t.isAlive()) result += "<s><font color=\"red\">";
+            result += "<a href=tank_greatest_"+i + ">";
+            result += t.name + " [Fitness: " + t.fitness + "]</a>";
+            if(!t.isAlive()) result += "</font></s>";
             result += "</p>";
 
         }
@@ -89,8 +91,7 @@ public class EvolutionPanel extends JPanel implements HyperlinkListener{
 
     }
 
-    @Override
-    public void hyperlinkUpdate(HyperlinkEvent e) {
-
+    public void addHyperlinkListener(HyperlinkListener l) {
+        textPane.addHyperlinkListener(l);
     }
 }

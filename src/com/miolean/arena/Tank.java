@@ -424,14 +424,16 @@ public class Tank extends Entity {
     @Override
     void update() {
 
-        //Congratulations on surviving another few milliseconds!
-        fitness++;
+        double initialCogs = cogs;
 
         //Apply physics
         applyPhysics();
 
         //Run the loaded P memory!
         runGenes(PMEM);
+
+        //Congratulations on not dying! Used cogs go towards fitness
+        fitness += initialCogs - cogs;
 
         //Make sure health is valid
         if(health > stats[STAT_MAX_HEALTH].val()) health = stats[STAT_MAX_HEALTH].val();

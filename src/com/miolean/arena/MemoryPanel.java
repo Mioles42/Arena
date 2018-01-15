@@ -101,11 +101,9 @@ public class MemoryPanel extends JPanel {
         StyledDocument doc = new DefaultStyledDocument();
         String text = "§";
 
-        if(source != null && ! source.isAlive()) source = source.lastChild;
-
         if(source != null) {
 
-            text += "c\nTank \"" + source.name + "\"\n\n";
+            text += (source.isAlive())? "c\nTank \"" + source.name + "\"\n\n" : "r\nTank \"" + source.name + "\" [dead]\n\n";
 
             switch (comboBox.getSelectedIndex()) {
             case INDEX_UMEM:

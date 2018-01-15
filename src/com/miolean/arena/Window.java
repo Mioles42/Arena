@@ -3,6 +3,8 @@ package com.miolean.arena;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.MutableTreeNode;
 import java.awt.*;
@@ -10,16 +12,21 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
 
-public class Window extends JFrame implements ChangeListener ,KeyListener {
+public class Window extends JFrame implements ChangeListener ,KeyListener, HyperlinkListener {
 
     private JSlider slider;
+    private JTabbedPane tabbedPane;
     MainPanel main;
     MemoryPanel memoryPanel;
     EvolutionPanel evolutionPanel;
 
+    java.util.List<Tank> topTanks;
+
 
     Window(MainPanel mainPanel, java.util.List<Tank> topTanks) {
         this.main = mainPanel;
+        this.topTanks = topTanks;
+
         LayoutManager layout = new GridBagLayout();
         setLayout(layout);
 
@@ -38,6 +45,7 @@ public class Window extends JFrame implements ChangeListener ,KeyListener {
         evolutionPanel = new EvolutionPanel(topTanks);
         JPanel usedSetPanel = new JPanel();
 
+        evolutionPanel.addHyperlinkListener(this);
 
         //Add the main panel:
         JPanel mainContainer = new JPanel();
@@ -62,11 +70,11 @@ public class Window extends JFrame implements ChangeListener ,KeyListener {
 
         //Add the info panel:
         //Because of the way borders work we have to use multiple panels...
-        JTabbedPane infoPanel = new JTabbedPane();
+        tabbedPane = new JTabbedPane();
         JPanel infoPanelPanel = new JPanel();
         infoPanelPanel.setLayout(new BorderLayout());
-        infoPanelPanel.add(infoPanel, BorderLayout.CENTER);
-        infoPanel.setBackground(new Color(0, 155, 0));
+        infoPanelPanel.add(tabbedPane, BorderLayout.CENTER);
+        tabbedPane.setBackground(new Color(0, 155, 0));
 
         c = new GridBagConstraints();
         c.fill = GridBagConstraints.BOTH;
@@ -83,15 +91,15 @@ public class Window extends JFrame implements ChangeListener ,KeyListener {
 
         makeGenomePanel(genomePanel);
 
-        infoPanel.addTab("Program Memory", memoryPanel);
-        infoPanel.addTab("Used Set", usedSetPanel);
-        infoPanel.addTab("Genome", genomePanel);
-        infoPanel.addTab("Evolution", evolutionPanel);
+        tabbedPane.addTab("Program Memory", memoryPanel);
+        tabbedPane.addTab("Used Set", usedSetPanel);
+        tabbedPane.addTab("Genome", genomePanel);
+        tabbedPane.addTab("Evolution", evolutionPanel);
 
         JLabel genomeLabel = new JLabel("Genome", JLabel.CENTER);
         genomeLabel.setVerticalTextPosition(JLabel.BOTTOM);
         genomeLabel.setHorizontalTextPosition(JLabel.CENTER);
-        infoPanel.setTabComponentAt(2, genomeLabel);
+        tabbedPane.setTabComponentAt(2, genomeLabel);
 
         infoPanelPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         this.add(infoPanelPanel, c);
@@ -213,5 +221,16 @@ public class Window extends JFrame implements ChangeListener ,KeyListener {
 
     public void setActiveTank(Tank tank) {
         memoryPanel.source = tank;
+    }
+
+    @Override
+    public void hyperlinkUpdate(HyperlinkEvent e) {
+        if(e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
+            int i = Integer.parseInt(e.getDescription().replace("tank_greatest_", ""));
+            System.out.println("Active tank is now high scorer " + i);
+            setActiveTank(topTanks.get(i));
+            if(topTanks.get(i).isAlive()) main.viewholder = topTanks.get(i);
+            tabbedPane.setSelectedIndex(0);
+        }
     }
 }
