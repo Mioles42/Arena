@@ -117,7 +117,7 @@ class Handler {
         }
 
         if(Global.random.nextFloat() < 0.01) {
-            Tank tank = new Tank("cain");
+            Tank tank = new Tank(Global.BASE_TANK);
             tank.x = Global.random.nextFloat() * Global.ARENA_SIZE;
             tank.y = Global.random.nextFloat() * Global.ARENA_SIZE;
             tank.r = Global.random.nextFloat() * Global.ARENA_SIZE;

@@ -421,22 +421,15 @@ public class Tank extends Entity {
     @Override
     void update() {
 
+        //Congratulations on surviving another few milliseconds!
+        fitness++;
+
+        //Apply physics
         applyPhysics();
+
         //Run the loaded P memory!
+        runGenes(PMEM);
 
-        try {
-
-            runGenes(PMEM);
-        } catch(Exception e) {
-            System.err.println("Exception thrown while running genes for: " + name);
-            System.err.println("Index: " + index + " | Loaded memory: " + loaded);
-            System.err.println("Memory read: ");
-            System.err.println("\tin 0:\n" + activeMemoryToString(PMEM[0], false));
-            System.err.println("\tin 1:\n" + activeMemoryToString(PMEM[1], false));
-            System.err.println("\t in " + loaded + ":\n" + activeMemoryToString(PMEM[loaded], false));
-            e.printStackTrace();
-            System.exit(1);
-        }
         //Make sure health is valid
         if(health > stats[STAT_MAX_HEALTH].val()) health = stats[STAT_MAX_HEALTH].val();
         if(cogs <= 0) health--;
@@ -810,8 +803,8 @@ public class Tank extends Entity {
     static UByte randomGene() {
 
         int rand = (int) (Global.random.nextFloat() * totalKWeight);
-        int selection = -1;
-        while(rand > 0) {
+        int selection = 0;
+        while(rand > 0 && selection < KMEM.length) {
             if(KMEM[selection] != null) rand -= KMEM[selection].weight;
             selection++;
         }

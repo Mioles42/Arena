@@ -20,7 +20,7 @@ class Global {
     static int distributeCycle = 50;
 
     //Publicly accessible random instance
-    public static Random random = new Random(42);
+    public static Random random = new Random(11);
 
     //1 pixel= 1 tank-meter, I suppose
     static final int ARENA_SIZE = 1024;
@@ -28,6 +28,8 @@ class Global {
     static final int BORDER = 20;
 
     static boolean[] KEY = new boolean[9];
+
+    public final static Tank BASE_TANK = new Tank("cain");
 
     //Key constants
     static final int KEY_Q = 0;
