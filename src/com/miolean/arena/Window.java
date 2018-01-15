@@ -186,6 +186,7 @@ public class Window extends JFrame implements ChangeListener ,KeyListener {
     public void stateChanged(ChangeEvent e) {
         if(e.getSource() == slider) {
             Global.updateCycle = 1000/slider.getValue();
+            Global.distributeCycle = 1000/slider.getValue();
         }
     }
 

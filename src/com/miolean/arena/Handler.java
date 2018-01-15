@@ -108,12 +108,20 @@ class Handler {
 
     void distribute() {
 
-        if(Math.random() < 0.05) {
-            Cog cog = new Cog(1 + (int) (5 * Math.random()));
-            cog.x = Math.random() * Global.ARENA_SIZE;
-            cog.y = Math.random() * Global.ARENA_SIZE;
-            cog.r = Math.random() * Global.ARENA_SIZE;
+        if(Global.random.nextFloat() < 0.05) {
+            Cog cog = new Cog(5 + (int) (10 * Global.random.nextFloat()));
+            cog.x = Global.random.nextFloat() * Global.ARENA_SIZE;
+            cog.y = Global.random.nextFloat() * Global.ARENA_SIZE;
+            cog.r = Global.random.nextFloat() * Global.ARENA_SIZE;
             add(cog);
+        }
+
+        if(Global.random.nextFloat() < 0.01) {
+            Tank tank = new Tank("cain");
+            tank.x = Global.random.nextFloat() * Global.ARENA_SIZE;
+            tank.y = Global.random.nextFloat() * Global.ARENA_SIZE;
+            tank.r = Global.random.nextFloat() * Global.ARENA_SIZE;
+            add(tank);
         }
     }
 }

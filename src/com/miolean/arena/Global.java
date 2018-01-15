@@ -1,5 +1,7 @@
 package com.miolean.arena;
 
+import java.util.Random;
+
 /**
  * Created by commandm on 5/21/17.
  *
@@ -15,7 +17,10 @@ class Global {
     static int updateCycle = 50;
     static int displayCycle = 50;
     static int renderCycle = 10;
-    static int distributeCycle = 500;
+    static int distributeCycle = 50;
+
+    //Publicly accessible random instance
+    public static Random random = new Random(42);
 
     //1 pixel= 1 tank-meter, I suppose
     static final int ARENA_SIZE = 1024;
