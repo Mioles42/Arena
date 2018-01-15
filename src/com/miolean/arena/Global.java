@@ -1,5 +1,7 @@
 package com.miolean.arena;
 
+import com.miolean.random.WordRandom;
+
 import java.util.Random;
 
 /**
@@ -21,6 +23,7 @@ class Global {
 
     //Publicly accessible random instance
     public static Random random = new Random(11);
+    public static WordRandom wordRandom = new WordRandom(11);
 
     //1 pixel= 1 tank-meter, I suppose
     static final int ARENA_SIZE = 1024;

@@ -152,7 +152,15 @@ public class MainPanel extends JPanel implements Runnable, KeyListener, MouseLis
         }
     }
 
-    @Override public void keyTyped(KeyEvent e) {}
+    @Override public void keyTyped(KeyEvent e) {
+        char key = e.getKeyChar();
+        if(key == 'l') {
+            System.out.println("============Top tanks============");
+            for(Tank t: handler.topTanks) {
+                System.out.println("Tank " + t + " [Fitness " + t.fitness + "]");
+            }
+        }
+    }
     @Override public void keyPressed(KeyEvent e) {
         char key = e.getKeyChar();
         if(key == 'q') Global.KEY[Global.KEY_Q] = true;
@@ -227,6 +235,9 @@ public class MainPanel extends JPanel implements Runnable, KeyListener, MouseLis
     @Override public void windowOpened(WindowEvent e) {}
     @Override public void windowClosing(WindowEvent e) {
         isRunning = false;
+        for(Tank t: handler.topTanks) {
+            System.out.println(t);
+        }
         System.exit(0);
     }
     @Override public void windowClosed(WindowEvent e) {}

@@ -1,5 +1,8 @@
 package com.miolean.arena;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by commandm on 2/19/17.
  */
@@ -9,6 +12,7 @@ class Handler {
     final static int MAX_TANKS = 32;
 
     private Entity[] entities;
+    List<Tank> topTanks = new ArrayList<>();
     int numEntities;
 
     int numCogs;
@@ -35,7 +39,19 @@ class Handler {
 
     void remove(int uuid) {
         if(entities[uuid] instanceof Cog) numCogs--;
-        if(entities[uuid] instanceof Tank) numTanks--;
+        if(entities[uuid] instanceof Tank) {
+            Tank tank = (Tank) entities[uuid];
+            numTanks--;
+
+            //Add to list of top tanks, if necessary
+            for(int i = 0; i < 10; i++) {
+                if(topTanks.size() <= i || tank.fitness > topTanks.get(i).fitness) {
+                    topTanks.add(i, tank);
+                    if(topTanks.size() == 11) topTanks.remove(10);
+                    break;
+                }
+            }
+        }
 
         entities[uuid].onDeath();
         entities[uuid].handler = null;

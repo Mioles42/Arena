@@ -8,7 +8,7 @@ import java.util.Scanner;
 
 import static com.miolean.arena.Global.ARENA_SIZE;
 import static com.miolean.arena.Global.BORDER;
-import static com.miolean.arena.Global.KEY_R;
+import com.miolean.random.*;
 import static com.miolean.arena.UByte.ub;
 import static com.miolean.arena.UByte.ubDeepCopy;
 
@@ -46,7 +46,6 @@ public class Tank extends Entity {
     //Program index:
     private int index = 0;
     private int loaded = 0;
-
     //Loaded memory:
     private int totalMemories = 0;
 
@@ -81,6 +80,7 @@ public class Tank extends Entity {
 
     //General variables:
     int fitness = 0;
+    int generation = 0;
     double cogs = 0;
     private int viewDistance = 10;
     private long lastFireTime = Global.time;
@@ -122,7 +122,7 @@ public class Tank extends Entity {
         }
     }
 
-    //Create a totally blank Tank
+    //Create a totally blank Tank (for whatever reason)
     Tank() {
         width = 40;
         height = 40;
@@ -132,7 +132,8 @@ public class Tank extends Entity {
     Tank(Tank parent) {
         width = 40;
         height = 40;
-        name = parent.name + "+";
+        name = Global.wordRandom.nextWord();
+        generation = parent.generation + 1;
 
         UMEM = ubDeepCopy(parent.UMEM);
         PMEM = ubDeepCopy(parent.PMEM);
@@ -163,6 +164,7 @@ public class Tank extends Entity {
         flashR = 0;
         flashG = 0;
         flashB = 0;
+        generation = 0;
 
         //1: Initialize memories.
         UMEM = new UByte[256][];
@@ -520,7 +522,7 @@ public class Tank extends Entity {
 
     @Override
     public String toString() {
-        return super.toString() + "{x: " + x + ", y: " + y + "}";
+        return name;
     }
 
     public void applyPhysics() {
