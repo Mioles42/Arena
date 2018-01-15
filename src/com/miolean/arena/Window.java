@@ -15,9 +15,10 @@ public class Window extends JFrame implements ChangeListener ,KeyListener {
     private JSlider slider;
     MainPanel main;
     MemoryPanel memoryPanel;
+    EvolutionPanel evolutionPanel;
 
 
-    Window(MainPanel mainPanel) {
+    Window(MainPanel mainPanel, java.util.List<Tank> topTanks) {
         this.main = mainPanel;
         LayoutManager layout = new GridBagLayout();
         setLayout(layout);
@@ -28,12 +29,13 @@ public class Window extends JFrame implements ChangeListener ,KeyListener {
             e.printStackTrace();
         }
 
-        makeMainLayout();
+        makeMainLayout(topTanks);
     }
 
-    public void makeMainLayout() {
+    public void makeMainLayout(java.util.List<Tank> topTanks) {
         JPanel genomePanel = new JPanel();
         memoryPanel = new MemoryPanel(null);
+        evolutionPanel = new EvolutionPanel(topTanks);
         JPanel usedSetPanel = new JPanel();
 
 
@@ -84,6 +86,7 @@ public class Window extends JFrame implements ChangeListener ,KeyListener {
         infoPanel.addTab("Program Memory", memoryPanel);
         infoPanel.addTab("Used Set", usedSetPanel);
         infoPanel.addTab("Genome", genomePanel);
+        infoPanel.addTab("Evolution", evolutionPanel);
 
         JLabel genomeLabel = new JLabel("Genome", JLabel.CENTER);
         genomeLabel.setVerticalTextPosition(JLabel.BOTTOM);
@@ -133,6 +136,7 @@ public class Window extends JFrame implements ChangeListener ,KeyListener {
 
     public void display() {
         memoryPanel.updateInfo();
+        evolutionPanel.updateInfo();
     }
 
     public void makeGenomePanel(JPanel genomePanel) {

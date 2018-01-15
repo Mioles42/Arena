@@ -34,23 +34,29 @@ class Handler {
                 if(e.intersectsWith(j) && e != j) e.intersect(j);
             }
             if(e.health <= 0) remove(e.getUUID());
+
+            //If we're holding a Tank that has beaten a record (or there are no records)
+            if(topTanks.size() == 0 && e instanceof Tank) topTanks.add((Tank) e);
+            else if(e instanceof Tank && ((Tank) e).fitness > topTanks.get(topTanks.size()-1).fitness) {
+                Tank tank = (Tank) e;
+                topTanks.remove(tank); //Just recategorize it
+
+                //We should really do a binary search here, but the time it would save us is pretty limited tbh
+                for(int i = 0; i < topTanks.size(); i++) {
+                    if(tank.fitness > topTanks.get(i).fitness) {
+                        topTanks.add(i, tank);
+                        break;
+                    }
+                }
+                if(topTanks.size() > 11) topTanks.remove(11);
+            }
         }
     }
 
     void remove(int uuid) {
         if(entities[uuid] instanceof Cog) numCogs--;
         if(entities[uuid] instanceof Tank) {
-            Tank tank = (Tank) entities[uuid];
             numTanks--;
-
-            //Add to list of top tanks, if necessary
-            for(int i = 0; i < 10; i++) {
-                if(topTanks.size() <= i || tank.fitness > topTanks.get(i).fitness) {
-                    topTanks.add(i, tank);
-                    if(topTanks.size() == 11) topTanks.remove(10);
-                    break;
-                }
-            }
         }
 
         entities[uuid].onDeath();

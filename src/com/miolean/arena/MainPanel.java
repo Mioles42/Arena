@@ -29,9 +29,9 @@ public class MainPanel extends JPanel implements Runnable, KeyListener, MouseLis
 
         Entity[] entities = new Entity[256];
 
-        window = new Window(this);
         renderer = new Renderer(entities);
         handler = new Handler(entities);
+        window = new Window(this, handler.topTanks);
 
         handler.add(new ControlledTank(300, 300));
         viewholder = entities[0];

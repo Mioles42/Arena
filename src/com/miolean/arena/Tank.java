@@ -133,6 +133,7 @@ public class Tank extends Entity {
         width = 40;
         height = 40;
         name = Global.wordRandom.nextWord();
+        name = name.substring(0, 1).toUpperCase() + name.substring(1);
         generation = parent.generation + 1;
 
         UMEM = ubDeepCopy(parent.UMEM);
