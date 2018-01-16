@@ -4,6 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.FileNotFoundException;
+import java.io.InvalidObjectException;
 import java.io.PrintStream;
 
 import static com.miolean.arena.Global.ARENA_SIZE;
@@ -106,7 +107,9 @@ public class MainPanel extends JPanel implements Runnable, KeyListener, MouseLis
         }
     }
 
-    private void setViewholder(Entity e, int x, int y) {
+    public void setViewholder(int x, int y) {
+        Entity e = handler.entityAtLocation(x, y);
+
         if (e == null) {
             if (viewholder instanceof ControlledTank) {
                 viewholder.x = x;
@@ -126,13 +129,25 @@ public class MainPanel extends JPanel implements Runnable, KeyListener, MouseLis
             window.setActiveTank((Tank) viewholder);
     }
 
+    public void setViewholder(Entity e) {
+
+        if(e == null) throw new NumberFormatException("Null viewholder.");
+
+        if (viewholder instanceof ControlledTank) viewholder.health = 0;
+        viewholder = e;
+
+        if (viewholder instanceof Tank && !(viewholder instanceof ControlledTank))
+            window.setActiveTank((Tank) viewholder);
+    }
+
     private void render(Graphics g) {
 
         if(! viewholder.isAlive()
                 && viewholder instanceof Tank
                 && ((Tank) viewholder).lastChild != null) {
-            viewholder = ((Tank) viewholder).lastChild;
+            setViewholder(((Tank) viewholder).lastChild);
         }
+
 
 
         g.setColor(Color.BLACK);
@@ -204,24 +219,31 @@ public class MainPanel extends JPanel implements Runnable, KeyListener, MouseLis
     }
     @Override public void mouseClicked(MouseEvent e) {
 
+        int x = (int) (e.getX() + viewholder.x - this.getWidth() / 2);
+        int y = (int) (e.getY() + viewholder.y - this.getHeight() / 2);
 
         if(e.getButton() == MouseEvent.BUTTON1) {
             if (!this.hasFocus()) {
                 this.requestFocus();
                 return;
             }
-            int x = (int) (e.getX() + viewholder.x - this.getWidth() / 2);
-            int y = (int) (e.getY() + viewholder.y - this.getHeight() / 2);
 
-            Entity newHolder = handler.entityAtLocation(x, y);
-            setViewholder(newHolder, x, y);
+            setViewholder(x, y);
         }
 
         if(e.getButton() == MouseEvent.BUTTON3) {
             Cog cog = new Cog(100);
-            cog.x = (int) (e.getX() + viewholder.x - this.getWidth() / 2); 
-            cog.y = (int) (e.getY() + viewholder.y - this.getHeight() / 2);
+            cog.x = x;
+            cog.y = y;
             handler.add(cog);
+        }
+
+        if(e.getButton() == MouseEvent.BUTTON2) {
+            Tank creation = new Tank("cain");
+            creation.x = x;
+            creation.y = y;
+            creation.name = "creation";
+            handler.add(creation);
         }
     }
     @Override public void mousePressed(MouseEvent e) {}

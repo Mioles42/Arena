@@ -1,7 +1,10 @@
 package com.miolean.arena;
 
 import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.List;
 
 public class EntityPanel extends JPanel {
@@ -10,7 +13,7 @@ public class EntityPanel extends JPanel {
     Entity[] entities;
     JComboBox<String> comboBox;
     JLabel label;
-    JList list;
+    JList<Entity> list;
     JScrollPane scrollPane;
 
     private static final int INDEX_TANKS = 0;
@@ -55,7 +58,8 @@ public class EntityPanel extends JPanel {
         scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 
-        list = new JList();
+        list = new JList<>();
+        list.setListData(entities);
         c = new GridBagConstraints();
         c.gridx = 0;
         c.gridy = 1;
@@ -69,12 +73,21 @@ public class EntityPanel extends JPanel {
         list.setSize(1000, 1000);
         scrollPane.setViewportView(list);
         this.add(scrollPane, c);
-
     }
 
     void updateInfo() {
-        if(comboBox.getSelectedIndex() == INDEX_ALL_ENTITIES) list.setListData(entities);
-        if(comboBox.getSelectedIndex() == INDEX_TANKS) list.setListData(tanks.toArray());
+        if(comboBox.getSelectedIndex() == INDEX_ALL_ENTITIES) {
+            list.setListData(entities);
+        }
+
+        if(comboBox.getSelectedIndex() == INDEX_TANKS) {
+            Tank[] tankArray = new Tank[tanks.size()];
+            tanks.toArray(tankArray);
+            list.setListData(tankArray);
+        }
     }
 
+    void addListSelectionListener(ListSelectionListener lsl) {
+        list.addListSelectionListener(lsl);
+    }
 }

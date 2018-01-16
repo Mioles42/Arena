@@ -3,6 +3,8 @@ package com.miolean.arena;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.MutableTreeNode;
 import java.awt.*;
@@ -10,7 +12,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
 
-public class Window extends JFrame implements ChangeListener ,KeyListener {
+public class Window extends JFrame implements ChangeListener ,KeyListener, ListSelectionListener {
 
     private JSlider slider;
     MainPanel main;
@@ -36,6 +38,7 @@ public class Window extends JFrame implements ChangeListener ,KeyListener {
         JPanel genomePanel = new JPanel();
         memoryPanel = new MemoryPanel(null);
         entityPanel = new EntityPanel(tanks, entities);
+        entityPanel.addListSelectionListener(this);
 
         JPanel usedSetPanel = new JPanel();
 
@@ -211,5 +214,12 @@ public class Window extends JFrame implements ChangeListener ,KeyListener {
 
     public void setActiveTank(Tank tank) {
         memoryPanel.source = tank;
+    }
+
+    @Override
+    public void valueChanged(ListSelectionEvent e) {
+        System.out.println("Viewholder selected from entities list, set to " + main.viewholder);
+        Entity n = (Entity) ((JList)e.getSource()).getSelectedValue();
+        if(n != null) main.setViewholder(n);
     }
 }
