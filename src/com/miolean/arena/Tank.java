@@ -1,12 +1,14 @@
 package com.miolean.arena;
 
+import sun.plugin.dom.exception.InvalidStateException;
+
 import java.awt.*;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Scanner;
 
 import static com.miolean.arena.Global.ARENA_SIZE;
 import static com.miolean.arena.Global.BORDER;
-import static com.miolean.arena.Global.KEY_R;
+import com.miolean.random.*;
 import static com.miolean.arena.UByte.ub;
 import static com.miolean.arena.UByte.ubDeepCopy;
 
@@ -44,7 +46,6 @@ public class Tank extends Entity {
     //Program index:
     private int index = 0;
     private int loaded = 0;
-
     //Loaded memory:
     private int totalMemories = 0;
 
@@ -78,13 +79,15 @@ public class Tank extends Entity {
     private int flashB = 0x00;
 
     //General variables:
-    int fitness = 0;
+    double fitness = 0;
+    int generation = 0;
     double cogs = 0;
     private int viewDistance = 10;
     private long lastFireTime = Global.time;
     String name = "";
     private static int totalKWeight;
     private boolean generateLog = false;
+    private UByte[][] CURRENT = PMEM;
 
     Tank lastChild = null;
 
@@ -119,7 +122,7 @@ public class Tank extends Entity {
         }
     }
 
-    //Create a totally blank Tank
+    //Create a totally blank Tank (for whatever reason)
     Tank() {
         width = 40;
         height = 40;
@@ -129,7 +132,9 @@ public class Tank extends Entity {
     Tank(Tank parent) {
         width = 40;
         height = 40;
-        name = parent.name + "+";
+        name = Global.wordRandom.nextWord();
+        name = name.substring(0, 1).toUpperCase() + name.substring(1);
+        generation = parent.generation + 1;
 
         UMEM = ubDeepCopy(parent.UMEM);
         PMEM = ubDeepCopy(parent.PMEM);
@@ -143,8 +148,8 @@ public class Tank extends Entity {
         for(int i = 0; i < stats.length; i++) stats[i] = ub(10);
 
         int maxOffset = Global.ARENA_SIZE / 4;
-        x = parent.x + maxOffset * (Math.random()*2-1);
-        y = parent.y + maxOffset * (Math.random()*2-1);
+        x = parent.x + maxOffset * (Global.random.nextFloat()*2-1);
+        y = parent.y + maxOffset * (Global.random.nextFloat()*2-1);
     }
 
     //Create a Tank from a file
@@ -160,6 +165,7 @@ public class Tank extends Entity {
         flashR = 0;
         flashG = 0;
         flashB = 0;
+        generation = 0;
 
         //1: Initialize memories.
         UMEM = new UByte[256][];
@@ -317,15 +323,15 @@ public class Tank extends Entity {
         for(int i = 0; i < 256; i++) if(WMEM[i] == null) WMEM[i] = ub(0);
 
         for(UByte[] a: SMEM) if(a != null) {
-            for(int i = 0; i < 255; i++) if (a[i] == null) a[i] = ub(0);
+            for(int i = 0; i < 256; i++) if (a[i] == null) a[i] = ub(0);
         }
 
         for(UByte[] a: PMEM) if(a != null) {
-            for(int i = 0; i < 255; i++) if (a[i] == null) a[i] = ub(0);
+            for(int i = 0; i < 256; i++) if (a[i] == null) a[i] = ub(0);
         }
 
         for(UByte[] a: UMEM) if(a != null) {
-            for(int i = 0; i < 255; i++) if (a[i] == null) a[i] = ub(0);
+            for(int i = 0; i < 256; i++) if (a[i] == null) a[i] = ub(0);
         }
 
         health = 11;
@@ -418,9 +424,17 @@ public class Tank extends Entity {
     @Override
     void update() {
 
+        double initialCogs = cogs;
+
+        //Apply physics
         applyPhysics();
+
         //Run the loaded P memory!
         runGenes(PMEM);
+
+        //Congratulations on not dying! Used cogs go towards fitness, excluding the survival ones
+        //Unless you actually are dying. Then we have a problem.
+        if(cogs > 0) fitness += initialCogs - cogs - DIFFICULTY;
 
         //Make sure health is valid
         if(health > stats[STAT_MAX_HEALTH].val()) health = stats[STAT_MAX_HEALTH].val();
@@ -429,7 +443,7 @@ public class Tank extends Entity {
 
     void runGenes(UByte[][] genes) {
 
-
+        CURRENT = genes;
         cogs -= DIFFICULTY;
 
         greater = false;
@@ -440,6 +454,11 @@ public class Tank extends Entity {
 
         for(; index < genes.length-3; index++) {
             //For every entry in this list of genes (excluding the ones at the end that don't have enough others after them as arguments)
+
+            if(genes==null) System.err.println("List of memories: NULL");
+            if(genes[loaded]==null) System.err.println("Loaded: NULL");
+            if(genes[loaded][index]==null) System.err.println("Index: NULL");
+
 
             if(genes[loaded] == null) loaded = 0;
             try {
@@ -453,12 +472,8 @@ public class Tank extends Entity {
             try {
                 //System.out.printf("%s(%d, %d, %d)\n", KMEM[genes[index].val()].getMeaning().getName(), genes[index+1].val(), genes[index+2].val(), genes[index+3].val());
 
-                if(KMEM[genes[loaded][index].val()].cost > cogs) {
-                    index += 3;
-                    continue;
-                }
-
                 cogs -= KMEM[genes[loaded][index].val()].cost;
+                if(cogs < 0) break;
 
                 KMEM[genes[loaded][index].val()].getMeaning().invoke(this, genes[loaded][index+1].val(), genes[loaded][index+2].val(), genes[loaded][index+3].val());
 
@@ -509,6 +524,11 @@ public class Tank extends Entity {
     void intersect(Entity e) {
     }
 
+    @Override
+    public String toString() {
+        return name;
+    }
+
     public void applyPhysics() {
         super.applyPhysics();
         if(x > ARENA_SIZE - BORDER) x = ARENA_SIZE - BORDER;
@@ -541,7 +561,7 @@ public class Tank extends Entity {
         if(force > stats[STAT_ROTATE_SPEED].val()) force = stats[STAT_ROTATE_SPEED].val(); //Tanks can't rotate faster than a certain limit
         if(force < -stats[STAT_ROTATE_SPEED].val()) force = -stats[STAT_ROTATE_SPEED].val(); //Tanks can't rotate faster than a certain limit
 
-        this.accR = ((double) force ) / 128;
+        this.accR = ((double) force ) / 512;
     }
 
     private void upgrade(UByte stat, int amount) {
@@ -590,20 +610,28 @@ public class Tank extends Entity {
         for(int i = 0; i < genes.length-3; i++) {
             //For every entry in this list of genes (excluding the ones at the end that don't have enough others after them as arguments)
 
-            if(genes[i].val() == 0x00) continue; //Don't even bother with opcode 0x00, standing for "do nothing"
-            if(KMEM[genes[i].val()] == null) continue; //If the opcode doesn't actually stand for something meaningful, skip it too
+            if(genes[i] != null) { //we really can't afford to lose track of null genes
+                if (genes[i].val() == 0x00)
+                    continue; //Don't even bother with opcode 0x00, standing for "do nothing"
+                if (KMEM[genes[i].val()] == null)
+                    continue; //If the opcode doesn't actually stand for something meaningful, skip it too
+            }
 
             //Since everything appears to be in order, let's try to parse that as a gene. (Normally we'd run it.)
             result += "§k" + Integer.toHexString(i) + " ";
-            result += "§g" + KMEM[genes[i].val()].getMeaning().getName() + " §k(";
-            result += "§b" + genes[i+1].val() + " §k[" + WMEM[genes[i+1].val()].val() + "], ";
-            result += "§b" + genes[i+2].val() + " §k[" + WMEM[genes[i+2].val()].val() + "],";
-            result += "§b" + genes[i+3].val() + " §k[" + WMEM[genes[i+3].val()].val() + "]) \n";
+            result += (genes[i] == null)? "§rNULL \n" : "§g" + KMEM[genes[i].val()].getMeaning().getName() + " §k(";
+            result += (genes[i+1] == null)? "§rNULL \n" : "§b" + genes[i+1].val() + " §k[" + WMEM[genes[i+1].val()].val() + "], ";
+            result += (genes[i+2] == null)? "§rNULL \n" : "§b" + genes[i+2].val() + " §k[" + WMEM[genes[i+2].val()].val() + "],";
+            result += (genes[i+3] == null)? "§rNULL \n" : "§b" + genes[i+3].val() + " §k[" + WMEM[genes[i+3].val()].val() + "]) \n";
 
 
             //Assuming nothing went wrong we've completed a command by now. (If something did go wrong, we'll at least have a stack trace.)
             i += 3; //We don't want to run the arguments by accident, so let's skip them.
 
+        }
+
+        if(! color) {
+            result = result.replaceAll("§.", "");
         }
 
         return result;
@@ -616,6 +644,10 @@ public class Tank extends Entity {
         for(int i = 0; i < genes.length; i++) {
             if(i%4 == 0) result += "\n" + Integer.toHexString(i/16) + Integer.toHexString(i%16) + "\t";
             result += "§k|  " + genes[i].val() +"\t§b";
+        }
+
+        if(! color) {
+            result.replaceAll("§\\D", "");
         }
 
         return result;
@@ -706,7 +738,7 @@ public class Tank extends Entity {
     public void _UUIDL(int arg0, int arg1, int arg2) {WMEM[arg0] = ub(uuidLeast);}
     public void _HP   (int arg0, int arg1, int arg2) {WMEM[arg0] = ub(health);}
     public void _COG  (int arg0, int arg1, int arg2) {WMEM[arg0] = ub((int) cogs);}
-    public void _PNT  (int arg0, int arg1, int arg2) {WMEM[arg0] = ub(fitness);}
+    public void _PNT  (int arg0, int arg1, int arg2) {WMEM[arg0] = ub((int)fitness);}
     // A
     public void _UPG  (int arg0, int arg1, int arg2) {upgrade(WMEM[arg0], WMEM[arg1].val());}
     public void _STAT (int arg0, int arg1, int arg2) {WMEM[arg0] = stats[Math.abs(arg1>>5)];}
@@ -738,7 +770,10 @@ public class Tank extends Entity {
     public void _DEFU (int arg0, int arg1, int arg2) {if(UMEM[arg0] == null) createMemory(UMEM, ub(arg0));}
     public void _UDEP (int arg0, int arg1, int arg2) {}
     public void _SWAP(int arg0, int arg1, int arg2) {
-        loaded = arg0; index = arg1 - 4;
+        if(CURRENT[arg0] != null) {
+            loaded = arg0;
+            index = arg1 - 4;
+        }
     }
     // E
     public void _TARG(int arg0, int arg1, int arg2) {}
@@ -754,7 +789,7 @@ public class Tank extends Entity {
     public void _PRAND(int arg0, int arg1, int arg2) {if(PMEM[arg1] != null) WMEM[arg0] = randomExists(PMEM[arg1]);}
     public void _SRAND(int arg0, int arg1, int arg2) {if(SMEM[arg1] != null) WMEM[arg0] = randomExists(SMEM[arg1]);}
     public void _WRAND(int arg0, int arg1, int arg2) {WMEM[arg0] = randomExists(WMEM);}
-    public void _IRAND(int arg0, int arg1, int arg2) {WMEM[arg0] = ub((int) (Math.random() * 255));}
+    public void _IRAND(int arg0, int arg1, int arg2) {WMEM[arg0] = ub((int) (Global.random.nextFloat() * 255));}
 
 
     static UByte randomExists(UByte[] memory) {
@@ -762,7 +797,7 @@ public class Tank extends Entity {
         int totalExist = 0;
         for(UByte u: memory) if(u != ub(0)) totalExist++;
 
-        int selection = (int) (totalExist * Math.random());
+        int selection = (int) (totalExist * Global.random.nextFloat());
         int i;
         for(i = 0; selection > 0; i++) {
             if(memory[i] != ub(0)) selection--;
@@ -773,11 +808,11 @@ public class Tank extends Entity {
 
     static UByte randomGene() {
 
-        int rand = (int) (Math.random() * totalKWeight);
-        int selection = -1;
-        while(rand > 0) {
-            selection++;
+        int rand = (int) (Global.random.nextFloat() * totalKWeight);
+        int selection = 0;
+        while(rand > 0 && selection < KMEM.length) {
             if(KMEM[selection] != null) rand -= KMEM[selection].weight;
+            selection++;
         }
 
         return ub(selection);

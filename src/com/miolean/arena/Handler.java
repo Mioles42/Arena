@@ -8,10 +8,11 @@ import java.util.List;
  */
 class Handler {
 
-    final static int MAX_COGS = 128;
+    final static int MAX_COGS = 200;
     final static int MAX_TANKS = 32;
 
     private Entity[] entities;
+    List<Tank> topTanks = new ArrayList<>();
     List<Tank> tanks; //This will come in handy sooner or later
 
     int numEntities;
@@ -36,6 +37,22 @@ class Handler {
                 if(e.intersectsWith(j) && e != j) e.intersect(j);
             }
             if(e.health <= 0) remove(e.getUUID());
+
+            //If we're holding a Tank that has beaten a record (or there are no records)
+            if(topTanks.size() == 0 && e instanceof Tank) topTanks.add((Tank) e);
+            else if(e instanceof Tank && ((Tank) e).fitness > topTanks.get(topTanks.size()-1).fitness) {
+                Tank tank = (Tank) e;
+                topTanks.remove(tank); //Just recategorize it
+
+                //We should really do a binary search here, but the time it would save us is pretty limited tbh
+                for(int i = 0; i < topTanks.size(); i++) {
+                    if(tank.fitness > topTanks.get(i).fitness) {
+                        topTanks.add(i, tank);
+                        break;
+                    }
+                }
+                if(topTanks.size() > 11) topTanks.remove(11);
+            }
         }
     }
 
@@ -120,12 +137,23 @@ class Handler {
 
     void distribute() {
 
-        if(Math.random() < 0.05) {
-            Cog cog = new Cog(1 + (int) (5 * Math.random()));
-            cog.x = Math.random() * Global.ARENA_SIZE;
-            cog.y = Math.random() * Global.ARENA_SIZE;
-            cog.r = Math.random() * Global.ARENA_SIZE;
+        if(Global.random.nextFloat() < 0.05) {
+            Cog cog = new Cog(5 + (int) (10 * Global.random.nextFloat()));
+            cog.x = Global.random.nextFloat() * Global.ARENA_SIZE;
+            cog.y = Global.random.nextFloat() * Global.ARENA_SIZE;
+            cog.r = Global.random.nextFloat() * Global.ARENA_SIZE;
             add(cog);
+        }
+
+        if(Global.random.nextFloat() < 0.01) {
+            Tank tank;
+            if(topTanks.size() > 9) tank = new Tank(topTanks.get(Global.random.nextInt(5)));
+            else tank = new Tank("cain");
+
+            tank.x = Global.random.nextFloat() * Global.ARENA_SIZE;
+            tank.y = Global.random.nextFloat() * Global.ARENA_SIZE;
+            tank.r = Global.random.nextFloat() * Global.ARENA_SIZE;
+            add(tank);
         }
     }
 

@@ -32,12 +32,14 @@ public final class UByte implements Serializable {
     }
   
     public static UByte rand() {
-        return new UByte((int) (256 * Math.random()));
+        return new UByte((int) (256 * Global.random.nextFloat()));
     }
 
     public static UByte[][] ubDeepCopy(UByte[][] array) {
-        UByte[][] result = new UByte[array.length][array[0].length];
+        if(array == null) throw new IllegalArgumentException("Cannot copy a null array");
+        UByte[][] result = new UByte[array.length][];
         for(int i = 0; i < result.length; i++) {
+
             if(array[i] != null) {
                 result[i] = new UByte[array[i].length];
                 for(int j = 0; j < result[i].length; j++) {

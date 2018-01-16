@@ -12,9 +12,9 @@ public class ControlledTank extends Tank {
         //Do better default stats.
         stats[STAT_SPEED] = ub(20);
         stats[STAT_BULLET_SPEED] = ub(20);
-        stats[STAT_ROTATE_SPEED] = ub(10);
+        stats[STAT_ROTATE_SPEED] = ub(40);
         stats[STAT_HASTE] = ub(120);
-        stats[STAT_DAMAGE] = ub(100);
+        stats[STAT_DAMAGE] = ub(10);
         stats[STAT_MAX_HEALTH] = ub(100);
         stats[STAT_BULLET_SPREAD] = ub(30);
     }

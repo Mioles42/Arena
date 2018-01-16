@@ -18,7 +18,6 @@ class Bullet extends Entity {
 
     Bullet(Tank source) {
         this.source = source;
-
         width = 8;
         height = 8;
 
@@ -27,16 +26,16 @@ class Bullet extends Entity {
             y = source.y;
             r = source.r;
             damage = source.stats[Tank.STAT_DAMAGE].val();
-            velX = (15 + source.stats[Tank.STAT_BULLET_SPEED].val()) * Math.cos(r + source.stats[Tank.STAT_BULLET_SPREAD].val() / 128.0 * (Math.random() - .5));
-            velY = (15 + source.stats[Tank.STAT_BULLET_SPEED].val()) * -Math.sin(r + source.stats[Tank.STAT_BULLET_SPREAD].val() / 128.0 * (Math.random() - .5));
+            velX = (15 + source.stats[Tank.STAT_BULLET_SPEED].val()) * Math.cos(r + source.stats[Tank.STAT_BULLET_SPREAD].val() / 128.0 * (Global.random.nextFloat() - .5));
+            velY = (15 + source.stats[Tank.STAT_BULLET_SPEED].val()) * -Math.sin(r + source.stats[Tank.STAT_BULLET_SPREAD].val() / 128.0 * (Global.random.nextFloat() - .5));
             velR = 0;
             accX = 0;
             accY = 0;
             accR = 0;
             health = 1;
         } else {
-            x = Global.ARENA_SIZE * Math.random();
-            y = Global.ARENA_SIZE * Math.random();
+            x = Global.ARENA_SIZE * Global.random.nextFloat();
+            y = Global.ARENA_SIZE * Global.random.nextFloat();
 
             health = 3;
             damage = 5;

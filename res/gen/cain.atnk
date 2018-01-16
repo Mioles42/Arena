@@ -24,7 +24,7 @@ edit program 0 at 4:
 
 edit program 1 at 0:
     _COG 33 -- --
-    _IMOV 34 90 --
+    _IMOV 34 60 --
     _HP 35 -- --
     _IMOV 36 9 --
     _COMP 34 33 --

@@ -3,6 +3,8 @@ package com.miolean.arena;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -11,17 +13,21 @@ import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
-
-public class Window extends JFrame implements ChangeListener ,KeyListener, ListSelectionListener {
+public class Window extends JFrame implements ChangeListener ,KeyListener, ListSelectionListener, HyperlinkListener {
 
     private JSlider slider;
+    private JTabbedPane tabbedPane;
     MainPanel main;
     MemoryPanel memoryPanel;
+    EvolutionPanel evolutionPanel;
     EntityPanel entityPanel;
 
+    java.util.List<Tank> topTanks;
 
-    Window(MainPanel mainPanel, Entity[] entities, java.util.List<Tank> tanks) {
+    Window(MainPanel mainPanel, java.util.List<Tank> topTanks, Entity[] entities, java.util.List<Tank> tanks) {
         this.main = mainPanel;
+        this.topTanks = topTanks;
+
         LayoutManager layout = new GridBagLayout();
         setLayout(layout);
 
@@ -31,17 +37,19 @@ public class Window extends JFrame implements ChangeListener ,KeyListener, ListS
             e.printStackTrace();
         }
 
-        makeMainLayout(entities, tanks);
+        makeMainLayout(topTanks, entities, tanks);
     }
 
-    public void makeMainLayout(Entity[] entities, java.util.List<Tank> tanks) {
+    public void makeMainLayout(java.util.List<Tank> topTanks, Entity[] entities, java.util.List<Tank> tanks) {
         JPanel genomePanel = new JPanel();
         memoryPanel = new MemoryPanel(null);
+        evolutionPanel = new EvolutionPanel(topTanks);
         entityPanel = new EntityPanel(tanks, entities);
         entityPanel.addListSelectionListener(this);
 
         JPanel usedSetPanel = new JPanel();
 
+        evolutionPanel.addHyperlinkListener(this);
 
         //Add the main panel:
         JPanel mainContainer = new JPanel();
@@ -66,11 +74,11 @@ public class Window extends JFrame implements ChangeListener ,KeyListener, ListS
 
         //Add the info panel:
         //Because of the way borders work we have to use multiple panels...
-        JTabbedPane infoPanel = new JTabbedPane();
+        tabbedPane = new JTabbedPane();
         JPanel infoPanelPanel = new JPanel();
         infoPanelPanel.setLayout(new BorderLayout());
-        infoPanelPanel.add(infoPanel, BorderLayout.CENTER);
-        infoPanel.setBackground(new Color(0, 155, 0));
+        infoPanelPanel.add(tabbedPane, BorderLayout.CENTER);
+        tabbedPane.setBackground(new Color(0, 155, 0));
 
         c = new GridBagConstraints();
         c.fill = GridBagConstraints.BOTH;
@@ -87,14 +95,15 @@ public class Window extends JFrame implements ChangeListener ,KeyListener, ListS
 
         makeGenomePanel(genomePanel);
 
-        infoPanel.addTab("Memory", memoryPanel);
-        infoPanel.addTab("Entities", entityPanel);
-        infoPanel.addTab("Genome", genomePanel);
+        tabbedPane.addTab("Program Memory", memoryPanel);
+        tabbedPane.addTab("Entities", usedSetPanel);
+        tabbedPane.addTab("Genome", genomePanel);
+        tabbedPane.addTab("Evolution", evolutionPanel);
 
         JLabel genomeLabel = new JLabel("Genome", JLabel.CENTER);
         genomeLabel.setVerticalTextPosition(JLabel.BOTTOM);
         genomeLabel.setHorizontalTextPosition(JLabel.CENTER);
-        infoPanel.setTabComponentAt(2, genomeLabel);
+        tabbedPane.setTabComponentAt(2, genomeLabel);
 
         infoPanelPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         this.add(infoPanelPanel, c);
@@ -140,6 +149,7 @@ public class Window extends JFrame implements ChangeListener ,KeyListener, ListS
     public void display() {
 
         memoryPanel.updateInfo();
+        evolutionPanel.updateInfo();
         entityPanel.updateInfo();
     }
 
@@ -191,7 +201,9 @@ public class Window extends JFrame implements ChangeListener ,KeyListener, ListS
     @Override
     public void stateChanged(ChangeEvent e) {
         if(e.getSource() == slider) {
+            double distributeRatio = Global.distributeCycle / Global.updateCycle;
             Global.updateCycle = 1000/slider.getValue();
+            Global.distributeCycle = (int) (distributeRatio * Global.updateCycle);
         }
     }
 
@@ -216,6 +228,16 @@ public class Window extends JFrame implements ChangeListener ,KeyListener, ListS
         memoryPanel.source = tank;
     }
 
+    @Override
+    public void hyperlinkUpdate(HyperlinkEvent e) {
+        if(e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
+            int i = Integer.parseInt(e.getDescription().replace("tank_greatest_", ""));
+            System.out.println("Active tank is now high scorer " + i);
+            setActiveTank(topTanks.get(i));
+            if(topTanks.get(i).isAlive()) main.viewholder = topTanks.get(i);
+            tabbedPane.setSelectedIndex(0);
+        }
+  
     @Override
     public void valueChanged(ListSelectionEvent e) {
         System.out.println("Viewholder selected from entities list, set to " + main.viewholder);

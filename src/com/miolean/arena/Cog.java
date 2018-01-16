@@ -10,14 +10,14 @@ class Cog extends Entity {
 
     Cog(int value) {
         this.value = value;
-        width = 5 + value*2;
-        height = 5 + value*2;
+        width = (int) (5*Math.sqrt(value));
+        height = width;
         health = 1;
     }
 
     @Override
     void render(Graphics g) {
-        g.setColor(new Color(256 - 128/value, 150, 100 + 128/value));
+        g.setColor(new Color(256 - value*4, 128 + value*4, 150));
         g.fillRect((int) x - width/2, (int) y - height/2, width, height);
         g.setColor(Color.black);
         g.drawRect((int) (x - width/2), (int) (y - height/2), width, height);
