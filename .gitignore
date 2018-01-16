@@ -6,6 +6,7 @@
 .idea/dictionaries/
 .idea/inspectionProfiles/
 .idea/workspace.xml
+.idea/misc.xml
 
 # Output files
 out/

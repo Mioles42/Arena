@@ -10,7 +10,7 @@ class Bullet extends Entity {
 
     private static final int ROGUE_SPEED = 8;
     private static final double ROGUE_TURN_SPEED = 0.1;
-    private static final int ROGUE_OBSERVATION = 1;
+    private static final int ROGUE_OBSERVATION = 100;
 
     private Tank source;
     private Tank target;
@@ -20,7 +20,6 @@ class Bullet extends Entity {
         this.source = source;
         width = 8;
         height = 8;
-
 
         if(source != null) {
             x = source.x;
@@ -110,8 +109,8 @@ class Bullet extends Entity {
             double rdis = (r - targetR) % (2*Math.PI);
             if(rdis < -Math.PI) rdis += (2*Math.PI);
 
-            if(rdis > -velR) accR = -ROGUE_TURN_SPEED;
-            else if(rdis < velR) accR = ROGUE_TURN_SPEED;
+            if(rdis > -2*velR) accR = -ROGUE_TURN_SPEED;
+            else if(rdis < 2*velR) accR = ROGUE_TURN_SPEED;
             else accR = 0;
 
             forward(ROGUE_SPEED);

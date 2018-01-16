@@ -461,7 +461,11 @@ public class Tank extends Entity {
 
 
             if(genes[loaded] == null) loaded = 0;
-            if(genes[loaded][index].val() == 0x00) continue; //Don't even bother with opcode 0x00, standing for "do nothing"
+            try {
+                if(genes[loaded][index].val() == 0x00) continue; //Don't even bother with opcode 0x00, standing for "do nothing"
+            } catch(Exception e) {
+                while(true) System.out.println("Something horrible has happened...");
+            }
             if(KMEM[genes[loaded][index].val()] == null) continue; //If the opcode doesn't actually stand for something meaningful, skip it too
 
             //Since everything appears to be in order, let's try to run that as a gene.

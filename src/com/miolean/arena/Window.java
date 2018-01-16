@@ -5,25 +5,26 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.MutableTreeNode;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
-
-public class Window extends JFrame implements ChangeListener ,KeyListener, HyperlinkListener {
+public class Window extends JFrame implements ChangeListener ,KeyListener, ListSelectionListener, HyperlinkListener {
 
     private JSlider slider;
     private JTabbedPane tabbedPane;
     MainPanel main;
     MemoryPanel memoryPanel;
     EvolutionPanel evolutionPanel;
+    EntityPanel entityPanel;
 
     java.util.List<Tank> topTanks;
 
-
-    Window(MainPanel mainPanel, java.util.List<Tank> topTanks) {
+    Window(MainPanel mainPanel, java.util.List<Tank> topTanks, Entity[] entities, java.util.List<Tank> tanks) {
         this.main = mainPanel;
         this.topTanks = topTanks;
 
@@ -36,13 +37,16 @@ public class Window extends JFrame implements ChangeListener ,KeyListener, Hyper
             e.printStackTrace();
         }
 
-        makeMainLayout(topTanks);
+        makeMainLayout(topTanks, entities, tanks);
     }
 
-    public void makeMainLayout(java.util.List<Tank> topTanks) {
+    public void makeMainLayout(java.util.List<Tank> topTanks, Entity[] entities, java.util.List<Tank> tanks) {
         JPanel genomePanel = new JPanel();
         memoryPanel = new MemoryPanel(null);
         evolutionPanel = new EvolutionPanel(topTanks);
+        entityPanel = new EntityPanel(tanks, entities);
+        entityPanel.addListSelectionListener(this);
+
         JPanel usedSetPanel = new JPanel();
 
         evolutionPanel.addHyperlinkListener(this);
@@ -92,7 +96,7 @@ public class Window extends JFrame implements ChangeListener ,KeyListener, Hyper
         makeGenomePanel(genomePanel);
 
         tabbedPane.addTab("Program Memory", memoryPanel);
-        tabbedPane.addTab("Used Set", usedSetPanel);
+        tabbedPane.addTab("Entities", usedSetPanel);
         tabbedPane.addTab("Genome", genomePanel);
         tabbedPane.addTab("Evolution", evolutionPanel);
 
@@ -143,8 +147,10 @@ public class Window extends JFrame implements ChangeListener ,KeyListener, Hyper
     }
 
     public void display() {
+
         memoryPanel.updateInfo();
         evolutionPanel.updateInfo();
+        entityPanel.updateInfo();
     }
 
     public void makeGenomePanel(JPanel genomePanel) {
@@ -189,8 +195,6 @@ public class Window extends JFrame implements ChangeListener ,KeyListener, Hyper
         tree.setFocusable(false);
         JScrollPane scrollPane = new JScrollPane(tree);
         genomePanel.add(scrollPane, c);
-
-
     }
 
 
@@ -233,5 +237,11 @@ public class Window extends JFrame implements ChangeListener ,KeyListener, Hyper
             if(topTanks.get(i).isAlive()) main.viewholder = topTanks.get(i);
             tabbedPane.setSelectedIndex(0);
         }
+  
+    @Override
+    public void valueChanged(ListSelectionEvent e) {
+        System.out.println("Viewholder selected from entities list, set to " + main.viewholder);
+        Entity n = (Entity) ((JList)e.getSource()).getSelectedValue();
+        if(n != null) main.setViewholder(n);
     }
 }

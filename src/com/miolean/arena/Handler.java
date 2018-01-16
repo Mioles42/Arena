@@ -13,6 +13,8 @@ class Handler {
 
     private Entity[] entities;
     List<Tank> topTanks = new ArrayList<>();
+    List<Tank> tanks; //This will come in handy sooner or later
+
     int numEntities;
 
     int numCogs;
@@ -22,6 +24,7 @@ class Handler {
 
     Handler(Entity[] entities) {
         this.entities = entities;
+        tanks = new ArrayList<>();
     }
 
     void update() {
@@ -57,6 +60,7 @@ class Handler {
         if(entities[uuid] instanceof Cog) numCogs--;
         if(entities[uuid] instanceof Tank) {
             numTanks--;
+            tanks.remove(entities[uuid]);
         }
 
         entities[uuid].onDeath();
@@ -84,7 +88,10 @@ class Handler {
         e.onBirth();
 
         if(e instanceof Cog) numCogs++;
-        if(e instanceof Tank) numTanks++;
+        if(e instanceof Tank) {
+            numTanks++;
+            tanks.add((Tank)e);
+        }
     }
 
 
@@ -149,4 +156,9 @@ class Handler {
             add(tank);
         }
     }
+
+    List<Tank> getTanks() {
+        return tanks;
+    }
+
 }
