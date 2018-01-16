@@ -36,6 +36,7 @@ public final class UByte implements Serializable {
     }
 
     public static UByte[][] ubDeepCopy(UByte[][] array) {
+        if(array == null) throw new IllegalArgumentException("Cannot copy a null array");
         UByte[][] result = new UByte[array.length][];
         for(int i = 0; i < result.length; i++) {
 

@@ -149,7 +149,17 @@ public class MainPanel extends JPanel implements Runnable, KeyListener, MouseLis
             if(((Tank)viewholder).cogs < 20) g.drawString(label, 18 + (int) ((Tank)viewholder).cogs, getHeight()-75);
             else g.drawString(label, 18, getHeight()-75);
             g.drawRect(15, getHeight() - 90, (int) ((Tank)viewholder).cogs, 20);
+
+            g.setColor(new Color(100, 255, 100, 200));
+            g.fillRect(15, getHeight() - 120, (int) ((Tank)viewholder).fitness, 20);
+            g.setColor(Color.BLACK);
+            label = String.format("%2.2f", ((Tank)viewholder).fitness);
+            if(((Tank)viewholder).fitness < 20) g.drawString(label, (int) (18 + ((Tank)viewholder).fitness), getHeight()-105);
+            else g.drawString(label, 18, getHeight()-105);
+            g.drawRect(15, getHeight() - 120, (int) ((Tank)viewholder).fitness, 20);
         }
+
+
     }
 
     @Override public void keyTyped(KeyEvent e) {

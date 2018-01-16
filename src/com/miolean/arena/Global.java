@@ -19,14 +19,14 @@ class Global {
     static int updateCycle = 50;
     static int displayCycle = 50;
     static int renderCycle = 10;
-    static int distributeCycle = 50;
+    static int distributeCycle = 20;
 
     //Publicly accessible random instance
     public static Random random = new Random(11);
     public static WordRandom wordRandom = new WordRandom(11);
 
     //1 pixel= 1 tank-meter, I suppose
-    static final int ARENA_SIZE = 1024;
+    static final int ARENA_SIZE = 2*1024;
 
     static final int BORDER = 20;
 

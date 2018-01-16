@@ -79,7 +79,7 @@ public class Tank extends Entity {
     private int flashB = 0x00;
 
     //General variables:
-    int fitness = 0;
+    double fitness = 0;
     int generation = 0;
     double cogs = 0;
     private int viewDistance = 10;
@@ -432,8 +432,9 @@ public class Tank extends Entity {
         //Run the loaded P memory!
         runGenes(PMEM);
 
-        //Congratulations on not dying! Used cogs go towards fitness
-        fitness += initialCogs - cogs;
+        //Congratulations on not dying! Used cogs go towards fitness, excluding the survival ones
+        //Unless you actually are dying. Then we have a problem.
+        if(cogs > 0) fitness += initialCogs - cogs - DIFFICULTY;
 
         //Make sure health is valid
         if(health > stats[STAT_MAX_HEALTH].val()) health = stats[STAT_MAX_HEALTH].val();
@@ -467,12 +468,8 @@ public class Tank extends Entity {
             try {
                 //System.out.printf("%s(%d, %d, %d)\n", KMEM[genes[index].val()].getMeaning().getName(), genes[index+1].val(), genes[index+2].val(), genes[index+3].val());
 
-                if(KMEM[genes[loaded][index].val()].cost > cogs) {
-                    index += 3;
-                    continue;
-                }
-
                 cogs -= KMEM[genes[loaded][index].val()].cost;
+                if(cogs < 0) break;
 
                 KMEM[genes[loaded][index].val()].getMeaning().invoke(this, genes[loaded][index+1].val(), genes[loaded][index+2].val(), genes[loaded][index+3].val());
 
@@ -737,7 +734,7 @@ public class Tank extends Entity {
     public void _UUIDL(int arg0, int arg1, int arg2) {WMEM[arg0] = ub(uuidLeast);}
     public void _HP   (int arg0, int arg1, int arg2) {WMEM[arg0] = ub(health);}
     public void _COG  (int arg0, int arg1, int arg2) {WMEM[arg0] = ub((int) cogs);}
-    public void _PNT  (int arg0, int arg1, int arg2) {WMEM[arg0] = ub(fitness);}
+    public void _PNT  (int arg0, int arg1, int arg2) {WMEM[arg0] = ub((int)fitness);}
     // A
     public void _UPG  (int arg0, int arg1, int arg2) {upgrade(WMEM[arg0], WMEM[arg1].val());}
     public void _STAT (int arg0, int arg1, int arg2) {WMEM[arg0] = stats[Math.abs(arg1>>5)];}

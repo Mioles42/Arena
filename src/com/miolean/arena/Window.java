@@ -197,8 +197,9 @@ public class Window extends JFrame implements ChangeListener ,KeyListener, Hyper
     @Override
     public void stateChanged(ChangeEvent e) {
         if(e.getSource() == slider) {
+            double distributeRatio = Global.distributeCycle / Global.updateCycle;
             Global.updateCycle = 1000/slider.getValue();
-            Global.distributeCycle = 1000/slider.getValue();
+            Global.distributeCycle = (int) (distributeRatio * Global.updateCycle);
         }
     }
 

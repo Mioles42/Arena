@@ -80,7 +80,7 @@ public class EvolutionPanel extends JPanel{
             result += "<p><b>[" + (i+1) + "]</b>  ";
             if(!t.isAlive()) result += "<s><font color=\"red\">";
             result += "<a href=tank_greatest_"+i + ">";
-            result += t.name + " [Fitness: " + t.fitness + "]</a>";
+            result += t.name + " [Fitness: " + String.format("%.2f", t.fitness) + "]</a>";
             if(!t.isAlive()) result += "</font></s>";
             result += "</p>";
 

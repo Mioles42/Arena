@@ -8,7 +8,7 @@ import java.util.List;
  */
 class Handler {
 
-    final static int MAX_COGS = 128;
+    final static int MAX_COGS = 200;
     final static int MAX_TANKS = 32;
 
     private Entity[] entities;
@@ -139,7 +139,10 @@ class Handler {
         }
 
         if(Global.random.nextFloat() < 0.01) {
-            Tank tank = new Tank(Global.BASE_TANK);
+            Tank tank;
+            if(topTanks.size() > 9) tank = new Tank(topTanks.get(Global.random.nextInt(5)));
+            else tank = new Tank("cain");
+
             tank.x = Global.random.nextFloat() * Global.ARENA_SIZE;
             tank.y = Global.random.nextFloat() * Global.ARENA_SIZE;
             tank.r = Global.random.nextFloat() * Global.ARENA_SIZE;
