@@ -3,6 +3,8 @@ package com.miolean.arena;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.MutableTreeNode;
 import java.awt.*;
@@ -10,14 +12,15 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
 
-public class Window extends JFrame implements ChangeListener ,KeyListener {
+public class Window extends JFrame implements ChangeListener ,KeyListener, ListSelectionListener {
 
     private JSlider slider;
     MainPanel main;
     MemoryPanel memoryPanel;
+    EntityPanel entityPanel;
 
 
-    Window(MainPanel mainPanel) {
+    Window(MainPanel mainPanel, Entity[] entities, java.util.List<Tank> tanks) {
         this.main = mainPanel;
         LayoutManager layout = new GridBagLayout();
         setLayout(layout);
@@ -28,12 +31,15 @@ public class Window extends JFrame implements ChangeListener ,KeyListener {
             e.printStackTrace();
         }
 
-        makeMainLayout();
+        makeMainLayout(entities, tanks);
     }
 
-    public void makeMainLayout() {
+    public void makeMainLayout(Entity[] entities, java.util.List<Tank> tanks) {
         JPanel genomePanel = new JPanel();
         memoryPanel = new MemoryPanel(null);
+        entityPanel = new EntityPanel(tanks, entities);
+        entityPanel.addListSelectionListener(this);
+
         JPanel usedSetPanel = new JPanel();
 
 
@@ -81,8 +87,8 @@ public class Window extends JFrame implements ChangeListener ,KeyListener {
 
         makeGenomePanel(genomePanel);
 
-        infoPanel.addTab("Program Memory", memoryPanel);
-        infoPanel.addTab("Used Set", usedSetPanel);
+        infoPanel.addTab("Memory", memoryPanel);
+        infoPanel.addTab("Entities", entityPanel);
         infoPanel.addTab("Genome", genomePanel);
 
         JLabel genomeLabel = new JLabel("Genome", JLabel.CENTER);
@@ -132,7 +138,9 @@ public class Window extends JFrame implements ChangeListener ,KeyListener {
     }
 
     public void display() {
+
         memoryPanel.updateInfo();
+        entityPanel.updateInfo();
     }
 
     public void makeGenomePanel(JPanel genomePanel) {
@@ -177,8 +185,6 @@ public class Window extends JFrame implements ChangeListener ,KeyListener {
         tree.setFocusable(false);
         JScrollPane scrollPane = new JScrollPane(tree);
         genomePanel.add(scrollPane, c);
-
-
     }
 
 
@@ -208,5 +214,12 @@ public class Window extends JFrame implements ChangeListener ,KeyListener {
 
     public void setActiveTank(Tank tank) {
         memoryPanel.source = tank;
+    }
+
+    @Override
+    public void valueChanged(ListSelectionEvent e) {
+        System.out.println("Viewholder selected from entities list, set to " + main.viewholder);
+        Entity n = (Entity) ((JList)e.getSource()).getSelectedValue();
+        if(n != null) main.setViewholder(n);
     }
 }

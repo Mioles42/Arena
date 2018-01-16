@@ -79,4 +79,9 @@ abstract class Entity {
 
     abstract void onBirth();
     abstract void onDeath();
+
+    @Override
+    public String toString() {
+        return this.getClass().getSimpleName();
+    }
 }
