@@ -1,7 +1,5 @@
 package com.miolean.arena;
 
-import javafx.scene.control.Hyperlink;
-
 import javax.swing.*;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;

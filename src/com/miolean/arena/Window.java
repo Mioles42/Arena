@@ -45,11 +45,11 @@ public class Window extends JFrame implements ChangeListener ,KeyListener, ListS
         memoryPanel = new MemoryPanel(null);
         evolutionPanel = new EvolutionPanel(topTanks);
         entityPanel = new EntityPanel(tanks, entities);
-        entityPanel.addListSelectionListener(this);
 
         JPanel usedSetPanel = new JPanel();
 
         evolutionPanel.addHyperlinkListener(this);
+        entityPanel.addHyperlinkListener(this);
 
         //Add the main panel:
         JPanel mainContainer = new JPanel();
@@ -96,7 +96,7 @@ public class Window extends JFrame implements ChangeListener ,KeyListener, ListS
         makeGenomePanel(genomePanel);
 
         tabbedPane.addTab("Program Memory", memoryPanel);
-        tabbedPane.addTab("Entities", usedSetPanel);
+        tabbedPane.addTab("Entities", entityPanel);
         tabbedPane.addTab("Genome", genomePanel);
         tabbedPane.addTab("Evolution", evolutionPanel);
 
@@ -230,13 +230,14 @@ public class Window extends JFrame implements ChangeListener ,KeyListener, ListS
 
     @Override
     public void hyperlinkUpdate(HyperlinkEvent e) {
-        if(e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
+        if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
             int i = Integer.parseInt(e.getDescription().replace("tank_greatest_", ""));
             System.out.println("Active tank is now high scorer " + i);
             setActiveTank(topTanks.get(i));
-            if(topTanks.get(i).isAlive()) main.viewholder = topTanks.get(i);
+            if (topTanks.get(i).isAlive()) main.viewholder = topTanks.get(i);
             tabbedPane.setSelectedIndex(0);
         }
+    }
   
     @Override
     public void valueChanged(ListSelectionEvent e) {

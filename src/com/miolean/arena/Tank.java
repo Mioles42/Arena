@@ -1,7 +1,5 @@
 package com.miolean.arena;
 
-import sun.plugin.dom.exception.InvalidStateException;
-
 import java.awt.*;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Scanner;

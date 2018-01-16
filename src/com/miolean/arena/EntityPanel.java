@@ -1,31 +1,38 @@
 package com.miolean.arena;
 
 import javax.swing.*;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
+import javax.swing.text.*;
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Scanner;
+import java.util.regex.Pattern;
 
-public class EntityPanel extends JPanel {
+public class EntityPanel extends JPanel{
 
-    List<Tank> tanks;
-    Entity[] entities;
-    JComboBox<String> comboBox;
+    JTextPane textPane;
     JLabel label;
-    JList<Entity> list;
+    JSpinner spinner;
+
     JScrollPane scrollPane;
 
-    private static final int INDEX_TANKS = 0;
-    private static final int INDEX_ALL_ENTITIES = 1;
+    java.util.List<Tank> tanks;
+    Entity[] entities;
 
-    public EntityPanel(List<Tank> tanks, Entity[] entities) {
-        this.tanks = tanks;
+
+    JComboBox<String> comboBox;
+    private static final int INDEX_TANKS = 0;
+    private static final int INDEX_ENTITIES = 1;
+
+    public EntityPanel(java.util.List<Tank> tanks, Entity[] entities) {
+
         this.entities = entities;
+        this.tanks = tanks;
 
         GridBagConstraints c;
         LayoutManager layout = new GridBagLayout();
         setLayout(layout);
+
 
         label = new JLabel();
         c = new GridBagConstraints();
@@ -37,15 +44,27 @@ public class EntityPanel extends JPanel {
         c.gridheight = 1;
         c.fill = GridBagConstraints.BOTH;
         c.insets = new Insets(5, 5, 5, 5);
-        label.setText("Showing entities:");
+        label.setText("Entities in block: ");
         this.add(label, c);
 
-        comboBox = new JComboBox<>();
-        comboBox.addItem("Tanks");
-        comboBox.addItem("All Entities");
-        comboBox.setSelectedItem("Tanks");
-        c = new GridBagConstraints();
+        SpinnerModel model = new SpinnerNumberModel(0, 0, 255, 1);
+        spinner = new JSpinner(model);
+        spinner.getEditor().setFocusable(false);
         c.gridx = 1;
+        c.gridy = 0;
+        c.weighty = .05;
+        c.weightx = 1;
+        c.gridwidth = 1;
+        c.gridheight = 1;
+        c.fill = GridBagConstraints.BOTH;
+        this.add(spinner, c);
+
+        comboBox = new JComboBox<>();
+        comboBox.addItem("All Entities");
+        comboBox.addItem("Tanks");
+        comboBox.setSelectedItem("All Entities");
+        c = new GridBagConstraints();
+        c.gridx = 2;
         c.gridy = 0;
         c.weighty = .05;
         c.weightx = 1;
@@ -58,8 +77,11 @@ public class EntityPanel extends JPanel {
         scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 
-        list = new JList<>();
-        list.setListData(entities);
+
+        textPane = new JTextPane();
+        textPane.setEditable(false);
+        textPane.setHighlighter(null);
+        textPane.setContentType("text/html");
         c = new GridBagConstraints();
         c.gridx = 0;
         c.gridy = 1;
@@ -70,24 +92,58 @@ public class EntityPanel extends JPanel {
         c.fill = GridBagConstraints.BOTH;
         c.anchor = GridBagConstraints.WEST;
         c.insets = new Insets(5, 5, 5, 5);
-        list.setSize(1000, 1000);
-        scrollPane.setViewportView(list);
+        textPane.setSize(1000, 1000);
+        scrollPane.setViewportView(textPane);
         this.add(scrollPane, c);
+
     }
 
     void updateInfo() {
-        if(comboBox.getSelectedIndex() == INDEX_ALL_ENTITIES) {
-            list.setListData(entities);
-        }
+        String result = "";
 
         if(comboBox.getSelectedIndex() == INDEX_TANKS) {
-            Tank[] tankArray = new Tank[tanks.size()];
-            tanks.toArray(tankArray);
-            list.setListData(tankArray);
+            result += "<p>Total Tanks: " + tanks.size() + "</p>";
+
+            for (int i = 0; i < tanks.size(); i++) {
+                Tank t = tanks.get(i);
+
+                result += "<b>[" + t.getClass().getSimpleName() + "]</b><font color=\"blue\">  ";
+                result += "<a href=tank_num_" + i + ">";
+                result += t.name + " [Fitness: " + String.format("%.2f", t.fitness) + "]</a>";
+                result += "</font>";
+                result += "<br />";
+
+            }
+        } else if(comboBox.getSelectedIndex() == INDEX_ENTITIES) {
+
+            for (int i = 0; i < entities.length; i++) {
+                if(entities[i] == null) continue;
+                Entity e = entities[i];
+
+                if(e instanceof Tank && ! (e instanceof ControlledTank)) result += "<font color=\"blue\">";
+                else if(e instanceof Cog) result += "<font color=\"orange\">";
+                else if(e instanceof ControlledTank) result += "<font color=\"grey\">";
+                else if(e instanceof Bullet) result += "<font color=\"red\">";
+                else result += "<font color=\"black\">";
+
+                result += "<b>[" + e.getClass().getSimpleName() + "]</b>";
+
+                if(e instanceof Tank && ! (e instanceof ControlledTank)) {
+                    result += "<a href=tank_num_" + i + ">";
+                    result += ((Tank)e).name + " [Fitness: " + String.format("%.2f", ((Tank)e).fitness) + "]</a>";
+                }
+                result += "</font>";
+                result += "<br />";
+
+            }
         }
+
+
+        textPane.setText(result);
+
     }
 
-    void addListSelectionListener(ListSelectionListener lsl) {
-        list.addListSelectionListener(lsl);
+    public void addHyperlinkListener(HyperlinkListener l) {
+        textPane.addHyperlinkListener(l);
     }
 }

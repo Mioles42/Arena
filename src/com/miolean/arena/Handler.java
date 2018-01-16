@@ -60,7 +60,7 @@ class Handler {
         if(entities[uuid] instanceof Cog) numCogs--;
         if(entities[uuid] instanceof Tank) {
             numTanks--;
-            tanks.remove(entities[uuid]);
+            tanks.remove( entities[uuid]);
         }
 
         entities[uuid].onDeath();
