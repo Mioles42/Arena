@@ -201,9 +201,8 @@ public class Window extends JFrame implements ChangeListener ,KeyListener, ListS
     @Override
     public void stateChanged(ChangeEvent e) {
         if(e.getSource() == slider) {
-            double distributeRatio = Global.distributeCycle / Global.updateCycle;
-            Global.updateCycle = 1000/slider.getValue();
-            Global.distributeCycle = (int) (distributeRatio * Global.updateCycle);
+            Global.updateCycle = (int) (1000.0/slider.getValue());
+            Global.distributeCycle = (int) (Global.distributeRatio * 1000.0/slider.getValue());
         }
     }
 

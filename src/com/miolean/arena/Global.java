@@ -20,6 +20,7 @@ class Global {
     static int displayCycle = 100;
     static int renderCycle = 10;
     static int distributeCycle = 20;
+    static double distributeRatio = 0.3; //distributes per update
 
     //Publicly accessible random instance
     public static Random random = new Random(11);
