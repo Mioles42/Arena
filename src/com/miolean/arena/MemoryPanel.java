@@ -13,6 +13,7 @@ public class MemoryPanel extends JPanel {
     JComboBox<String> comboBox;
     JLabel label;
     JScrollPane scrollPane;
+    Point scrollPosition;
 
     Tank source;
 
@@ -144,7 +145,17 @@ public class MemoryPanel extends JPanel {
         }
 
         try {
+            scrollPosition = scrollPane.getViewport().getViewPosition();
             textPane.setDocument(doc);
+
+            Runnable runnable = new Runnable() {
+                @Override
+                public void run() {
+                    scrollPane.getViewport().setViewPosition(scrollPosition);
+                }
+            };
+
+            SwingUtilities.invokeLater(runnable);
         } catch (Exception e) {
             System.err.println("Error caught from Swing internals");
         }

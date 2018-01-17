@@ -5,14 +5,18 @@ import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import javax.swing.text.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.Scanner;
 import java.util.regex.Pattern;
 
-public class EntityPanel extends JPanel{
+public class EntityPanel extends JPanel implements ActionListener{
 
     JTextPane textPane;
     JLabel label;
     JSpinner spinner;
+    JButton refresh = new JButton("Go!");
+    Point scrollPosition = new Point(0, 0);
 
     JScrollPane scrollPane;
 
@@ -21,8 +25,8 @@ public class EntityPanel extends JPanel{
 
 
     JComboBox<String> comboBox;
-    private static final int INDEX_TANKS = 0;
-    private static final int INDEX_ENTITIES = 1;
+    private static final int INDEX_TANKS = 1;
+    private static final int INDEX_ENTITIES = 0;
 
     public EntityPanel(java.util.List<Tank> tanks, Entity[] entities) {
 
@@ -73,6 +77,17 @@ public class EntityPanel extends JPanel{
         c.fill = GridBagConstraints.BOTH;
         this.add(comboBox, c);
 
+        refresh.addActionListener(this);
+        c = new GridBagConstraints();
+        c.gridx = 3;
+        c.gridy = 0;
+        c.weighty = .05;
+        c.weightx = .1;
+        c.gridwidth = 1;
+        c.gridheight = 1;
+        c.fill = GridBagConstraints.BOTH;
+        this.add(refresh, c);
+
         scrollPane = new JScrollPane();
         scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
@@ -87,7 +102,7 @@ public class EntityPanel extends JPanel{
         c.gridy = 1;
         c.weighty = 1;
         c.weightx = 1;
-        c.gridwidth = 3;
+        c.gridwidth = 4;
         c.gridheight = 1;
         c.fill = GridBagConstraints.BOTH;
         c.anchor = GridBagConstraints.WEST;
@@ -138,12 +153,26 @@ public class EntityPanel extends JPanel{
             }
         }
 
-
+        scrollPosition = scrollPane.getViewport().getViewPosition();
         textPane.setText(result);
+
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                scrollPane.getViewport().setViewPosition(scrollPosition);
+            }
+        };
+
+        SwingUtilities.invokeLater(runnable);
 
     }
 
     public void addHyperlinkListener(HyperlinkListener l) {
         textPane.addHyperlinkListener(l);
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if(e.getSource() == refresh) updateInfo();
     }
 }
