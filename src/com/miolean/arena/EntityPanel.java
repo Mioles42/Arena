@@ -42,21 +42,24 @@ public class EntityPanel extends JPanel implements ActionListener{
         c = new GridBagConstraints();
         c.gridx = 0;
         c.gridy = 0;
-        c.weighty = .05;
+        c.weighty = .03;
         c.weightx = 1;
         c.gridwidth = 1;
         c.gridheight = 1;
         c.fill = GridBagConstraints.BOTH;
         c.insets = new Insets(5, 5, 5, 5);
-        label.setText("Entities in block: ");
+        label.setText("Active Entities");
+        label.setHorizontalAlignment(JLabel.CENTER);
         this.add(label, c);
 
         SpinnerModel model = new SpinnerNumberModel(0, 0, 255, 1);
         spinner = new JSpinner(model);
+        spinner.setEditor(new JSpinner.NumberEditor(spinner, "Block ###"));
         spinner.getEditor().setFocusable(false);
+        ((JSpinner.DefaultEditor)spinner.getEditor()).getTextField().setEditable(false);
         c.gridx = 1;
         c.gridy = 0;
-        c.weighty = .05;
+        c.weighty = .03;
         c.weightx = 1;
         c.gridwidth = 1;
         c.gridheight = 1;
@@ -70,7 +73,7 @@ public class EntityPanel extends JPanel implements ActionListener{
         c = new GridBagConstraints();
         c.gridx = 2;
         c.gridy = 0;
-        c.weighty = .05;
+        c.weighty = .03;
         c.weightx = 1;
         c.gridwidth = 1;
         c.gridheight = 1;
@@ -81,7 +84,7 @@ public class EntityPanel extends JPanel implements ActionListener{
         c = new GridBagConstraints();
         c.gridx = 3;
         c.gridy = 0;
-        c.weighty = .05;
+        c.weighty = .03;
         c.weightx = .1;
         c.gridwidth = 1;
         c.gridheight = 1;

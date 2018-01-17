@@ -23,10 +23,12 @@ public class Window extends JFrame implements ChangeListener ,KeyListener, ListS
     EntityPanel entityPanel;
 
     java.util.List<Tank> topTanks;
+    java.util.List<Tank> tanks;
 
     Window(MainPanel mainPanel, java.util.List<Tank> topTanks, Entity[] entities, java.util.List<Tank> tanks) {
         this.main = mainPanel;
         this.topTanks = topTanks;
+        this.tanks = tanks;
 
         LayoutManager layout = new GridBagLayout();
         setLayout(layout);
@@ -230,11 +232,18 @@ public class Window extends JFrame implements ChangeListener ,KeyListener, ListS
     @Override
     public void hyperlinkUpdate(HyperlinkEvent e) {
         if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-            int i = Integer.parseInt(e.getDescription().replace("tank_greatest_", ""));
-            System.out.println("Active tank is now high scorer " + i);
-            setActiveTank(topTanks.get(i));
-            if (topTanks.get(i).isAlive()) main.viewholder = topTanks.get(i);
-            tabbedPane.setSelectedIndex(0);
+
+            if(e.getDescription().contains("tank_greatest_")) {
+                int i = Integer.parseInt(e.getDescription().replace("tank_greatest_", ""));
+                setActiveTank(topTanks.get(i));
+                if (topTanks.get(i).isAlive()) main.viewholder = topTanks.get(i);
+                tabbedPane.setSelectedIndex(0);
+            } else if(e.getDescription().contains("tank_num_")) {
+                int i = Integer.parseInt(e.getDescription().replace("tank_num_", ""));
+                setActiveTank(tanks.get(i));
+                if (tanks.get(i).isAlive()) main.viewholder = tanks.get(i);
+                tabbedPane.setSelectedIndex(0);
+            }
         }
     }
   
