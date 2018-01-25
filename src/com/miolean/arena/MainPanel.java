@@ -40,7 +40,7 @@ public class MainPanel extends JPanel implements Runnable, KeyListener, MouseLis
       
         window = new Window(this, handler.topRobots, entities, handler.getRobots());
 
-        handler.add(new ControlledRobot(300, 300));
+        new ControlledRobot(300, 300, handler);
         viewholder = entities[0];
 
         Bullet rogue = new Bullet(null);

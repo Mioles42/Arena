@@ -129,7 +129,7 @@ public class EntityPanel extends JPanel implements ActionListener{
 
                 result += "<b>[" + t.getClass().getSimpleName() + "]</b><font color=\"blue\">  ";
                 result += "<a href=tank_num_" + i + ">";
-                result += t.name + " [Fitness: " + String.format("%.2f", t.fitness) + "]</a>";
+                result += t.getName() + " [Fitness: " + String.format("%.2f", t.getFitness()) + "]</a>";
                 result += "</font>";
                 result += "<br />";
 
@@ -150,7 +150,7 @@ public class EntityPanel extends JPanel implements ActionListener{
 
                 if(e instanceof com.miolean.arena.entities.Robot && ! (e instanceof ControlledRobot)) {
                     result += "<a href=tank_num_" + i + ">";
-                    result += ((com.miolean.arena.entities.Robot)e).name + " [Fitness: " + String.format("%.2f", ((Robot)e).fitness) + "]</a>";
+                    result += ((com.miolean.arena.entities.Robot)e).getName() + " [Fitness: " + String.format("%.2f", ((Robot)e).getFitness()) + "]</a>";
                 }
                 result += "</font>";
                 result += "<br />";

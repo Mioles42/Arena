@@ -85,6 +85,9 @@ public class Robot extends Entity {
     private double fitness = 0;
     private int generation = 0;
     private double cogs = 0;
+
+
+
     private String name = "";
 
     private int viewDistance = 10;
@@ -127,7 +130,7 @@ public class Robot extends Entity {
     }
 
     //Create a Robot from a parent
-    Robot(Robot parent, Handler handler) {
+    public Robot(Robot parent, Handler handler) {
         super(SIZE, SIZE, DEFAULT_STAT_VALUE, handler);
         name = Global.wordRandom.nextWord();
         name = name.substring(0, 1).toUpperCase() + name.substring(1);
@@ -151,7 +154,7 @@ public class Robot extends Entity {
     }
 
     //Create a Robot from a file
-    Robot(InputStream file, Handler handler, int uuid) {
+    public Robot(InputStream file, Handler handler) {
 
         super(SIZE, SIZE, DEFAULT_STAT_VALUE, handler);
         //0: Initial values.
@@ -812,4 +815,13 @@ public class Robot extends Entity {
     int pmemAt(int memory, int address) {return PMEM[memory][address].val();}
     int smemAt(int memory, int address) {return SMEM[memory][address].val();}
     int wmemAt(int address) {return WMEM[address].val();}
+
+    public double getFitness() { return fitness; }
+    public void setFitness(double fitness) { this.fitness = fitness; }
+    public int getGeneration() { return generation; }
+    public void setGeneration(int generation) { this.generation = generation; }
+    public double getCogs() { return cogs; }
+    public void setCogs(double cogs) { this.cogs = cogs; }
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
 }

@@ -80,7 +80,7 @@ public abstract class Entity {
     public abstract void onDeath();
     public abstract String toHTML();
 
-    boolean isAlive() {return ! (handler == null);}
+    public boolean isAlive() {return (health > 0);}
     public double getX() { return x; }
     public double getY() { return y; }
     public double getR() { return r; }
@@ -106,11 +106,19 @@ public abstract class Entity {
     public void setAccR(double accR) { this.accR = accR; }
     public void setHealth(double health) { this.health = health;}
 
-    public void die() {
+    public final void die() {
         health = 0;
         handler = null;
+        handler.remove(uuid);
         onDeath();
     }
+
+    public final void appear(Handler handler) {
+        this.handler = handler;
+        handler.add(this);
+        onBirth();
+    }
+
     public void damage(double amount) {health -= amount;}
     public void heal(double amount) {health += amount;}
     public void add(Entity e) {handler.add(e);}

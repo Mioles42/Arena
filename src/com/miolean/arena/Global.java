@@ -34,7 +34,7 @@ public class Global {
 
     public static boolean[] KEY = new boolean[9];
 
-    public final static Robot BASE_ROBOT = new Robot("cain");
+    public final static String BASE_ROBOT = "default.ergo";
 
     //Key constants
     public static final int KEY_Q = 0;

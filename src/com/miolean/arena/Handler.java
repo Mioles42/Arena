@@ -41,17 +41,17 @@ public class Handler {
             for(Entity j: entities) { if (j == null) continue;
                 if(e.intersectsWith(j) && e != j) e.intersect(j);
             }
-            if(e.health <= 0) remove(e.getUUID());
+            if(e.getHealth() <= 0) remove(e.getUUID());
 
             //If we're holding a Robot that has beaten a record (or there are no records)
             if(topRobots.size() == 0 && e instanceof Robot) topRobots.add((Robot) e);
-            else if(e instanceof Robot && ((Robot) e).fitness > topRobots.get(topRobots.size()-1).fitness) {
+            else if(e instanceof Robot && ((Robot) e).getFitness() > topRobots.get(topRobots.size()-1).getFitness()) {
                 Robot robot = (Robot) e;
                 topRobots.remove(robot); //Just recategorize it
 
                 //We should really do a binary search here, but the time it would save us is pretty limited tbh
                 for(int i = 0; i < topRobots.size(); i++) {
-                    if(robot.fitness > topRobots.get(i).fitness) {
+                    if(robot.getFitness() > topRobots.get(i).getFitness()) {
                         topRobots.add(i, robot);
                         break;
                     }
@@ -69,34 +69,31 @@ public class Handler {
         }
 
         entities[uuid].onDeath();
-        entities[uuid].handler = null;
         entities[uuid] = null;
         numEntities--;
 
 
     }
 
-    public void add(Entity e) {
+    public int add(Entity e) {
 
-        if(e instanceof Cog && numCogs >= MAX_COGS) return;
-        if(e instanceof Robot && numTanks >= MAX_TANKS) return;
-
-        while(entities[lastUUIDUsed] != null) {
-            lastUUIDUsed++;
-            lastUUIDUsed %= entities.length;
-        }
-        entities[lastUUIDUsed] = e;
-        e.uuidMost = lastUUIDUsed >> 8;
-        e.uuidLeast = lastUUIDUsed % 0b100000000;
-        e.handler = this;
-        numEntities++;
-        e.onBirth();
+        if(e instanceof Cog && numCogs >= MAX_COGS) return 0;
+        if(e instanceof Robot && numTanks >= MAX_TANKS) return 0;
 
         if(e instanceof Cog) numCogs++;
         if(e instanceof Robot) {
             numTanks++;
             robots.add((Robot)e);
         }
+        numEntities++;
+
+        while(entities[lastUUIDUsed] != null) {
+            lastUUIDUsed++;
+            lastUUIDUsed %= entities.length;
+        }
+        entities[lastUUIDUsed] = e;
+        e.onBirth();
+        return lastUUIDUsed;
     }
 
 
@@ -119,7 +116,7 @@ public class Handler {
         int count = 0x0000;
         for(Entity e: entities) {
             if(e == null) continue;
-            if ((x - e.x) * (x - e.x) + (y - e.y) * (y - e.y) < distance * distance) count++;
+            if ((x - e.getX()) * (x - e.getX()) + (y - e.getY()) * (y - e.getY()) < distance * distance) count++;
         }
         return count;
     }
@@ -131,7 +128,7 @@ public class Handler {
 
     public Entity entityAtLocation(int x, int y) {
 
-        TrackerDot location = new TrackerDot(x, y, 1);
+        TrackerDot location = new TrackerDot(x, y, 1, this);
 
         for(Entity e: entities) {
             if(e != null && e.intersectsWith(location)) return e;
@@ -143,21 +140,21 @@ public class Handler {
     public void distribute() {
 
         if(Global.random.nextFloat() < 0.05) {
-            Cog cog = new Cog(5 + (int) (10 * Global.random.nextFloat()));
-            cog.x = Global.random.nextFloat() * Global.ARENA_SIZE;
-            cog.y = Global.random.nextFloat() * Global.ARENA_SIZE;
-            cog.r = Global.random.nextFloat() * Global.ARENA_SIZE;
+            Cog cog = new Cog(5 + (int) (10 * Global.random.nextFloat()), this);
+            cog.setX(Global.random.nextFloat() * Global.ARENA_SIZE);
+            cog.setY(Global.random.nextFloat() * Global.ARENA_SIZE);
+            cog.setR(Global.random.nextFloat() * Global.ARENA_SIZE);
             add(cog);
         }
 
         if(Global.random.nextFloat() < 0.01) {
             Robot robot;
-            if(topRobots.size() > 9) robot = new Robot(topRobots.get(Global.random.nextInt(5)));
-            else robot = new Robot("default");
+            if(topRobots.size() > 9) robot = new Robot(topRobots.get(Global.random.nextInt(5)), this);
+            else robot = new Robot(Global.class.getResourceAsStream("default.ergo"), this);
 
-            robot.x = Global.random.nextFloat() * Global.ARENA_SIZE;
-            robot.y = Global.random.nextFloat() * Global.ARENA_SIZE;
-            robot.r = Global.random.nextFloat() * Global.ARENA_SIZE;
+            robot.setX(Global.random.nextFloat() * Global.ARENA_SIZE);
+            robot.setY(Global.random.nextFloat() * Global.ARENA_SIZE);
+            robot.setR(Global.random.nextFloat() * Global.ARENA_SIZE);
             add(robot);
         }
     }

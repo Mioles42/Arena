@@ -25,55 +25,50 @@ public class Bullet extends Entity {
         this.source = source;
 
         if(source != null) {
-            x = source.x;
-            y = source.y;
-            r = source.r;
+            setX(source.getX());
+            setY(source.getY());
             damage = source.stats[Robot.STAT_DAMAGE].val();
-            velX = (15 + source.stats[Robot.STAT_BULLET_SPEED].val()) * Math.cos(r + source.stats[Robot.STAT_BULLET_SPREAD].val() / 128.0 * (Global.random.nextFloat() - .5));
-            velY = (15 + source.stats[Robot.STAT_BULLET_SPEED].val()) * -Math.sin(r + source.stats[Robot.STAT_BULLET_SPREAD].val() / 128.0 * (Global.random.nextFloat() - .5));
-            velR = 0;
-            accX = 0;
-            accY = 0;
-            accR = 0;
-            health = 1;
+            setVelX((15 + source.stats[Robot.STAT_BULLET_SPEED].val()) * Math.cos(getR() + source.stats[Robot.STAT_BULLET_SPREAD].val() / 128.0 * (Global.random.nextFloat() - .5)));
+            setVelY((15 + source.stats[Robot.STAT_BULLET_SPEED].val()) * -Math.sin(getR() + source.stats[Robot.STAT_BULLET_SPREAD].val() / 128.0 * (Global.random.nextFloat() - .5)));
         } else {
-            x = Global.ARENA_SIZE * Global.random.nextFloat();
-            y = Global.ARENA_SIZE * Global.random.nextFloat();
-
-            health = 3;
+            setX(Global.ARENA_SIZE * Global.random.nextFloat());
+            setY(Global.ARENA_SIZE * Global.random.nextFloat());
             damage = 5;
         }
     }
 
 
     @Override
-    void render(Graphics g) {
+    public void render(Graphics g) {
 
 
         if(target != null || source != null) g.setColor(new Color(100 + damage / 2, 150 - damage / 2, 50));
         else g.setColor(new Color(100, 100, 255));
 
+        double x = getX();
+        double y = getY();
+
         if(source != null) {
-            g.fillOval((int) x - width / 2, (int) y - height / 2, width, height);
+            g.fillOval((int) x - SIZE / 2, (int) y - SIZE / 2, SIZE, SIZE);
             g.setColor(Color.black);
-            g.drawOval((int) x - width / 2, (int) y - height / 2, width, height);
+            g.drawOval((int) x - SIZE / 2, (int) y - SIZE / 2, SIZE, SIZE);
         } else {
 
-            double sinR = Math.sin(r + Math.PI);
-            double cosR = Math.cos(r + Math.PI);
+            double sinR = Math.sin(getR() + Math.PI);
+            double cosR = Math.cos(getR() + Math.PI);
             double sinExtra = .25867;
             double cosExtra = .88007;
 
             //Fun fact: This is stolen from Robot's gun barrel.
             int[] XPoints = {
-                    (int) (x+width*3*(cosR*cosExtra - sinR*sinExtra)),
-                    (int) (x+width*3*(cosR*cosExtra + sinR*sinExtra)),
+                    (int) (x+SIZE*3*(cosR*cosExtra - sinR*sinExtra)),
+                    (int) (x+SIZE*3*(cosR*cosExtra + sinR*sinExtra)),
                     (int) (x)
             };
 
             int[] YPoints = {
-                    (int) (y-width*3*(sinR*cosExtra + sinExtra*cosR)),
-                    (int) (y-width*3*(sinR*cosExtra - sinExtra*cosR)),
+                    (int) (y-SIZE*3*(sinR*cosExtra + sinExtra*cosR)),
+                    (int) (y-SIZE*3*(sinR*cosExtra - sinExtra*cosR)),
                     (int) (y)
 
             };
@@ -86,22 +81,22 @@ public class Bullet extends Entity {
 
     void forward(int force) {
        //Translate polar force into cartesian vector
-        this.accX = force * Math.cos(r) / 16; //Scaling!
-        this.accY = force * -Math.sin(r) / 16;
+        setAccX(force * Math.cos(getR()) / 16); //Scaling!
+        setAccY(force * -Math.sin(getR()) / 16);
     }
 
 
     @Override
-    void update() {
+    public void update() {
 
         applyPhysics();
 
         if(source != null) {
-            if (Math.abs(velX) < 1 && Math.abs(velY) < 1) health = 0;
-            if ((x > ARENA_SIZE - BORDER) || (x < BORDER) || (y > ARENA_SIZE - BORDER) || (y < BORDER)) health = 0;
+            if (Math.abs(getVelX()) < 1 && Math.abs(getVelY()) < 1) die();
+            if ((getX() > ARENA_SIZE - BORDER) || (getX() < BORDER) || (getY() > ARENA_SIZE - BORDER) || (getY() < BORDER)) die();
         } else if(target != null){
-            double xdis = target.x - x;
-            double ydis = target.y - y;
+            double xdis = target.getX() - getX();
+            double ydis = target.getY() - getY();
 
 
             double targetR = Math.atan(xdis/ydis) + Math.PI/2;
@@ -109,12 +104,12 @@ public class Bullet extends Entity {
             if(ydis > 0) targetR += Math.PI;
 
             // (A - B) mod C = (A mod C - B mod C) mod C
-            double rdis = (r - targetR) % (2*Math.PI);
+            double rdis = (getR() - targetR) % (2*Math.PI);
             if(rdis < -Math.PI) rdis += (2*Math.PI);
 
-            if(rdis > -2*velR) accR = -ROGUE_TURN_SPEED;
-            else if(rdis < 2*velR) accR = ROGUE_TURN_SPEED;
-            else accR = 0;
+            if(rdis > -2*getVelR()) setAccR(-ROGUE_TURN_SPEED);
+            else if(rdis < 2*getVelR()) setAccR(ROGUE_TURN_SPEED);
+            else setAccR(0);
 
             forward(ROGUE_SPEED);
 
@@ -122,11 +117,11 @@ public class Bullet extends Entity {
 
             for(int i = 0; i < ROGUE_OBSERVATION; i++) {
 
-                Entity attemptedTarget = handler.getByUUID(UByte.rand(), UByte.rand());
+                Entity attemptedTarget = getHandler().getByUUID(UByte.rand(), UByte.rand());
 
                 if (attemptedTarget != null && attemptedTarget instanceof Robot) {
-                    double axdis = attemptedTarget.x - x;
-                    double aydis = attemptedTarget.y - y;
+                    double axdis = attemptedTarget.getX() - getX();
+                    double aydis = attemptedTarget.getY() - getY();
 
                     if(axdis*axdis + aydis*aydis < xdis*xdis + ydis*ydis) {
                         target = (Robot) attemptedTarget;
@@ -136,10 +131,10 @@ public class Bullet extends Entity {
 
         } else {
 
-            velR = 0.1;
+            setVelR(0.1);
 
             for(int i = 0; i < ROGUE_OBSERVATION; i++){
-                Entity attemptedTarget = handler.getByUUID(UByte.rand(), UByte.rand());
+                Entity attemptedTarget = getHandler().getByUUID(UByte.rand(), UByte.rand());
                 if(attemptedTarget != null && attemptedTarget instanceof Robot) {
                     target = (Robot) attemptedTarget;
                     System.out.println("Found target");
@@ -149,43 +144,51 @@ public class Bullet extends Entity {
     }
 
     @Override
-    boolean intersectsWith(Entity e) {
+    public boolean intersectsWith(Entity e) {
         if( e instanceof TrackerDot) return false;
         if(e == null || e == source || (e instanceof Bullet && ((Bullet) e).source == source)) return false; //Don't interact with your own source
 
+        //This is going to be hell if we don't make up some shorthands
+        double x = getX();
+        double y = getY();
+        double velX = getVelX();
+        double velY = getVelY();
+        double accX = getAccX();
+        double accY = getAccY();
+
         Rectangle extendedBounds = new Rectangle(new Point((int)x, (int)y));
         extendedBounds.add(new Point((int) (x-velX-accX), (int) (y-velY-accY)));
-        extendedBounds.setLocation((int) (extendedBounds.getX() - e.width), (int) (extendedBounds.getY() - e.height));
-        extendedBounds.setSize((int) (extendedBounds.getWidth() + 2*e.width), (int) (extendedBounds.getHeight() + 2*e.height));
+        extendedBounds.setLocation((int) (extendedBounds.getX() - e.getWidth()), (int) (extendedBounds.getY() - e.getHeight()));
+        extendedBounds.setSize((int) (extendedBounds.getWidth() + 2*e.getWidth()), (int) (extendedBounds.getHeight() + 2*e.getHeight()));
 
-        if(extendedBounds.contains(new Point2D.Double(e.x, e.y))) {
+        if(extendedBounds.contains(new Point2D.Double(e.getX(), e.getY()))) {
             double slope = (velY + accY) / (velX + accX);
 
             double k = y - slope * x;
 
-            double a = e.x - (e.y-k)/slope;
-            double b = e.y - e.x*slope - k;
+            double a = e.getX() - (e.getY()-k)/slope;
+            double b = e.getY() - e.getX()*slope - k;
             double g2 = (a*a*b*b) / (a*a + b*b);
 
-            if(g2 < (width/2 + e.width/2)*(width/2 + e.width/2)) return true;
+            if(g2 < (SIZE/2 + e.getWidth()/2)*(SIZE/2 + e.getWidth()/2)) return true;
         }
 
         return false;
     }
 
     @Override
-    void intersect(Entity e) {
-        e.health -= damage;
-        health--;
+    public void intersect(Entity e) {
+        e.damage(damage);
+        damage(1);
     }
 
     @Override
-    void onBirth() {
+    public void onBirth() {
 
     }
 
     @Override
-    void onDeath() {
+    public void onDeath() {
 
     }
 }
