@@ -1,10 +1,10 @@
-package com.miolean.arena;
+package com.miolean.arena.entities;
 
 //In other words, a KMEM entry.
 
 import java.lang.reflect.Method;
 
-public class Gene {
+class Gene {
 
     private Method meaning;
     private String description;

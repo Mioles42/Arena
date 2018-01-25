@@ -1,6 +1,11 @@
-package com.miolean.arena;
+package com.miolean.arena.entities;
+
+import com.miolean.arena.Global;
+import com.miolean.arena.Handler;
+import com.miolean.arena.UByte;
 
 import java.awt.*;
+import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Scanner;
 
@@ -28,23 +33,24 @@ import static com.miolean.arena.UByte.ubDeepCopy;
 public class Robot extends Entity {
 
     //General constants
+    protected static final int SIZE = 40;
+    private static final int DEFAULT_STAT_VALUE = 10;
     private static final int MAX_BULLET_RECHARGE = 40;
     private static final int INITIAL_COGS = 40;
     private static final int HARD_COG_DEFICIT_LIMIT = -40;
     private static final double DIFFICULTY = 0.05;
 
     //Memories
-    static final Gene[] KMEM;
+    public static final Gene[] KMEM;
     private UByte[][] UMEM;
     private UByte[][] PMEM;
     private UByte[][] SMEM;
     private UByte[] WMEM;
+    private UByte[][] CURRENT = PMEM;
 
     //Program index:
     private int index = 0;
     private int loaded = 0;
-    //Loaded memory:
-    private int totalMemories = 0;
 
     //Comparison flags:
     private boolean equal = false;
@@ -75,20 +81,16 @@ public class Robot extends Entity {
     private int flashG = 0xBB;
     private int flashB = 0x00;
 
-    //General variables:
-    double fitness = 0;
-    int generation = 0;
-    double cogs = 0;
+    //State variables:
+    private double fitness = 0;
+    private int generation = 0;
+    private double cogs = 0;
+    private String name = "";
+
     private int viewDistance = 10;
     private long lastFireTime = Global.time;
-    String name = "";
     private static int totalKWeight;
     private boolean generateLog = false;
-    private UByte[][] CURRENT = PMEM;
-
-    Robot lastChild = null;
-
-
 
     static {
         KMEM = new Gene[256];
@@ -120,15 +122,13 @@ public class Robot extends Entity {
     }
 
     //Create a totally blank Robot (for whatever reason)
-    Robot() {
-        width = 40;
-        height = 40;
+    Robot(Handler handler) {
+        super(SIZE, SIZE, 10, handler);
     }
 
     //Create a Robot from a parent
-    Robot(Robot parent) {
-        width = 40;
-        height = 40;
+    Robot(Robot parent, Handler handler) {
+        super(SIZE, SIZE, DEFAULT_STAT_VALUE, handler);
         name = Global.wordRandom.nextWord();
         name = name.substring(0, 1).toUpperCase() + name.substring(1);
         generation = parent.generation + 1;
@@ -142,26 +142,21 @@ public class Robot extends Entity {
         //IMEM doesn't exist
 
         //Stats
-        for(int i = 0; i < stats.length; i++) stats[i] = ub(10);
+        for(int i = 0; i < stats.length; i++) stats[i] = ub(DEFAULT_STAT_VALUE);
 
         int maxOffset = Global.ARENA_SIZE / 4;
-        x = parent.x + maxOffset * (Global.random.nextFloat()*2-1);
-        y = parent.y + maxOffset * (Global.random.nextFloat()*2-1);
+        setX(parent.getX() + maxOffset * (Global.random.nextFloat()*2-1));
+        setY(parent.getY() + maxOffset * (Global.random.nextFloat()*2-1));
+        cogs = INITIAL_COGS;
     }
 
     //Create a Robot from a file
-    Robot(String file) {
+    Robot(InputStream file, Handler handler, int uuid) {
 
+        super(SIZE, SIZE, DEFAULT_STAT_VALUE, handler);
         //0: Initial values.
-        x = 100;
-        y = 100;
-        r = 0;
-        width = 40;
-        height = 40;
-        name = file;
-        flashR = 0;
-        flashG = 0;
-        flashB = 0;
+
+        name = "Unnamed";
         generation = 0;
 
         //1: Initialize memories.
@@ -179,7 +174,14 @@ public class Robot extends Entity {
         for(int i = 0; i < stats.length; i++) stats[i] = ub(10);
 
         //3: Grab memories from file.
-        Scanner in = new Scanner(Robot.class.getClassLoader().getResourceAsStream("gen/" + file + ".ergo"));
+        compile(file);
+
+        //4: Anything else?
+        cogs = INITIAL_COGS;
+    }
+
+    private void compile(InputStream file) {
+        Scanner in = new Scanner(file);
         String next;
 
         int loadIndex = 0;
@@ -330,9 +332,6 @@ public class Robot extends Entity {
         for(UByte[] a: UMEM) if(a != null) {
             for(int i = 0; i < 256; i++) if (a[i] == null) a[i] = ub(0);
         }
-
-        health = 11;
-        cogs = INITIAL_COGS;
     }
 
     private String undecorate(String input) {
@@ -345,18 +344,18 @@ public class Robot extends Entity {
     }
 
     @Override
-    void render(Graphics g) {
+    public void render(Graphics g) {
 
         g.setColor(Color.black);
-        g.drawOval((int) (x - width/2), (int) (y - height/2), width, height);
+        g.drawOval((int) (getX() - SIZE/2), (int) (getY() - SIZE/2), SIZE, SIZE);
 
 
         //Trigonometric functions are expensive so let's use math to minimize
         //how many times we have to calculate them.
         //And yeah, r is rotation. Not radius. Sorry about that, but my keyboard
         //doesn't have a theta. (not that Java would support it probably anyway)
-        double sinR = Math.sin(r);
-        double cosR = Math.cos(r);
+        double sinR = Math.sin(getR());
+        double cosR = Math.cos(getR());
         double sind5 = .47943; //As in sine decimal five, or sin(0.5). There is no pi and that is not a mistake.
         double cosd5 = .87758;
         double sind2 = .19867;
@@ -365,31 +364,34 @@ public class Robot extends Entity {
         //cos(r +- u) = cos(r)cos(u) +- sin(r)sin(u)
         //tan(r +- u) = sin(r +- u) / cos(r +- u) [not that division is so much better]
 
+        double x = getX();
+        double y = getY();
+
         //Wheels!
         int[] wheelXPoints = {
-                (int) (x+width*.7*(sinR*cosd5 - sind5*cosR)),
-                (int) (x+width*.7*(sinR*cosd5 + sind5*cosR)),
-                (int) (x-width*.7*(sinR*cosd5 - sind5*cosR)),
-                (int) (x-width*.7*(sinR*cosd5 + sind5*cosR))
+                (int) (x+SIZE*.7*(sinR*cosd5 - sind5*cosR)),
+                (int) (x+SIZE*.7*(sinR*cosd5 + sind5*cosR)),
+                (int) (x-SIZE*.7*(sinR*cosd5 - sind5*cosR)),
+                (int) (x-SIZE*.7*(sinR*cosd5 + sind5*cosR))
         };
 
         int[] wheelYPoints = {
-                (int) (y+width*.7*(cosR*cosd5 + sinR*sind5)),
-                (int) (y+width*.7*(cosR*cosd5 - sinR*sind5)),
-                (int) (y-width*.7*(cosR*cosd5 + sinR*sind5)),
-                (int) (y-width*.7*(cosR*cosd5 - sinR*sind5))
+                (int) (y+SIZE*.7*(cosR*cosd5 + sinR*sind5)),
+                (int) (y+SIZE*.7*(cosR*cosd5 - sinR*sind5)),
+                (int) (y-SIZE*.7*(cosR*cosd5 + sinR*sind5)),
+                (int) (y-SIZE*.7*(cosR*cosd5 - sinR*sind5))
         };
 
         //Gun barrel!
         int[] gunXPoints = {
-                (int) (x+width*.7*(cosR*cosd2 - sinR*sind2)), //y + size * a little bit more * cos(r - .5)
-                (int) (x+width*.7*(cosR*cosd2 + sinR*sind2)), //y + size * a little bit more * cos(r - .5)
+                (int) (x+SIZE*.7*(cosR*cosd2 - sinR*sind2)), //y + size * a little bit more * cos(r - .5)
+                (int) (x+SIZE*.7*(cosR*cosd2 + sinR*sind2)), //y + size * a little bit more * cos(r - .5)
                 (int) (x)
         };
 
         int[] gunYPoints = {
-                (int) (y-width*.7*(sinR*cosd2 + sind2*cosR)),
-                (int) (y-width*.7*(sinR*cosd2 - sind2*cosR)),
+                (int) (y-SIZE*.7*(sinR*cosd2 + sind2*cosR)),
+                (int) (y-SIZE*.7*(sinR*cosd2 - sind2*cosR)),
                 (int) (y)
 
         };
@@ -403,23 +405,23 @@ public class Robot extends Entity {
         g.setColor(Color.GRAY);
         g.fillPolygon(gunXPoints, gunYPoints, 3); //Barrel
 
-        double healthPercent = (((double) health) / stats[STAT_MAX_HEALTH].val());
+        double healthPercent = (getHealth() / stats[STAT_MAX_HEALTH].val());
         if(healthPercent < 0) healthPercent = 0;
         if(healthPercent > 1) healthPercent = 1;
         g.setColor(new Color((int) (healthPercent * 100 + 100), (int) (healthPercent * 100 + 100), (int) (healthPercent * 100 + 100)));
-        g.fillOval((int) x - width/2, (int) y - height/2, width, height); //Body
+        g.fillOval((int) x - SIZE/2, (int) y - SIZE/2, SIZE, SIZE); //Body
 
         g.setColor(Color.GRAY);
-        g.fillOval((int) x - width/8, (int) y - height/8, width/4, height/4); //Beacon
+        g.fillOval((int) x - SIZE/8, (int) y - SIZE/8, SIZE/4, SIZE/4); //Beacon
         g.setColor(new Color(flashR, flashG, flashB));
-        g.fillOval((int) x - width/10, (int) y - height/10, width/5, height/5); //Beacon
+        g.fillOval((int) x - SIZE/10, (int) y - SIZE/10, SIZE/5, SIZE/5); //Beacon
 
         g.setColor(Color.black);
-        g.drawString(name, (int) x - width, (int) y - height);
+        g.drawString(name, (int) x - SIZE, (int) y - SIZE);
     }
 
     @Override
-    void update() {
+    public void update() {
 
         double initialCogs = cogs;
 
@@ -434,8 +436,8 @@ public class Robot extends Entity {
         if(cogs > 0) fitness += initialCogs - cogs - DIFFICULTY;
 
         //Make sure health is valid
-        if(health > stats[STAT_MAX_HEALTH].val()) health = stats[STAT_MAX_HEALTH].val();
-        if(cogs <= 0) health--;
+        if(getHealth() > stats[STAT_MAX_HEALTH].val()) setHealth(stats[STAT_MAX_HEALTH].val());
+        if(cogs <= 0) damage(1);
     }
 
     void runGenes(UByte[][] genes) {
@@ -503,22 +505,21 @@ public class Robot extends Entity {
         //Never ever destroy memory 0.
         if(number.val() != 0) {
             memory[number.val()] = null;
-            totalMemories--;
         }
         if(number.val() == loaded) loaded = 0;
     }
 
     @Override
-    boolean intersectsWith(Entity e) {
+    public boolean intersectsWith(Entity e) {
         if(e == null) return false;
-        double distanceSquared = (x - e.x)*(x - e.x)+(y - e.y)*(y - e.y);
-        double minDistance = (width/2.0 + e.width/2.0) * (width/2.0 + e.width/2.0);
+        double distanceSquared = (getX() - e.getX())*(getX() - e.getX())+(getY() - e.getY())*(getY() - e.getY());
+        double minDistance = (SIZE/2.0 + e.getWidth()/2.0) * (SIZE/2.0 + e.getWidth()/2.0);
 
         return distanceSquared <= minDistance;
     }
 
     @Override
-    void intersect(Entity e) {
+    public void intersect(Entity e) {
     }
 
     @Override
@@ -526,18 +527,10 @@ public class Robot extends Entity {
         return name;
     }
 
-    public void applyPhysics() {
-        super.applyPhysics();
-        if(x > ARENA_SIZE - BORDER) x = ARENA_SIZE - BORDER;
-        if(x < BORDER) x = BORDER;
-        if(y > ARENA_SIZE - BORDER) y = ARENA_SIZE - BORDER;
-        if(y < BORDER) y = BORDER;
-    }
-
     void fire() {
         if(lastFireTime + MAX_BULLET_RECHARGE - stats[STAT_HASTE].val() < Global.time) {
             Bullet bullet = new Bullet(this);
-            handler.add(bullet);
+            add(bullet);
             lastFireTime = Global.time;
         }
     }
@@ -550,15 +543,15 @@ public class Robot extends Entity {
         if(force < -stats[STAT_SPEED].val()) force = -stats[STAT_SPEED].val(); //Tanks can't move faster than a certain limit
 
         //Translate polar force into cartesian vector
-        this.accX = force * Math.cos(r) / 16; //Scaling!
-        this.accY = force * -Math.sin(r) / 16;
+        setAccX(force *  Math.cos(getR()) / 16); //Scaling!
+        setAccY(force * -Math.sin(getR()) / 16);
     }
 
     void rotate(int force) {
         if(force > stats[STAT_ROTATE_SPEED].val()) force = stats[STAT_ROTATE_SPEED].val(); //Tanks can't rotate faster than a certain limit
         if(force < -stats[STAT_ROTATE_SPEED].val()) force = -stats[STAT_ROTATE_SPEED].val(); //Tanks can't rotate faster than a certain limit
 
-        this.accR = ((double) force ) / 512;
+        setAccR( ((double) force )/512 );
     }
 
     private void upgrade(UByte stat, int amount) {
@@ -577,24 +570,22 @@ public class Robot extends Entity {
     }
 
     void reproduce() {
-        Robot offspring = new Robot(this);
-        handler.add(offspring);
-        lastChild = offspring;
+        Robot offspring = new Robot(this, getHandler());
+        add(this);
     }
 
-    void onDeath() {
+    public void onDeath() {
     }
 
-    void onBirth() {
+    @Override
+    public String toHTML() {
+        //TODO
+        return "This should be HTML";
+    }
 
-        cogs = INITIAL_COGS;
-
+    public void onBirth() {
         //Run the loaded U memory!
         runGenes(UMEM);
-
-        cogs = INITIAL_COGS;
-        health = stats[STAT_MAX_HEALTH].val();
-
     }
 
     private String activeMemoryToString(UByte[] genes, boolean color) {
@@ -690,21 +681,21 @@ public class Robot extends Entity {
     public void _PCLR (int arg0, int arg1, int arg2) {if(PMEM[WMEM[arg0].val()] != null) for(; arg1 < arg2 && arg1 < 256; arg1++) PMEM[WMEM[arg0].val()][WMEM[arg1].val()] = ub(0);}
     public void _UCLR (int arg0, int arg1, int arg2) {if(UMEM[WMEM[arg0].val()] != null) for(; arg1 < arg2 && arg1 < 256; arg1++) UMEM[WMEM[arg0].val()][WMEM[arg1].val()] = ub(0);}
     // 3
-    public void _POSX (int arg0, int arg1, int arg2) {WMEM[arg0] = ub((int) (x/ARENA_SIZE*255));}
-    public void _VELX (int arg0, int arg1, int arg2) {WMEM[arg0] = ub((int) velX);}
-    public void _ACCX (int arg0, int arg1, int arg2) {WMEM[arg0] = ub((int) accX);}
-    public void _POSY (int arg0, int arg1, int arg2) {WMEM[arg0] = ub((int) (y/ARENA_SIZE*255));}
-    public void _VELY (int arg0, int arg1, int arg2) {WMEM[arg0] = ub((int) velY);}
-    public void _ACCY (int arg0, int arg1, int arg2) {WMEM[arg0] = ub((int) accY);}
-    public void _POSR (int arg0, int arg1, int arg2) {WMEM[arg0] = ub((int) (r/2*Math.PI*255));}
-    public void _VELR (int arg0, int arg1, int arg2) {WMEM[arg0] = ub((int) velR);}
-    public void _ACCR (int arg0, int arg1, int arg2) {WMEM[arg0] = ub((int) accR);}
+    public void _POSX (int arg0, int arg1, int arg2) {WMEM[arg0] = ub((int) (getX()/ARENA_SIZE*255));}
+    public void _VELX (int arg0, int arg1, int arg2) {WMEM[arg0] = ub((int) getVelX());}
+    public void _ACCX (int arg0, int arg1, int arg2) {WMEM[arg0] = ub((int) getAccX());}
+    public void _POSY (int arg0, int arg1, int arg2) {WMEM[arg0] = ub((int) (getY()/ARENA_SIZE*255));}
+    public void _VELY (int arg0, int arg1, int arg2) {WMEM[arg0] = ub((int) getVelY());}
+    public void _ACCY (int arg0, int arg1, int arg2) {WMEM[arg0] = ub((int) getAccY());}
+    public void _POSR (int arg0, int arg1, int arg2) {WMEM[arg0] = ub((int) (getR()/2*Math.PI*255));}
+    public void _VELR (int arg0, int arg1, int arg2) {WMEM[arg0] = ub((int) getVelR());}
+    public void _ACCR (int arg0, int arg1, int arg2) {WMEM[arg0] = ub((int) getAccR());}
     // 4 TODO Implement new Sight Block methods
     public void _VIEW (int arg0, int arg1, int arg2) {viewDistance = WMEM[arg0].val();}
-    public void _NEAR (int arg0, int arg1, int arg2) {WMEM[arg0] = ub(handler.withinDistance(x, y, viewDistance));}
+    public void _NEAR (int arg0, int arg1, int arg2) {WMEM[arg0] = ub(getHandler().withinDistance(getX(), getY(), viewDistance));}
     public void _NRST (int arg0, int arg1, int arg2) {}
     // 5
-    public void _HEAL (int arg0, int arg1, int arg2) {health++;}
+    public void _HEAL (int arg0, int arg1, int arg2) {heal(1);}
     public void _FORWD(int arg0, int arg1, int arg2) {forward(WMEM[arg0].val());}
     public void _REVRS(int arg0, int arg1, int arg2) {forward(-WMEM[arg0].val());}
     public void _FIRE (int arg0, int arg1, int arg2) {fire();}
@@ -720,22 +711,22 @@ public class Robot extends Entity {
     public void _BWXOR(int arg0, int arg1, int arg2) {WMEM[arg0] = ub(arg1 ^ arg2);}
     public void _INCR (int arg0, int arg1, int arg2) {WMEM[arg0] = ub(WMEM[arg0].val() + 1);}
     // 7
-    public void _OTYPE(int arg0, int arg1, int arg2) {if(handler.getByUUID(WMEM[arg1],WMEM[arg2]) instanceof Robot) WMEM[arg0] = ub(typeOf(handler.getByUUID(WMEM[arg1],WMEM[arg2])));}
-    public void _OHP  (int arg0, int arg1, int arg2) {if(handler.getByUUID(WMEM[arg1],WMEM[arg2]) instanceof Robot) WMEM[arg0] = ub(handler.getByUUID(WMEM[arg1],WMEM[arg2]).health);}
-    public void _OCOG (int arg0, int arg1, int arg2) {if(handler.getByUUID(WMEM[arg1],WMEM[arg2]) instanceof Robot) WMEM[arg0] = ub((int)((Robot) handler.getByUUID(WMEM[arg1],WMEM[arg2])).cogs);}
+    public void _OTYPE(int arg0, int arg1, int arg2) {if(getHandler().getByUUID(WMEM[arg1],WMEM[arg2]) instanceof Robot) WMEM[arg0] = ub(typeOf(getHandler().getByUUID(WMEM[arg1],WMEM[arg2])));}
+    public void _OHP  (int arg0, int arg1, int arg2) {if(getHandler().getByUUID(WMEM[arg1],WMEM[arg2]) instanceof Robot) WMEM[arg0] = ub((int) (getHandler().getByUUID(WMEM[arg1],WMEM[arg2]).getHealth()));}
+    public void _OCOG (int arg0, int arg1, int arg2) {if(getHandler().getByUUID(WMEM[arg1],WMEM[arg2]) instanceof Robot) WMEM[arg0] = ub((int)((Robot) getHandler().getByUUID(WMEM[arg1],WMEM[arg2])).cogs);}
     // 8
     public void _WALL (int arg0, int arg1, int arg2) {} //TODO Implement _WALL() [when Walls exist]
     public void _SPIT (int arg0, int arg1, int arg2) {} //TODO Implement _SPIT() [when Cogs exist]
     public void _LED (int arg0, int arg1, int arg2) {flashR = (WMEM[arg0].val()); flashG = (WMEM[arg1].val()); flashB = (WMEM[arg2].val());}
-    public void _OLEDR(int arg0, int arg1, int arg2) {if(handler.getByUUID(WMEM[arg1],WMEM[arg2]) instanceof Robot)  WMEM[arg0] = ub(((Robot) handler.getByUUID(WMEM[arg1],WMEM[arg2])).flashR);}
-    public void _OLEDG(int arg0, int arg1, int arg2) {if(handler.getByUUID(WMEM[arg1],WMEM[arg2]) instanceof Robot) WMEM[arg0] = ub(((Robot) handler.getByUUID(WMEM[arg1],WMEM[arg2])).flashG);}
-    public void _OLEDB(int arg0, int arg1, int arg2) {if(handler.getByUUID(WMEM[arg1],WMEM[arg2]) instanceof Robot) WMEM[arg0] = ub(((Robot) handler.getByUUID(WMEM[arg1],WMEM[arg2])).flashB);}
+    public void _OLEDR(int arg0, int arg1, int arg2) {if(getHandler().getByUUID(WMEM[arg1],WMEM[arg2]) instanceof Robot)  WMEM[arg0] = ub(((Robot) getHandler().getByUUID(WMEM[arg1],WMEM[arg2])).flashR);}
+    public void _OLEDG(int arg0, int arg1, int arg2) {if(getHandler().getByUUID(WMEM[arg1],WMEM[arg2]) instanceof Robot) WMEM[arg0] = ub(((Robot) getHandler().getByUUID(WMEM[arg1],WMEM[arg2])).flashG);}
+    public void _OLEDB(int arg0, int arg1, int arg2) {if(getHandler().getByUUID(WMEM[arg1],WMEM[arg2]) instanceof Robot) WMEM[arg0] = ub(((Robot) getHandler().getByUUID(WMEM[arg1],WMEM[arg2])).flashB);}
     // 9
-    public void _UUIDM(int arg0, int arg1, int arg2) {WMEM[arg0] = ub(uuidMost);}
-    public void _UUIDL(int arg0, int arg1, int arg2) {WMEM[arg0] = ub(uuidLeast);}
-    public void _HP   (int arg0, int arg1, int arg2) {WMEM[arg0] = ub(health);}
+    public void _UUIDM(int arg0, int arg1, int arg2) {WMEM[arg0] = ub(getUUID());}
+    public void _UUIDL(int arg0, int arg1, int arg2) {WMEM[arg0] = ub(getUUID());}
+    public void _HP   (int arg0, int arg1, int arg2) {WMEM[arg0] = ub((int) getHealth());}
     public void _COG  (int arg0, int arg1, int arg2) {WMEM[arg0] = ub((int) cogs);}
-    public void _PNT  (int arg0, int arg1, int arg2) {WMEM[arg0] = ub((int)fitness);}
+    public void _PNT  (int arg0, int arg1, int arg2) {WMEM[arg0] = ub((int) fitness);}
     // A
     public void _UPG  (int arg0, int arg1, int arg2) {upgrade(WMEM[arg0], WMEM[arg1].val());}
     public void _STAT (int arg0, int arg1, int arg2) {WMEM[arg0] = stats[Math.abs(arg1>>5)];}

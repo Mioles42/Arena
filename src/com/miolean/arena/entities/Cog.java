@@ -1,10 +1,10 @@
-package com.miolean.arena;
+package com.miolean.arena.entities;
 
 import java.awt.*;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Rectangle2D;
 
-class Cog extends Entity {
+public class Cog extends Entity {
 
     private int value;
 

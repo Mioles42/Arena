@@ -1,7 +1,8 @@
 package com.miolean.arena;
 
+import com.miolean.arena.entities.Entity;
+
 import java.awt.*;
-import static com.miolean.arena.Global.*;
 
 /**
  * Created by commandm on 2/16/17.

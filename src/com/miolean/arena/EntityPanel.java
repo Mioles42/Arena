@@ -1,5 +1,11 @@
 package com.miolean.arena;
 
+import com.miolean.arena.entities.Bullet;
+import com.miolean.arena.entities.Cog;
+import com.miolean.arena.entities.ControlledRobot;
+import com.miolean.arena.entities.Entity;
+import com.miolean.arena.entities.Robot;
+
 import javax.swing.*;
 import javax.swing.event.HyperlinkListener;
 import java.awt.*;
@@ -16,7 +22,7 @@ public class EntityPanel extends JPanel implements ActionListener{
 
     JScrollPane scrollPane;
 
-    java.util.List<Robot> robots;
+    java.util.List<com.miolean.arena.entities.Robot> robots;
     Entity[] entities;
 
 
@@ -24,7 +30,7 @@ public class EntityPanel extends JPanel implements ActionListener{
     private static final int INDEX_TANKS = 1;
     private static final int INDEX_ENTITIES = 0;
 
-    public EntityPanel(java.util.List<Robot> robots, Entity[] entities) {
+    public EntityPanel(java.util.List<com.miolean.arena.entities.Robot> robots, Entity[] entities) {
 
         this.entities = entities;
         this.robots = robots;
@@ -119,7 +125,7 @@ public class EntityPanel extends JPanel implements ActionListener{
             result += "<p>Total Robots: " + robots.size() + "</p>";
 
             for (int i = 0; i < robots.size(); i++) {
-                Robot t = robots.get(i);
+                com.miolean.arena.entities.Robot t = robots.get(i);
 
                 result += "<b>[" + t.getClass().getSimpleName() + "]</b><font color=\"blue\">  ";
                 result += "<a href=tank_num_" + i + ">";
@@ -134,7 +140,7 @@ public class EntityPanel extends JPanel implements ActionListener{
                 if(entities[i] == null) continue;
                 Entity e = entities[i];
 
-                if(e instanceof Robot && ! (e instanceof ControlledRobot)) result += "<font color=\"blue\">";
+                if(e instanceof com.miolean.arena.entities.Robot && ! (e instanceof ControlledRobot)) result += "<font color=\"blue\">";
                 else if(e instanceof Cog) result += "<font color=\"orange\">";
                 else if(e instanceof ControlledRobot) result += "<font color=\"grey\">";
                 else if(e instanceof Bullet) result += "<font color=\"red\">";
@@ -142,9 +148,9 @@ public class EntityPanel extends JPanel implements ActionListener{
 
                 result += "<b>[" + e.getClass().getSimpleName() + "]</b>";
 
-                if(e instanceof Robot && ! (e instanceof ControlledRobot)) {
+                if(e instanceof com.miolean.arena.entities.Robot && ! (e instanceof ControlledRobot)) {
                     result += "<a href=tank_num_" + i + ">";
-                    result += ((Robot)e).name + " [Fitness: " + String.format("%.2f", ((Robot)e).fitness) + "]</a>";
+                    result += ((com.miolean.arena.entities.Robot)e).name + " [Fitness: " + String.format("%.2f", ((Robot)e).fitness) + "]</a>";
                 }
                 result += "</font>";
                 result += "<br />";

@@ -1,5 +1,7 @@
 package com.miolean.arena;
 
+import com.miolean.arena.entities.Robot;
+
 import javax.swing.*;
 import javax.swing.event.HyperlinkListener;
 import java.awt.*;
@@ -11,14 +13,14 @@ public class EvolutionPanel extends JPanel{
 
     JScrollPane scrollPane;
 
-    java.util.List<Robot> robots;
+    java.util.List<com.miolean.arena.entities.Robot> robots;
 
     private static final int INDEX_UMEM = 0;
     private static final int INDEX_PMEM = 1;
     private static final int INDEX_SMEM = 2;
     private static final int INDEX_WMEM = 3;
 
-    public EvolutionPanel(java.util.List<Robot> robots) {
+    public EvolutionPanel(java.util.List<com.miolean.arena.entities.Robot> robots) {
 
         this.robots = robots;
 

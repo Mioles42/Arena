@@ -1,5 +1,7 @@
 package com.miolean.arena;
 
+import com.miolean.arena.entities.Robot;
+
 import javax.swing.*;
 import javax.swing.text.*;
 import java.awt.*;
@@ -15,7 +17,7 @@ public class MemoryPanel extends JPanel {
     JScrollPane scrollPane;
     Point scrollPosition;
 
-    Robot source;
+    com.miolean.arena.entities.Robot source;
 
     private static final int INDEX_UMEM = 0;
     private static final int INDEX_PMEM = 1;

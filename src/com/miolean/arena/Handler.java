@@ -1,12 +1,17 @@
 package com.miolean.arena;
 
+import com.miolean.arena.entities.Cog;
+import com.miolean.arena.entities.Entity;
+import com.miolean.arena.entities.Robot;
+import com.miolean.arena.entities.TrackerDot;
+
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by commandm on 2/19/17.
  */
-class Handler {
+public class Handler {
 
     final static int MAX_COGS = 200;
     final static int MAX_TANKS = 32;
@@ -27,7 +32,7 @@ class Handler {
         robots = new ArrayList<>();
     }
 
-    void update() {
+    public void update() {
         Global.time++;
 
         for(Entity e: entities) {
@@ -56,7 +61,7 @@ class Handler {
         }
     }
 
-    void remove(int uuid) {
+    public void remove(int uuid) {
         if(entities[uuid] instanceof Cog) numCogs--;
         if(entities[uuid] instanceof Robot) {
             numTanks--;
@@ -71,7 +76,7 @@ class Handler {
 
     }
 
-    void add(Entity e) {
+    public void add(Entity e) {
 
         if(e instanceof Cog && numCogs >= MAX_COGS) return;
         if(e instanceof Robot && numTanks >= MAX_TANKS) return;
@@ -120,11 +125,11 @@ class Handler {
     }
 
     //TODO more than 256 entity support
-    Entity getByUUID(UByte uuidLeast, UByte uuidMost) {
+    public Entity getByUUID(UByte uuidLeast, UByte uuidMost) {
         return entities[uuidLeast.val()];
     }
 
-    Entity entityAtLocation(int x, int y) {
+    public Entity entityAtLocation(int x, int y) {
 
         TrackerDot location = new TrackerDot(x, y, 1);
 
@@ -135,7 +140,7 @@ class Handler {
         return null;
     }
 
-    void distribute() {
+    public void distribute() {
 
         if(Global.random.nextFloat() < 0.05) {
             Cog cog = new Cog(5 + (int) (10 * Global.random.nextFloat()));
@@ -157,7 +162,7 @@ class Handler {
         }
     }
 
-    List<Robot> getRobots() {
+    public List<Robot> getRobots() {
         return robots;
     }
 

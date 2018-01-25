@@ -1,5 +1,6 @@
 package com.miolean.arena;
 
+import com.miolean.arena.entities.Robot;
 import com.miolean.random.WordRandom;
 
 import java.util.Random;
@@ -10,10 +11,10 @@ import java.util.Random;
  */
 
 
-class Global {
+public class Global {
 
     //Number of ticks in-simulation
-    static int time;
+    public static int time;
 
     //Milliseconds per tick, for each of the different cycles
     static int updateCycle = 50;
@@ -27,23 +28,23 @@ class Global {
     public static WordRandom wordRandom = new WordRandom(11);
 
     //1 pixel= 1 tank-meter, I suppose
-    static final int ARENA_SIZE = 2*1024;
+    public static final int ARENA_SIZE = 2*1024;
 
-    static final int BORDER = 20;
+    public static final int BORDER = 20;
 
-    static boolean[] KEY = new boolean[9];
+    public static boolean[] KEY = new boolean[9];
 
     public final static Robot BASE_ROBOT = new Robot("cain");
 
     //Key constants
-    static final int KEY_Q = 0;
-    static final int KEY_W = 1;
-    static final int KEY_E = 2;
-    static final int KEY_R = 3;
-    static final int KEY_A = 4;
-    static final int KEY_S = 5;
-    static final int KEY_D = 6;
-    static final int KEY_F = 7;
-    static final int KEY_SPACE = 8;
+    public static final int KEY_Q = 0;
+    public static final int KEY_W = 1;
+    public static final int KEY_E = 2;
+    public static final int KEY_R = 3;
+    public static final int KEY_A = 4;
+    public static final int KEY_S = 5;
+    public static final int KEY_D = 6;
+    public static final int KEY_F = 7;
+    public static final int KEY_SPACE = 8;
 
 }

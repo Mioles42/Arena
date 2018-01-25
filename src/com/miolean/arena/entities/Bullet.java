@@ -1,4 +1,7 @@
-package com.miolean.arena;
+package com.miolean.arena.entities;
+
+import com.miolean.arena.Global;
+import com.miolean.arena.UByte;
 
 import java.awt.*;
 import java.awt.geom.Point2D;
@@ -6,9 +9,10 @@ import java.awt.geom.Point2D;
 import static com.miolean.arena.Global.ARENA_SIZE;
 import static com.miolean.arena.Global.BORDER;
 
-class Bullet extends Entity {
+public class Bullet extends Entity {
 
     private static final int ROGUE_SPEED = 8;
+    private static final int SIZE = 8;
     private static final double ROGUE_TURN_SPEED = 0.1;
     private static final int ROGUE_OBSERVATION = 100;
 
@@ -17,9 +21,8 @@ class Bullet extends Entity {
     private int damage;
 
     Bullet(Robot source) {
+        super(SIZE, SIZE, 1, source.getHandler());
         this.source = source;
-        width = 8;
-        height = 8;
 
         if(source != null) {
             x = source.x;

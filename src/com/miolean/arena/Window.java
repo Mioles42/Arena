@@ -1,5 +1,9 @@
 package com.miolean.arena;
 
+import com.miolean.arena.entities.Entity;
+import com.miolean.arena.entities.Gene;
+import com.miolean.arena.entities.Robot;
+
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -21,10 +25,10 @@ public class Window extends JFrame implements ChangeListener ,KeyListener, ListS
     EvolutionPanel evolutionPanel;
     EntityPanel entityPanel;
 
-    java.util.List<Robot> topRobots;
-    java.util.List<Robot> robots;
+    java.util.List<com.miolean.arena.entities.Robot> topRobots;
+    java.util.List<com.miolean.arena.entities.Robot> robots;
 
-    Window(MainPanel mainPanel, java.util.List<Robot> topRobots, Entity[] entities, java.util.List<Robot> robots) {
+    Window(MainPanel mainPanel, java.util.List<com.miolean.arena.entities.Robot> topRobots, Entity[] entities, java.util.List<com.miolean.arena.entities.Robot> robots) {
         this.main = mainPanel;
         this.topRobots = topRobots;
         this.robots = robots;
@@ -41,7 +45,7 @@ public class Window extends JFrame implements ChangeListener ,KeyListener, ListS
         makeMainLayout(topRobots, entities, robots);
     }
 
-    public void makeMainLayout(java.util.List<Robot> topRobots, Entity[] entities, java.util.List<Robot> robots) {
+    public void makeMainLayout(java.util.List<com.miolean.arena.entities.Robot> topRobots, Entity[] entities, java.util.List<com.miolean.arena.entities.Robot> robots) {
         JPanel genomePanel = new JPanel();
         memoryPanel = new MemoryPanel(null);
         evolutionPanel = new EvolutionPanel(topRobots);
@@ -165,15 +169,15 @@ public class Window extends JFrame implements ChangeListener ,KeyListener, ListS
         DefaultMutableTreeNode twig;
 
 
-        for(int i = 0; i < Robot.KMEM.length; i++) {
+        for(int i = 0; i < com.miolean.arena.entities.Robot.KMEM.length; i++) {
             if(i/16 > category) {
                 if(branch != null) root.add(branch);
                 category = i/16;
                 branch = new DefaultMutableTreeNode(Integer.toHexString(category).toUpperCase() + "  " + Gene.GENE_CATEGORIES[category]);
                 //Add a new section!
             }
-            if(Robot.KMEM[i] != null) {
-                 twig = new DefaultMutableTreeNode(Integer.toHexString(i).toUpperCase() + "|  " + Robot.KMEM[i]);
+            if(com.miolean.arena.entities.Robot.KMEM[i] != null) {
+                 twig = new DefaultMutableTreeNode(Integer.toHexString(i).toUpperCase() + "|  " + com.miolean.arena.entities.Robot.KMEM[i]);
                  branch.add(twig);
             }
         }

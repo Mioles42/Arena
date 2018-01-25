@@ -1,13 +1,16 @@
-package com.miolean.arena;
+package com.miolean.arena.entities;
+import com.miolean.arena.Handler;
+
 import static com.miolean.arena.Global.*;
 import static com.miolean.arena.UByte.ub;
 
 public class ControlledRobot extends Robot {
 
-    public ControlledRobot(int x, int y) {
-        this.x = x;
-        this.y = y;
-        health = 100;
+    public ControlledRobot(int x, int y, Handler handler) {
+        super(handler);
+        setX(x);
+        setY(y);
+        setHealth(100);
 
         //Do better default stats.
         stats[STAT_SPEED] = ub(20);
@@ -31,7 +34,8 @@ public class ControlledRobot extends Robot {
         else rotate(0);
 
         if(KEY[KEY_SPACE]) fire();
-        if(KEY[KEY_F]) health--;
+        if(KEY[KEY_F]) damage(1);
+        if(KEY[KEY_R]) heal(1);
     }
 
     @Override
