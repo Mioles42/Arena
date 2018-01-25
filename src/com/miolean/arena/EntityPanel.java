@@ -1,14 +1,10 @@
 package com.miolean.arena;
 
 import javax.swing.*;
-import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
-import javax.swing.text.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Scanner;
-import java.util.regex.Pattern;
 
 public class EntityPanel extends JPanel implements ActionListener{
 
@@ -20,7 +16,7 @@ public class EntityPanel extends JPanel implements ActionListener{
 
     JScrollPane scrollPane;
 
-    java.util.List<Tank> tanks;
+    java.util.List<Robot> robots;
     Entity[] entities;
 
 
@@ -28,10 +24,10 @@ public class EntityPanel extends JPanel implements ActionListener{
     private static final int INDEX_TANKS = 1;
     private static final int INDEX_ENTITIES = 0;
 
-    public EntityPanel(java.util.List<Tank> tanks, Entity[] entities) {
+    public EntityPanel(java.util.List<Robot> robots, Entity[] entities) {
 
         this.entities = entities;
-        this.tanks = tanks;
+        this.robots = robots;
 
         GridBagConstraints c;
         LayoutManager layout = new GridBagLayout();
@@ -68,7 +64,7 @@ public class EntityPanel extends JPanel implements ActionListener{
 
         comboBox = new JComboBox<>();
         comboBox.addItem("All Entities");
-        comboBox.addItem("Tanks");
+        comboBox.addItem("Robots");
         comboBox.setSelectedItem("All Entities");
         c = new GridBagConstraints();
         c.gridx = 2;
@@ -120,10 +116,10 @@ public class EntityPanel extends JPanel implements ActionListener{
         String result = "";
 
         if(comboBox.getSelectedIndex() == INDEX_TANKS) {
-            result += "<p>Total Tanks: " + tanks.size() + "</p>";
+            result += "<p>Total Robots: " + robots.size() + "</p>";
 
-            for (int i = 0; i < tanks.size(); i++) {
-                Tank t = tanks.get(i);
+            for (int i = 0; i < robots.size(); i++) {
+                Robot t = robots.get(i);
 
                 result += "<b>[" + t.getClass().getSimpleName() + "]</b><font color=\"blue\">  ";
                 result += "<a href=tank_num_" + i + ">";
@@ -138,17 +134,17 @@ public class EntityPanel extends JPanel implements ActionListener{
                 if(entities[i] == null) continue;
                 Entity e = entities[i];
 
-                if(e instanceof Tank && ! (e instanceof ControlledTank)) result += "<font color=\"blue\">";
+                if(e instanceof Robot && ! (e instanceof ControlledRobot)) result += "<font color=\"blue\">";
                 else if(e instanceof Cog) result += "<font color=\"orange\">";
-                else if(e instanceof ControlledTank) result += "<font color=\"grey\">";
+                else if(e instanceof ControlledRobot) result += "<font color=\"grey\">";
                 else if(e instanceof Bullet) result += "<font color=\"red\">";
                 else result += "<font color=\"black\">";
 
                 result += "<b>[" + e.getClass().getSimpleName() + "]</b>";
 
-                if(e instanceof Tank && ! (e instanceof ControlledTank)) {
+                if(e instanceof Robot && ! (e instanceof ControlledRobot)) {
                     result += "<a href=tank_num_" + i + ">";
-                    result += ((Tank)e).name + " [Fitness: " + String.format("%.2f", ((Tank)e).fitness) + "]</a>";
+                    result += ((Robot)e).name + " [Fitness: " + String.format("%.2f", ((Robot)e).fitness) + "]</a>";
                 }
                 result += "</font>";
                 result += "<br />";

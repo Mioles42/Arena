@@ -1,12 +1,8 @@
 package com.miolean.arena;
 
 import javax.swing.*;
-import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
-import javax.swing.text.*;
 import java.awt.*;
-import java.util.Scanner;
-import java.util.regex.Pattern;
 
 public class EvolutionPanel extends JPanel{
 
@@ -15,16 +11,16 @@ public class EvolutionPanel extends JPanel{
 
     JScrollPane scrollPane;
 
-    java.util.List<Tank> tanks;
+    java.util.List<Robot> robots;
 
     private static final int INDEX_UMEM = 0;
     private static final int INDEX_PMEM = 1;
     private static final int INDEX_SMEM = 2;
     private static final int INDEX_WMEM = 3;
 
-    public EvolutionPanel(java.util.List<Tank> tanks) {
+    public EvolutionPanel(java.util.List<Robot> robots) {
 
-        this.tanks = tanks;
+        this.robots = robots;
 
         GridBagConstraints c;
         LayoutManager layout = new GridBagLayout();
@@ -41,7 +37,7 @@ public class EvolutionPanel extends JPanel{
         c.gridheight = 1;
         c.fill = GridBagConstraints.BOTH;
         c.insets = new Insets(5, 5, 5, 5);
-        label.setText("Top tanks:");
+        label.setText("Top robots:");
         this.add(label, c);
 
         scrollPane = new JScrollPane();
@@ -72,8 +68,8 @@ public class EvolutionPanel extends JPanel{
     void updateInfo() {
         String result = "";
 
-        for(int i = 0; i < tanks.size()-1; i++) {
-            Tank t = tanks.get(i);
+        for(int i = 0; i < robots.size()-1; i++) {
+            Robot t = robots.get(i);
 
             result += "<p><b>[" + (i+1) + "]</b>  ";
             if(!t.isAlive()) result += "<s><font color=\"red\">";

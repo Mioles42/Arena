@@ -15,14 +15,14 @@ public class MemoryPanel extends JPanel {
     JScrollPane scrollPane;
     Point scrollPosition;
 
-    Tank source;
+    Robot source;
 
     private static final int INDEX_UMEM = 0;
     private static final int INDEX_PMEM = 1;
     private static final int INDEX_SMEM = 2;
     private static final int INDEX_WMEM = 3;
 
-    public MemoryPanel(Tank source) {
+    public MemoryPanel(Robot source) {
 
         this.source = source;
 
@@ -103,7 +103,7 @@ public class MemoryPanel extends JPanel {
 
         if(source != null) {
 
-            text += (source.isAlive())? "c\nTank \"" + source.name + "\"\n\n" : "r\nTank \"" + source.name + "\" [dead]\n\n";
+            text += (source.isAlive())? "c\nRobot \"" + source.name + "\"\n\n" : "r\nRobot \"" + source.name + "\" [dead]\n\n";
 
             switch (comboBox.getSelectedIndex()) {
             case INDEX_UMEM:
@@ -120,7 +120,7 @@ public class MemoryPanel extends JPanel {
                 break;
 
             }
-        } else text += "rNo Tank selected.";
+        } else text += "rNo Robot selected.";
 
         Scanner scanner = new Scanner(text);
         scanner.useDelimiter(Pattern.compile("§"));

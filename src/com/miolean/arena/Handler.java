@@ -12,8 +12,8 @@ class Handler {
     final static int MAX_TANKS = 32;
 
     private Entity[] entities;
-    List<Tank> topTanks = new ArrayList<>();
-    List<Tank> tanks; //This will come in handy sooner or later
+    List<Robot> topRobots = new ArrayList<>();
+    List<Robot> robots; //This will come in handy sooner or later
 
     int numEntities;
 
@@ -24,7 +24,7 @@ class Handler {
 
     Handler(Entity[] entities) {
         this.entities = entities;
-        tanks = new ArrayList<>();
+        robots = new ArrayList<>();
     }
 
     void update() {
@@ -38,29 +38,29 @@ class Handler {
             }
             if(e.health <= 0) remove(e.getUUID());
 
-            //If we're holding a Tank that has beaten a record (or there are no records)
-            if(topTanks.size() == 0 && e instanceof Tank) topTanks.add((Tank) e);
-            else if(e instanceof Tank && ((Tank) e).fitness > topTanks.get(topTanks.size()-1).fitness) {
-                Tank tank = (Tank) e;
-                topTanks.remove(tank); //Just recategorize it
+            //If we're holding a Robot that has beaten a record (or there are no records)
+            if(topRobots.size() == 0 && e instanceof Robot) topRobots.add((Robot) e);
+            else if(e instanceof Robot && ((Robot) e).fitness > topRobots.get(topRobots.size()-1).fitness) {
+                Robot robot = (Robot) e;
+                topRobots.remove(robot); //Just recategorize it
 
                 //We should really do a binary search here, but the time it would save us is pretty limited tbh
-                for(int i = 0; i < topTanks.size(); i++) {
-                    if(tank.fitness > topTanks.get(i).fitness) {
-                        topTanks.add(i, tank);
+                for(int i = 0; i < topRobots.size(); i++) {
+                    if(robot.fitness > topRobots.get(i).fitness) {
+                        topRobots.add(i, robot);
                         break;
                     }
                 }
-                if(topTanks.size() > 11) topTanks.remove(11);
+                if(topRobots.size() > 11) topRobots.remove(11);
             }
         }
     }
 
     void remove(int uuid) {
         if(entities[uuid] instanceof Cog) numCogs--;
-        if(entities[uuid] instanceof Tank) {
+        if(entities[uuid] instanceof Robot) {
             numTanks--;
-            tanks.remove( entities[uuid]);
+            robots.remove( entities[uuid]);
         }
 
         entities[uuid].onDeath();
@@ -74,7 +74,7 @@ class Handler {
     void add(Entity e) {
 
         if(e instanceof Cog && numCogs >= MAX_COGS) return;
-        if(e instanceof Tank && numTanks >= MAX_TANKS) return;
+        if(e instanceof Robot && numTanks >= MAX_TANKS) return;
 
         while(entities[lastUUIDUsed] != null) {
             lastUUIDUsed++;
@@ -88,9 +88,9 @@ class Handler {
         e.onBirth();
 
         if(e instanceof Cog) numCogs++;
-        if(e instanceof Tank) {
+        if(e instanceof Robot) {
             numTanks++;
-            tanks.add((Tank)e);
+            robots.add((Robot)e);
         }
     }
 
@@ -146,19 +146,19 @@ class Handler {
         }
 
         if(Global.random.nextFloat() < 0.01) {
-            Tank tank;
-            if(topTanks.size() > 9) tank = new Tank(topTanks.get(Global.random.nextInt(5)));
-            else tank = new Tank("cain");
+            Robot robot;
+            if(topRobots.size() > 9) robot = new Robot(topRobots.get(Global.random.nextInt(5)));
+            else robot = new Robot("default");
 
-            tank.x = Global.random.nextFloat() * Global.ARENA_SIZE;
-            tank.y = Global.random.nextFloat() * Global.ARENA_SIZE;
-            tank.r = Global.random.nextFloat() * Global.ARENA_SIZE;
-            add(tank);
+            robot.x = Global.random.nextFloat() * Global.ARENA_SIZE;
+            robot.y = Global.random.nextFloat() * Global.ARENA_SIZE;
+            robot.r = Global.random.nextFloat() * Global.ARENA_SIZE;
+            add(robot);
         }
     }
 
-    List<Tank> getTanks() {
-        return tanks;
+    List<Robot> getRobots() {
+        return robots;
     }
 
 }

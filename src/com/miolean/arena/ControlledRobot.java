@@ -2,9 +2,9 @@ package com.miolean.arena;
 import static com.miolean.arena.Global.*;
 import static com.miolean.arena.UByte.ub;
 
-public class ControlledTank extends Tank {
+public class ControlledRobot extends Robot {
 
-    public ControlledTank(int x, int y) {
+    public ControlledRobot(int x, int y) {
         this.x = x;
         this.y = y;
         health = 100;

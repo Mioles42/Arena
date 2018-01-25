@@ -36,7 +36,7 @@ public class Gene {
         this.weight = weight;
 
         try {
-            this.meaning = Tank.class.getMethod("_" + meaning, int.class, int.class, int.class);
+            this.meaning = Robot.class.getMethod("_" + meaning, int.class, int.class, int.class);
         } catch (NoSuchMethodException e) {
             System.out.println("Failed to find method " + meaning);
         }

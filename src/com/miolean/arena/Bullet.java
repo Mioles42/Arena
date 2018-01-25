@@ -12,11 +12,11 @@ class Bullet extends Entity {
     private static final double ROGUE_TURN_SPEED = 0.1;
     private static final int ROGUE_OBSERVATION = 100;
 
-    private Tank source;
-    private Tank target;
+    private Robot source;
+    private Robot target;
     private int damage;
 
-    Bullet(Tank source) {
+    Bullet(Robot source) {
         this.source = source;
         width = 8;
         height = 8;
@@ -25,9 +25,9 @@ class Bullet extends Entity {
             x = source.x;
             y = source.y;
             r = source.r;
-            damage = source.stats[Tank.STAT_DAMAGE].val();
-            velX = (15 + source.stats[Tank.STAT_BULLET_SPEED].val()) * Math.cos(r + source.stats[Tank.STAT_BULLET_SPREAD].val() / 128.0 * (Global.random.nextFloat() - .5));
-            velY = (15 + source.stats[Tank.STAT_BULLET_SPEED].val()) * -Math.sin(r + source.stats[Tank.STAT_BULLET_SPREAD].val() / 128.0 * (Global.random.nextFloat() - .5));
+            damage = source.stats[Robot.STAT_DAMAGE].val();
+            velX = (15 + source.stats[Robot.STAT_BULLET_SPEED].val()) * Math.cos(r + source.stats[Robot.STAT_BULLET_SPREAD].val() / 128.0 * (Global.random.nextFloat() - .5));
+            velY = (15 + source.stats[Robot.STAT_BULLET_SPEED].val()) * -Math.sin(r + source.stats[Robot.STAT_BULLET_SPREAD].val() / 128.0 * (Global.random.nextFloat() - .5));
             velR = 0;
             accX = 0;
             accY = 0;
@@ -61,7 +61,7 @@ class Bullet extends Entity {
             double sinExtra = .25867;
             double cosExtra = .88007;
 
-            //Fun fact: This is stolen from Tank's gun barrel.
+            //Fun fact: This is stolen from Robot's gun barrel.
             int[] XPoints = {
                     (int) (x+width*3*(cosR*cosExtra - sinR*sinExtra)),
                     (int) (x+width*3*(cosR*cosExtra + sinR*sinExtra)),
@@ -121,12 +121,12 @@ class Bullet extends Entity {
 
                 Entity attemptedTarget = handler.getByUUID(UByte.rand(), UByte.rand());
 
-                if (attemptedTarget != null && attemptedTarget instanceof Tank) {
+                if (attemptedTarget != null && attemptedTarget instanceof Robot) {
                     double axdis = attemptedTarget.x - x;
                     double aydis = attemptedTarget.y - y;
 
                     if(axdis*axdis + aydis*aydis < xdis*xdis + ydis*ydis) {
-                        target = (Tank) attemptedTarget;
+                        target = (Robot) attemptedTarget;
                     }
                 }
             }
@@ -137,8 +137,8 @@ class Bullet extends Entity {
 
             for(int i = 0; i < ROGUE_OBSERVATION; i++){
                 Entity attemptedTarget = handler.getByUUID(UByte.rand(), UByte.rand());
-                if(attemptedTarget != null && attemptedTarget instanceof Tank) {
-                    target = (Tank) attemptedTarget;
+                if(attemptedTarget != null && attemptedTarget instanceof Robot) {
+                    target = (Robot) attemptedTarget;
                     System.out.println("Found target");
                 }
             }

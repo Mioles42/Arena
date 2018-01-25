@@ -8,7 +8,6 @@ import javax.swing.event.HyperlinkListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.MutableTreeNode;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
@@ -22,13 +21,13 @@ public class Window extends JFrame implements ChangeListener ,KeyListener, ListS
     EvolutionPanel evolutionPanel;
     EntityPanel entityPanel;
 
-    java.util.List<Tank> topTanks;
-    java.util.List<Tank> tanks;
+    java.util.List<Robot> topRobots;
+    java.util.List<Robot> robots;
 
-    Window(MainPanel mainPanel, java.util.List<Tank> topTanks, Entity[] entities, java.util.List<Tank> tanks) {
+    Window(MainPanel mainPanel, java.util.List<Robot> topRobots, Entity[] entities, java.util.List<Robot> robots) {
         this.main = mainPanel;
-        this.topTanks = topTanks;
-        this.tanks = tanks;
+        this.topRobots = topRobots;
+        this.robots = robots;
 
         LayoutManager layout = new GridBagLayout();
         setLayout(layout);
@@ -39,14 +38,14 @@ public class Window extends JFrame implements ChangeListener ,KeyListener, ListS
             e.printStackTrace();
         }
 
-        makeMainLayout(topTanks, entities, tanks);
+        makeMainLayout(topRobots, entities, robots);
     }
 
-    public void makeMainLayout(java.util.List<Tank> topTanks, Entity[] entities, java.util.List<Tank> tanks) {
+    public void makeMainLayout(java.util.List<Robot> topRobots, Entity[] entities, java.util.List<Robot> robots) {
         JPanel genomePanel = new JPanel();
         memoryPanel = new MemoryPanel(null);
-        evolutionPanel = new EvolutionPanel(topTanks);
-        entityPanel = new EntityPanel(tanks, entities);
+        evolutionPanel = new EvolutionPanel(topRobots);
+        entityPanel = new EntityPanel(robots, entities);
 
         JPanel usedSetPanel = new JPanel();
 
@@ -166,15 +165,15 @@ public class Window extends JFrame implements ChangeListener ,KeyListener, ListS
         DefaultMutableTreeNode twig;
 
 
-        for(int i = 0; i < Tank.KMEM.length; i++) {
+        for(int i = 0; i < Robot.KMEM.length; i++) {
             if(i/16 > category) {
                 if(branch != null) root.add(branch);
                 category = i/16;
                 branch = new DefaultMutableTreeNode(Integer.toHexString(category).toUpperCase() + "  " + Gene.GENE_CATEGORIES[category]);
                 //Add a new section!
             }
-            if(Tank.KMEM[i] != null) {
-                 twig = new DefaultMutableTreeNode(Integer.toHexString(i).toUpperCase() + "|  " + Tank.KMEM[i]);
+            if(Robot.KMEM[i] != null) {
+                 twig = new DefaultMutableTreeNode(Integer.toHexString(i).toUpperCase() + "|  " + Robot.KMEM[i]);
                  branch.add(twig);
             }
         }
@@ -225,8 +224,8 @@ public class Window extends JFrame implements ChangeListener ,KeyListener, ListS
 
     }
 
-    public void setActiveTank(Tank tank) {
-        memoryPanel.source = tank;
+    public void setActiveTank(Robot robot) {
+        memoryPanel.source = robot;
     }
 
     @Override
@@ -235,13 +234,13 @@ public class Window extends JFrame implements ChangeListener ,KeyListener, ListS
 
             if(e.getDescription().contains("tank_greatest_")) {
                 int i = Integer.parseInt(e.getDescription().replace("tank_greatest_", ""));
-                setActiveTank(topTanks.get(i));
-                if (topTanks.get(i).isAlive()) main.viewholder = topTanks.get(i);
+                setActiveTank(topRobots.get(i));
+                if (topRobots.get(i).isAlive()) main.viewholder = topRobots.get(i);
                 tabbedPane.setSelectedIndex(0);
             } else if(e.getDescription().contains("tank_num_")) {
                 int i = Integer.parseInt(e.getDescription().replace("tank_num_", ""));
-                setActiveTank(tanks.get(i));
-                if (tanks.get(i).isAlive()) main.viewholder = tanks.get(i);
+                setActiveTank(robots.get(i));
+                if (robots.get(i).isAlive()) main.viewholder = robots.get(i);
                 tabbedPane.setSelectedIndex(0);
             }
         }

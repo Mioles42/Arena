@@ -30,7 +30,7 @@ class Cog extends Entity {
 
     @Override
     boolean intersectsWith(Entity e) {
-        if(! (e instanceof Tank)) return false; //Don't interact with anything but Tanks
+        if(! (e instanceof Robot)) return false; //Don't interact with anything but Tanks
 
         //Assume an elliptical collision
         Ellipse2D.Double bounds = new Ellipse2D.Double(e.x - e.width/2, e.y - e.height/2, e.width, e.height);
@@ -39,7 +39,7 @@ class Cog extends Entity {
 
     @Override
     void intersect(Entity e) {
-        ((Tank) e).cogs += value;
+        ((Robot) e).cogs += value;
         this.health = 0;
     }
 

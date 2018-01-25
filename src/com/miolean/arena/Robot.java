@@ -6,7 +6,6 @@ import java.util.Scanner;
 
 import static com.miolean.arena.Global.ARENA_SIZE;
 import static com.miolean.arena.Global.BORDER;
-import com.miolean.random.*;
 import static com.miolean.arena.UByte.ub;
 import static com.miolean.arena.UByte.ubDeepCopy;
 
@@ -24,9 +23,9 @@ import static com.miolean.arena.UByte.ubDeepCopy;
  * I: No memory; refers to immediate (literal) values
  */
 
-//Tank has all sorts of methods that appear unused but are actually reflected.
+//Robot has all sorts of methods that appear unused but are actually reflected.
 @SuppressWarnings("unused")
-public class Tank extends Entity {
+public class Robot extends Entity {
 
     //General constants
     private static final int MAX_BULLET_RECHARGE = 40;
@@ -87,13 +86,13 @@ public class Tank extends Entity {
     private boolean generateLog = false;
     private UByte[][] CURRENT = PMEM;
 
-    Tank lastChild = null;
+    Robot lastChild = null;
 
 
 
     static {
         KMEM = new Gene[256];
-        Scanner in = new Scanner(Tank.class.getClassLoader().getResourceAsStream("cfg/origin.txt"));
+        Scanner in = new Scanner(Robot.class.getClassLoader().getResourceAsStream("cfg/origin.txt"));
         in.useDelimiter("/");
 
         in.next();
@@ -120,14 +119,14 @@ public class Tank extends Entity {
         }
     }
 
-    //Create a totally blank Tank (for whatever reason)
-    Tank() {
+    //Create a totally blank Robot (for whatever reason)
+    Robot() {
         width = 40;
         height = 40;
     }
 
-    //Create a Tank from a parent
-    Tank(Tank parent) {
+    //Create a Robot from a parent
+    Robot(Robot parent) {
         width = 40;
         height = 40;
         name = Global.wordRandom.nextWord();
@@ -150,8 +149,8 @@ public class Tank extends Entity {
         y = parent.y + maxOffset * (Global.random.nextFloat()*2-1);
     }
 
-    //Create a Tank from a file
-    Tank(String file) {
+    //Create a Robot from a file
+    Robot(String file) {
 
         //0: Initial values.
         x = 100;
@@ -180,7 +179,7 @@ public class Tank extends Entity {
         for(int i = 0; i < stats.length; i++) stats[i] = ub(10);
 
         //3: Grab memories from file.
-        Scanner in = new Scanner(Tank.class.getClassLoader().getResourceAsStream("gen/" + file + ".atnk"));
+        Scanner in = new Scanner(Robot.class.getClassLoader().getResourceAsStream("gen/" + file + ".ergo"));
         String next;
 
         int loadIndex = 0;
@@ -486,7 +485,7 @@ public class Tank extends Entity {
     }
 
     private void throwCompileError(String reason) {
-        System.err.println("Error compiling Tank " + name + ":");
+        System.err.println("Error compiling Robot " + name + ":");
         System.err.println(reason);
         System.exit(0);
     }
@@ -570,7 +569,7 @@ public class Tank extends Entity {
     }
 
     private int typeOf(Entity entity) {
-        if (entity instanceof Tank) return TYPE_TANK;
+        if (entity instanceof Robot) return TYPE_TANK;
         //if (entity instanceof Cog) return TYPE_COG;
         //if (entity instanceof Bullet) return TYPE_BULLET;
         //if (entity instanceof Wall) return TYPE_WALL;
@@ -578,7 +577,7 @@ public class Tank extends Entity {
     }
 
     void reproduce() {
-        Tank offspring = new Tank(this);
+        Robot offspring = new Robot(this);
         handler.add(offspring);
         lastChild = offspring;
     }
@@ -721,16 +720,16 @@ public class Tank extends Entity {
     public void _BWXOR(int arg0, int arg1, int arg2) {WMEM[arg0] = ub(arg1 ^ arg2);}
     public void _INCR (int arg0, int arg1, int arg2) {WMEM[arg0] = ub(WMEM[arg0].val() + 1);}
     // 7
-    public void _OTYPE(int arg0, int arg1, int arg2) {if(handler.getByUUID(WMEM[arg1],WMEM[arg2]) instanceof Tank) WMEM[arg0] = ub(typeOf(handler.getByUUID(WMEM[arg1],WMEM[arg2])));}
-    public void _OHP  (int arg0, int arg1, int arg2) {if(handler.getByUUID(WMEM[arg1],WMEM[arg2]) instanceof Tank) WMEM[arg0] = ub(handler.getByUUID(WMEM[arg1],WMEM[arg2]).health);}
-    public void _OCOG (int arg0, int arg1, int arg2) {if(handler.getByUUID(WMEM[arg1],WMEM[arg2]) instanceof Tank) WMEM[arg0] = ub((int)((Tank) handler.getByUUID(WMEM[arg1],WMEM[arg2])).cogs);}
+    public void _OTYPE(int arg0, int arg1, int arg2) {if(handler.getByUUID(WMEM[arg1],WMEM[arg2]) instanceof Robot) WMEM[arg0] = ub(typeOf(handler.getByUUID(WMEM[arg1],WMEM[arg2])));}
+    public void _OHP  (int arg0, int arg1, int arg2) {if(handler.getByUUID(WMEM[arg1],WMEM[arg2]) instanceof Robot) WMEM[arg0] = ub(handler.getByUUID(WMEM[arg1],WMEM[arg2]).health);}
+    public void _OCOG (int arg0, int arg1, int arg2) {if(handler.getByUUID(WMEM[arg1],WMEM[arg2]) instanceof Robot) WMEM[arg0] = ub((int)((Robot) handler.getByUUID(WMEM[arg1],WMEM[arg2])).cogs);}
     // 8
     public void _WALL (int arg0, int arg1, int arg2) {} //TODO Implement _WALL() [when Walls exist]
     public void _SPIT (int arg0, int arg1, int arg2) {} //TODO Implement _SPIT() [when Cogs exist]
     public void _LED (int arg0, int arg1, int arg2) {flashR = (WMEM[arg0].val()); flashG = (WMEM[arg1].val()); flashB = (WMEM[arg2].val());}
-    public void _OLEDR(int arg0, int arg1, int arg2) {if(handler.getByUUID(WMEM[arg1],WMEM[arg2]) instanceof Tank)  WMEM[arg0] = ub(((Tank) handler.getByUUID(WMEM[arg1],WMEM[arg2])).flashR);}
-    public void _OLEDG(int arg0, int arg1, int arg2) {if(handler.getByUUID(WMEM[arg1],WMEM[arg2]) instanceof Tank) WMEM[arg0] = ub(((Tank) handler.getByUUID(WMEM[arg1],WMEM[arg2])).flashG);}
-    public void _OLEDB(int arg0, int arg1, int arg2) {if(handler.getByUUID(WMEM[arg1],WMEM[arg2]) instanceof Tank) WMEM[arg0] = ub(((Tank) handler.getByUUID(WMEM[arg1],WMEM[arg2])).flashB);}
+    public void _OLEDR(int arg0, int arg1, int arg2) {if(handler.getByUUID(WMEM[arg1],WMEM[arg2]) instanceof Robot)  WMEM[arg0] = ub(((Robot) handler.getByUUID(WMEM[arg1],WMEM[arg2])).flashR);}
+    public void _OLEDG(int arg0, int arg1, int arg2) {if(handler.getByUUID(WMEM[arg1],WMEM[arg2]) instanceof Robot) WMEM[arg0] = ub(((Robot) handler.getByUUID(WMEM[arg1],WMEM[arg2])).flashG);}
+    public void _OLEDB(int arg0, int arg1, int arg2) {if(handler.getByUUID(WMEM[arg1],WMEM[arg2]) instanceof Robot) WMEM[arg0] = ub(((Robot) handler.getByUUID(WMEM[arg1],WMEM[arg2])).flashB);}
     // 9
     public void _UUIDM(int arg0, int arg1, int arg2) {WMEM[arg0] = ub(uuidMost);}
     public void _UUIDL(int arg0, int arg1, int arg2) {WMEM[arg0] = ub(uuidLeast);}

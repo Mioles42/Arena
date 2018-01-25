@@ -33,7 +33,7 @@ class Global {
 
     static boolean[] KEY = new boolean[9];
 
-    public final static Tank BASE_TANK = new Tank("cain");
+    public final static Robot BASE_ROBOT = new Robot("cain");
 
     //Key constants
     static final int KEY_Q = 0;

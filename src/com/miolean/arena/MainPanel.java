@@ -3,9 +3,6 @@ package com.miolean.arena;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.io.FileNotFoundException;
-import java.io.InvalidObjectException;
-import java.io.PrintStream;
 
 import static com.miolean.arena.Global.ARENA_SIZE;
 import static com.miolean.arena.Global.BORDER;
@@ -35,9 +32,9 @@ public class MainPanel extends JPanel implements Runnable, KeyListener, MouseLis
         renderer = new Renderer(entities);
         handler = new Handler(entities);
       
-        window = new Window(this, handler.topTanks, entities, handler.getTanks());
+        window = new Window(this, handler.topRobots, entities, handler.getRobots());
 
-        handler.add(new ControlledTank(300, 300));
+        handler.add(new ControlledRobot(300, 300));
         viewholder = entities[0];
 
         Bullet rogue = new Bullet(null);
@@ -45,7 +42,7 @@ public class MainPanel extends JPanel implements Runnable, KeyListener, MouseLis
         rogue.x = 200;
         rogue.y = 200;
 
-        Tank dummy = new Tank("cain");
+        Robot dummy = new Robot("cain");
         window.setActiveTank(dummy);
         dummy.health = 256;
 
@@ -112,41 +109,41 @@ public class MainPanel extends JPanel implements Runnable, KeyListener, MouseLis
         Entity e = handler.entityAtLocation(x, y);
 
         if (e == null) {
-            if (viewholder instanceof ControlledTank) {
+            if (viewholder instanceof ControlledRobot) {
                 viewholder.x = x;
                 viewholder.y = y;
             } else {
-                e = new ControlledTank(x, y);
+                e = new ControlledRobot(x, y);
                 handler.add(e);
                 viewholder = e;
             }
 
         } else {
-            if (viewholder instanceof ControlledTank) viewholder.health = 0;
+            if (viewholder instanceof ControlledRobot) viewholder.health = 0;
             viewholder = e;
         }
 
-        if (viewholder instanceof Tank && !(viewholder instanceof ControlledTank))
-            window.setActiveTank((Tank) viewholder);
+        if (viewholder instanceof Robot && !(viewholder instanceof ControlledRobot))
+            window.setActiveTank((Robot) viewholder);
     }
 
     public void setViewholder(Entity e) {
 
         if(e == null) throw new NumberFormatException("Null viewholder.");
 
-        if (viewholder instanceof ControlledTank) viewholder.health = 0;
+        if (viewholder instanceof ControlledRobot) viewholder.health = 0;
         viewholder = e;
 
-        if (viewholder instanceof Tank && !(viewholder instanceof ControlledTank))
-            window.setActiveTank((Tank) viewholder);
+        if (viewholder instanceof Robot && !(viewholder instanceof ControlledRobot))
+            window.setActiveTank((Robot) viewholder);
     }
 
     private void render(Graphics g) {
 
         if(! viewholder.isAlive()
-                && viewholder instanceof Tank
-                && ((Tank) viewholder).lastChild != null) {
-            setViewholder(((Tank) viewholder).lastChild);
+                && viewholder instanceof Robot
+                && ((Robot) viewholder).lastChild != null) {
+            setViewholder(((Robot) viewholder).lastChild);
         }
 
 
@@ -179,22 +176,22 @@ public class MainPanel extends JPanel implements Runnable, KeyListener, MouseLis
         if(viewholder.health < 20) g.drawString(viewholder.health + "", 18 + viewholder.health, getHeight()-45);
         else g.drawString(viewholder.health + "", 18, getHeight()-45);
 
-        if(viewholder instanceof Tank) {
+        if(viewholder instanceof Robot) {
             g.setColor(new Color(100, 100, 255, 200));
-            g.fillRect(15, getHeight() - 90, (int)((Tank)viewholder).cogs, 20);
+            g.fillRect(15, getHeight() - 90, (int)((Robot)viewholder).cogs, 20);
             g.setColor(Color.BLACK);
-            String label = String.format("%2.2f", ((Tank)viewholder).cogs);
-            if(((Tank)viewholder).cogs < 20) g.drawString(label, 18 + (int) ((Tank)viewholder).cogs, getHeight()-75);
+            String label = String.format("%2.2f", ((Robot)viewholder).cogs);
+            if(((Robot)viewholder).cogs < 20) g.drawString(label, 18 + (int) ((Robot)viewholder).cogs, getHeight()-75);
             else g.drawString(label, 18, getHeight()-75);
-            g.drawRect(15, getHeight() - 90, (int) ((Tank)viewholder).cogs, 20);
+            g.drawRect(15, getHeight() - 90, (int) ((Robot)viewholder).cogs, 20);
 
             g.setColor(new Color(100, 255, 100, 200));
-            g.fillRect(15, getHeight() - 120, (int) ((Tank)viewholder).fitness, 20);
+            g.fillRect(15, getHeight() - 120, (int) ((Robot)viewholder).fitness, 20);
             g.setColor(Color.BLACK);
-            label = String.format("%2.2f", ((Tank)viewholder).fitness);
-            if(((Tank)viewholder).fitness < 20) g.drawString(label, (int) (18 + ((Tank)viewholder).fitness), getHeight()-105);
+            label = String.format("%2.2f", ((Robot)viewholder).fitness);
+            if(((Robot)viewholder).fitness < 20) g.drawString(label, (int) (18 + ((Robot)viewholder).fitness), getHeight()-105);
             else g.drawString(label, 18, getHeight()-105);
-            g.drawRect(15, getHeight() - 120, (int) ((Tank)viewholder).fitness, 20);
+            g.drawRect(15, getHeight() - 120, (int) ((Robot)viewholder).fitness, 20);
         }
 
 
@@ -203,9 +200,9 @@ public class MainPanel extends JPanel implements Runnable, KeyListener, MouseLis
     @Override public void keyTyped(KeyEvent e) {
         char key = e.getKeyChar();
         if(key == 'l') {
-            System.out.println("============Top tanks============");
-            for(Tank t: handler.topTanks) {
-                System.out.println("Tank " + t + " [Fitness " + t.fitness + "]");
+            System.out.println("============Top robots============");
+            for(Robot t: handler.topRobots) {
+                System.out.println("Robot " + t + " [Fitness " + t.fitness + "]");
             }
         }
     }
@@ -258,7 +255,7 @@ public class MainPanel extends JPanel implements Runnable, KeyListener, MouseLis
         }
 
         if(e.getButton() == MouseEvent.BUTTON2) {
-            Tank creation = new Tank("cain");
+            Robot creation = new Robot("cain");
             creation.x = x;
             creation.y = y;
             creation.name = "creation";
@@ -274,7 +271,7 @@ public class MainPanel extends JPanel implements Runnable, KeyListener, MouseLis
     @Override public void windowOpened(WindowEvent e) {}
     @Override public void windowClosing(WindowEvent e) {
         isRunning = false;
-        for(Tank t: handler.topTanks) {
+        for(Robot t: handler.topRobots) {
             System.out.println(t);
         }
         System.exit(0);
