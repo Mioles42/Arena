@@ -43,14 +43,14 @@ public class MainPanel extends JPanel implements Runnable, KeyListener, MouseLis
         new ControlledRobot(300, 300, handler);
         viewholder = entities[0];
 
-        Bullet rogue = new Bullet(null);
+        Bullet rogue = new Bullet(null, handler);
         handler.add(rogue);
-        rogue.x = 200;
-        rogue.y = 200;
+        rogue.setX(200);
+        rogue.setY(200);
 
-        com.miolean.arena.entities.Robot dummy = new com.miolean.arena.entities.Robot("cain");
+        com.miolean.arena.entities.Robot dummy = new com.miolean.arena.entities.Robot(Global.class.getResourceAsStream("cain.ergo"), handler);
         window.setActiveTank(dummy);
-        dummy.health = 256;
+        dummy.setHealth(256);
 
         handler.add(dummy);
 
@@ -116,16 +116,16 @@ public class MainPanel extends JPanel implements Runnable, KeyListener, MouseLis
 
         if (e == null) {
             if (viewholder instanceof ControlledRobot) {
-                viewholder.x = x;
-                viewholder.y = y;
+                viewholder.setX(x);
+                viewholder.setY(y);
             } else {
-                e = new ControlledRobot(x, y);
+                e = new ControlledRobot(x, y, handler);
                 handler.add(e);
                 viewholder = e;
             }
 
         } else {
-            if (viewholder instanceof ControlledRobot) viewholder.health = 0;
+            if (viewholder instanceof ControlledRobot) viewholder.die();
             viewholder = e;
         }
 
@@ -137,7 +137,7 @@ public class MainPanel extends JPanel implements Runnable, KeyListener, MouseLis
 
         if(e == null) throw new NumberFormatException("Null viewholder.");
 
-        if (viewholder instanceof ControlledRobot) viewholder.health = 0;
+        if (viewholder instanceof ControlledRobot) viewholder.die();
         viewholder = e;
 
         if (viewholder instanceof com.miolean.arena.entities.Robot && !(viewholder instanceof ControlledRobot))
@@ -146,21 +146,13 @@ public class MainPanel extends JPanel implements Runnable, KeyListener, MouseLis
 
     private void render(Graphics g) {
 
-        if(! viewholder.isAlive()
-                && viewholder instanceof com.miolean.arena.entities.Robot
-                && ((com.miolean.arena.entities.Robot) viewholder).lastChild != null) {
-            setViewholder(((com.miolean.arena.entities.Robot) viewholder).lastChild);
-        }
-
-
-
         g.setColor(Color.BLACK);
         g.drawString((int) (1000.0/Global.updateCycle) + "tk/s", 15, 25);
         g.drawString("Time:" + Global.time + "tks", 15, 45);
         g.drawString("Entities: " + handler.numEntities + " (Cogs: " + handler.numCogs + ", Tanks: " + handler.numTanks + ")", 15, 65);
         g.drawOval(this.getWidth()/2, this.getHeight()/2, 2, 2);
 
-        g.translate((int) (-viewholder.x + this.getWidth()/2), (int) (-viewholder.y + this.getHeight()/2));
+        g.translate((int) (-viewholder.getX() + this.getWidth()/2), (int) (-viewholder.getY() + this.getHeight()/2));
 
         g.setColor(Color.GRAY);
         for(int i = 0; i < ARENA_SIZE / 64; i++) {
@@ -173,31 +165,31 @@ public class MainPanel extends JPanel implements Runnable, KeyListener, MouseLis
 
         renderer.render(g);
 
-        g.translate((int) -(-viewholder.x + this.getWidth()/2), (int) -(-viewholder.y + this.getHeight()/2));
+        g.translate((int) -(-viewholder.getX() + this.getWidth()/2), (int) -(-viewholder.getY() + this.getHeight()/2));
 
         g.setColor(new Color(255, 100, 100, 200));
-        g.fillRect(15, getHeight()-60, viewholder.health, 20);
+        g.fillRect(15, getHeight()-60, (int) viewholder.getHealth(), 20);
         g.setColor(Color.BLACK);
-        g.drawRect(15, getHeight()-60, viewholder.health, 20);
-        if(viewholder.health < 20) g.drawString(viewholder.health + "", 18 + viewholder.health, getHeight()-45);
-        else g.drawString(viewholder.health + "", 18, getHeight()-45);
+        g.drawRect(15, getHeight()-60, (int) viewholder.getHealth(), 20);
+        if(viewholder.getHealth() < 20) g.drawString((int) viewholder.getHealth() + "", 18 + (int) viewholder.getHealth(), getHeight()-45);
+        else g.drawString(viewholder.getHealth() + "", 18, getHeight()-45);
 
         if(viewholder instanceof com.miolean.arena.entities.Robot) {
             g.setColor(new Color(100, 100, 255, 200));
-            g.fillRect(15, getHeight() - 90, (int)((com.miolean.arena.entities.Robot)viewholder).cogs, 20);
+            g.fillRect(15, getHeight() - 90, (int)((com.miolean.arena.entities.Robot)viewholder).getCogs(), 20);
             g.setColor(Color.BLACK);
-            String label = String.format("%2.2f", ((com.miolean.arena.entities.Robot)viewholder).cogs);
-            if(((com.miolean.arena.entities.Robot)viewholder).cogs < 20) g.drawString(label, 18 + (int) ((com.miolean.arena.entities.Robot)viewholder).cogs, getHeight()-75);
+            String label = String.format("%2.2f", ((com.miolean.arena.entities.Robot)viewholder).getCogs());
+            if(((com.miolean.arena.entities.Robot)viewholder).getCogs() < 20) g.drawString(label, 18 + (int) ((com.miolean.arena.entities.Robot)viewholder).getCogs(), getHeight()-75);
             else g.drawString(label, 18, getHeight()-75);
-            g.drawRect(15, getHeight() - 90, (int) ((com.miolean.arena.entities.Robot)viewholder).cogs, 20);
+            g.drawRect(15, getHeight() - 90, (int) ((com.miolean.arena.entities.Robot)viewholder).getCogs(), 20);
 
             g.setColor(new Color(100, 255, 100, 200));
-            g.fillRect(15, getHeight() - 120, (int) ((com.miolean.arena.entities.Robot)viewholder).fitness, 20);
+            g.fillRect(15, getHeight() - 120, (int) ((com.miolean.arena.entities.Robot)viewholder).getFitness(), 20);
             g.setColor(Color.BLACK);
-            label = String.format("%2.2f", ((com.miolean.arena.entities.Robot)viewholder).fitness);
-            if(((com.miolean.arena.entities.Robot)viewholder).fitness < 20) g.drawString(label, (int) (18 + ((com.miolean.arena.entities.Robot)viewholder).fitness), getHeight()-105);
+            label = String.format("%2.2f", ((com.miolean.arena.entities.Robot)viewholder).getFitness());
+            if(((com.miolean.arena.entities.Robot)viewholder).getFitness() < 20) g.drawString(label, (int) (18 + ((com.miolean.arena.entities.Robot)viewholder).getFitness()), getHeight()-105);
             else g.drawString(label, 18, getHeight()-105);
-            g.drawRect(15, getHeight() - 120, (int) ((com.miolean.arena.entities.Robot)viewholder).fitness, 20);
+            g.drawRect(15, getHeight() - 120, (int) ((com.miolean.arena.entities.Robot)viewholder).getFitness(), 20);
         }
 
 
@@ -208,7 +200,7 @@ public class MainPanel extends JPanel implements Runnable, KeyListener, MouseLis
         if(key == 'l') {
             System.out.println("============Top robots============");
             for(com.miolean.arena.entities.Robot t: handler.topRobots) {
-                System.out.println("Robot " + t + " [Fitness " + t.fitness + "]");
+                System.out.println("Robot " + t + " [Fitness " + t.getFitness() + "]");
             }
         }
     }
@@ -241,8 +233,8 @@ public class MainPanel extends JPanel implements Runnable, KeyListener, MouseLis
     }
     @Override public void mouseClicked(MouseEvent e) {
 
-        int x = (int) (e.getX() + viewholder.x - this.getWidth() / 2);
-        int y = (int) (e.getY() + viewholder.y - this.getHeight() / 2);
+        int x = (int) (e.getX() + viewholder.getX() - this.getWidth() / 2);
+        int y = (int) (e.getY() + viewholder.getY() - this.getHeight() / 2);
 
         if(e.getButton() == MouseEvent.BUTTON1) {
             if (!this.hasFocus()) {
@@ -254,17 +246,17 @@ public class MainPanel extends JPanel implements Runnable, KeyListener, MouseLis
         }
 
         if(e.getButton() == MouseEvent.BUTTON3) {
-            Cog cog = new Cog(100);
-            cog.x = x;
-            cog.y = y;
+            Cog cog = new Cog(100, handler);
+            cog.setX(x);
+            cog.setY(y);
             handler.add(cog);
         }
 
         if(e.getButton() == MouseEvent.BUTTON2) {
-            com.miolean.arena.entities.Robot creation = new com.miolean.arena.entities.Robot("cain");
-            creation.x = x;
-            creation.y = y;
-            creation.name = "creation";
+            com.miolean.arena.entities.Robot creation = new com.miolean.arena.entities.Robot(Global.class.getResourceAsStream("cain.ergo"), handler);
+            creation.setX(x);
+            creation.setY(y);
+            creation.setName("creation");
             handler.add(creation);
         }
     }

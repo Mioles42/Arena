@@ -105,7 +105,7 @@ public class MemoryPanel extends JPanel {
 
         if(source != null) {
 
-            text += (source.isAlive())? "c\nRobot \"" + source.name + "\"\n\n" : "r\nRobot \"" + source.name + "\" [dead]\n\n";
+            text += (source.isAlive())? "c\nRobot \"" + source.getName() + "\"\n\n" : "r\nRobot \"" + source.getName() + "\" [dead]\n\n";
 
             switch (comboBox.getSelectedIndex()) {
             case INDEX_UMEM:

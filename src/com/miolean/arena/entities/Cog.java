@@ -54,4 +54,10 @@ public class Cog extends Entity {
     public void onDeath() {
 
     }
+
+    @Override
+    public String toHTML() {
+        //TODO
+        return null;
+    }
 }

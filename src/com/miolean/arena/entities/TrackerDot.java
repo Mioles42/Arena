@@ -40,6 +40,7 @@ public class TrackerDot extends Entity {
 
     @Override
     public String toHTML() {
-        //Intentional compilation error
+        //TODO
+        return null;
     }
 }

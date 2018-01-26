@@ -1,6 +1,7 @@
 package com.miolean.arena.entities;
 
 import com.miolean.arena.Global;
+import com.miolean.arena.Handler;
 import com.miolean.arena.UByte;
 
 import java.awt.*;
@@ -20,8 +21,8 @@ public class Bullet extends Entity {
     private Robot target;
     private int damage;
 
-    Bullet(Robot source) {
-        super(SIZE, SIZE, 1, source.getHandler());
+    public Bullet(Robot source, Handler handler) {
+        super(SIZE, SIZE, 1, handler);
         this.source = source;
 
         if(source != null) {
@@ -190,5 +191,11 @@ public class Bullet extends Entity {
     @Override
     public void onDeath() {
 
+    }
+
+    @Override
+    public String toHTML() {
+        //TODO
+        return null;
     }
 }

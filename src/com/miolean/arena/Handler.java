@@ -68,7 +68,7 @@ public class Handler {
             robots.remove( entities[uuid]);
         }
 
-        entities[uuid].onDeath();
+        entities[uuid].die();
         entities[uuid] = null;
         numEntities--;
 
@@ -92,7 +92,7 @@ public class Handler {
             lastUUIDUsed %= entities.length;
         }
         entities[lastUUIDUsed] = e;
-        e.onBirth();
+        e.appear(lastUUIDUsed);
         return lastUUIDUsed;
     }
 

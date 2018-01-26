@@ -4,14 +4,14 @@ package com.miolean.arena.entities;
 
 import java.lang.reflect.Method;
 
-class Gene {
+public class Gene {
 
     private Method meaning;
     private String description;
     double cost;
     int weight;
 
-    static final String[] GENE_CATEGORIES = {
+    public static final String[] GENE_CATEGORIES = {
             "Reserved",
             "Branching",
             "Memory",

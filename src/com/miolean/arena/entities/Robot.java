@@ -532,7 +532,7 @@ public class Robot extends Entity {
 
     void fire() {
         if(lastFireTime + MAX_BULLET_RECHARGE - stats[STAT_HASTE].val() < Global.time) {
-            Bullet bullet = new Bullet(this);
+            Bullet bullet = new Bullet(this, getHandler());
             add(bullet);
             lastFireTime = Global.time;
         }

@@ -47,7 +47,6 @@ public abstract class Entity {
         this.height = height;
         this.health = health;
         this.handler = handler;
-        this.uuid = handler.add(this);
     }
 
 
@@ -76,8 +75,8 @@ public abstract class Entity {
     public abstract void update();
     public abstract boolean intersectsWith(Entity e);
     public abstract void intersect(Entity e);
-    public abstract void onBirth();
-    public abstract void onDeath();
+    protected abstract void onBirth();
+    protected abstract void onDeath();
     public abstract String toHTML();
 
     public boolean isAlive() {return (health > 0);}
@@ -113,9 +112,8 @@ public abstract class Entity {
         onDeath();
     }
 
-    public final void appear(Handler handler) {
-        this.handler = handler;
-        handler.add(this);
+    public final void appear(int uuid) {
+        this.uuid = uuid;
         onBirth();
     }
 
