@@ -104,6 +104,7 @@ public abstract class Entity {
     public void setAccY(double accY) { this.accY = accY; }
     public void setAccR(double accR) { this.accR = accR; }
     public void setHealth(double health) { this.health = health;}
+    public void setUUID(int uuid) {this.uuid = uuid;}
 
     public final void die() {
         onDeath();

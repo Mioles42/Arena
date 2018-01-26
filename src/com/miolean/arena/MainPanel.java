@@ -15,9 +15,9 @@ import static com.miolean.arena.Global.BORDER;
 
 public class MainPanel extends JPanel implements Runnable, KeyListener, MouseListener, WindowListener, MouseMotionListener {
 
-    private Renderer renderer;
+    private com.miolean.arena.Renderer renderer;
     private Handler handler;
-    private Window window;
+    private com.miolean.arena.Window window;
 
     Entity viewholder;
 
@@ -35,7 +35,7 @@ public class MainPanel extends JPanel implements Runnable, KeyListener, MouseLis
 
         Entity[] entities = new Entity[256];
 
-        renderer = new Renderer(entities);
+        renderer = new com.miolean.arena.Renderer(entities);
         handler = new Handler(entities);
       
         window = new Window(this, handler.topRobots, entities, handler.getRobots());

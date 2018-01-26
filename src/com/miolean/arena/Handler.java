@@ -37,17 +37,18 @@ public class Handler {
 
         for(int n = 0; n < entities.length; n++) {
             Entity e = entities[n]; if(e==null) continue;
+            e.setUUID(n);
 
+            if(e.getHealth() <= 0) {
+                remove(e.getUUID());
+                continue;
+            }
 
             e.update();
             for(Entity j: entities) { if (j == null) continue;
                 if(e.intersectsWith(j) && e != j) e.intersect(j);
             }
 
-            if(e.getHealth() <= 0) {
-                if(entities[n] != null) remove(n);
-                continue;
-            }
 
             //If we're holding a Robot that has beaten a record (or there are no records)
             if(topRobots.size() == 0 && e instanceof Robot) topRobots.add((Robot) e);

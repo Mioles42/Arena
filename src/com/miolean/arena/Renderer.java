@@ -7,7 +7,7 @@ import java.awt.*;
 /**
  * Created by commandm on 2/16/17.
  */
-class Renderer {
+public class Renderer {
 
     private Entity[] entities;
 
