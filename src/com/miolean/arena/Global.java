@@ -24,8 +24,8 @@ public class Global {
     static double distributeRatio = 0.3; //distributes per update
 
     //Publicly accessible random instance
-    public static Random random = new Random(11);
-    public static WordRandom wordRandom = new WordRandom(11);
+    public static Random random = new Random();
+    public static WordRandom wordRandom = new WordRandom();
 
     //1 pixel= 1 tank-meter, I suppose
     public static final int ARENA_SIZE = 2*1024;

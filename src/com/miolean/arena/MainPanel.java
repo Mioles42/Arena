@@ -40,7 +40,7 @@ public class MainPanel extends JPanel implements Runnable, KeyListener, MouseLis
       
         window = new Window(this, handler.topRobots, entities, handler.getRobots());
 
-        new ControlledRobot(300, 300, handler);
+        entities[0] = new ControlledRobot(300, 300, handler);
         viewholder = entities[0];
 
         Bullet rogue = new Bullet(null, handler);
@@ -48,7 +48,7 @@ public class MainPanel extends JPanel implements Runnable, KeyListener, MouseLis
         rogue.setX(200);
         rogue.setY(200);
 
-        com.miolean.arena.entities.Robot dummy = new com.miolean.arena.entities.Robot(Global.class.getResourceAsStream("cain.ergo"), handler);
+        com.miolean.arena.entities.Robot dummy = new Robot(Global.class.getClassLoader().getResourceAsStream("gen/cain.ergo"), handler);
         window.setActiveTank(dummy);
         dummy.setHealth(256);
 
@@ -125,7 +125,7 @@ public class MainPanel extends JPanel implements Runnable, KeyListener, MouseLis
             }
 
         } else {
-            if (viewholder instanceof ControlledRobot) viewholder.die();
+            if (viewholder instanceof ControlledRobot) handler.remove(viewholder.getUUID());
             viewholder = e;
         }
 
@@ -137,7 +137,7 @@ public class MainPanel extends JPanel implements Runnable, KeyListener, MouseLis
 
         if(e == null) throw new NumberFormatException("Null viewholder.");
 
-        if (viewholder instanceof ControlledRobot) viewholder.die();
+        if (viewholder instanceof ControlledRobot) handler.remove(viewholder.getUUID());
         viewholder = e;
 
         if (viewholder instanceof com.miolean.arena.entities.Robot && !(viewholder instanceof ControlledRobot))

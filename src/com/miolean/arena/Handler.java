@@ -35,13 +35,19 @@ public class Handler {
     public void update() {
         Global.time++;
 
-        for(Entity e: entities) {
-            if(e == null) continue;
+        for(int n = 0; n < entities.length; n++) {
+            Entity e = entities[n]; if(e==null) continue;
+
+
             e.update();
             for(Entity j: entities) { if (j == null) continue;
                 if(e.intersectsWith(j) && e != j) e.intersect(j);
             }
-            if(e.getHealth() <= 0) remove(e.getUUID());
+
+            if(e.getHealth() <= 0) {
+                if(entities[n] != null) remove(n);
+                continue;
+            }
 
             //If we're holding a Robot that has beaten a record (or there are no records)
             if(topRobots.size() == 0 && e instanceof Robot) topRobots.add((Robot) e);
@@ -75,10 +81,11 @@ public class Handler {
 
     }
 
-    public int add(Entity e) {
+    public void add(Entity e) {
 
-        if(e instanceof Cog && numCogs >= MAX_COGS) return 0;
-        if(e instanceof Robot && numTanks >= MAX_TANKS) return 0;
+        if(e.getUUID() != -1) return;
+        if(e instanceof Cog && numCogs >= MAX_COGS) return;
+        if(e instanceof Robot && numTanks >= MAX_TANKS) return;
 
         if(e instanceof Cog) numCogs++;
         if(e instanceof Robot) {
@@ -93,7 +100,6 @@ public class Handler {
         }
         entities[lastUUIDUsed] = e;
         e.appear(lastUUIDUsed);
-        return lastUUIDUsed;
     }
 
 
@@ -150,7 +156,7 @@ public class Handler {
         if(Global.random.nextFloat() < 0.01) {
             Robot robot;
             if(topRobots.size() > 9) robot = new Robot(topRobots.get(Global.random.nextInt(5)), this);
-            else robot = new Robot(Global.class.getResourceAsStream("default.ergo"), this);
+            else robot = new Robot(Global.class.getClassLoader().getResourceAsStream("gen/default.ergo"), this);
 
             robot.setX(Global.random.nextFloat() * Global.ARENA_SIZE);
             robot.setY(Global.random.nextFloat() * Global.ARENA_SIZE);

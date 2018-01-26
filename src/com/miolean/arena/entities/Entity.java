@@ -39,7 +39,7 @@ public abstract class Entity {
 
     //Other things:
     private Handler handler;
-    private int uuid;
+    private int uuid = -1;
 
 
     Entity(int width, int height, int health, Handler handler) {
@@ -106,15 +106,16 @@ public abstract class Entity {
     public void setHealth(double health) { this.health = health;}
 
     public final void die() {
+        onDeath();
         health = 0;
         handler = null;
-        handler.remove(uuid);
-        onDeath();
     }
 
     public final void appear(int uuid) {
-        this.uuid = uuid;
-        onBirth();
+        if(this.uuid == -1) {
+            this.uuid = uuid;
+            onBirth();
+        }
     }
 
     public void damage(double amount) {health -= amount;}

@@ -29,8 +29,8 @@ public class Bullet extends Entity {
             setX(source.getX());
             setY(source.getY());
             damage = source.stats[Robot.STAT_DAMAGE].val();
-            setVelX((15 + source.stats[Robot.STAT_BULLET_SPEED].val()) * Math.cos(getR() + source.stats[Robot.STAT_BULLET_SPREAD].val() / 128.0 * (Global.random.nextFloat() - .5)));
-            setVelY((15 + source.stats[Robot.STAT_BULLET_SPEED].val()) * -Math.sin(getR() + source.stats[Robot.STAT_BULLET_SPREAD].val() / 128.0 * (Global.random.nextFloat() - .5)));
+            setVelX((15 + source.stats[Robot.STAT_BULLET_SPEED].val()) * Math.cos(source.getR() + source.stats[Robot.STAT_BULLET_SPREAD].val() / 128.0 * (Global.random.nextFloat() - .5)));
+            setVelY((15 + source.stats[Robot.STAT_BULLET_SPEED].val()) * -Math.sin(source.getR() + source.stats[Robot.STAT_BULLET_SPREAD].val() / 128.0 * (Global.random.nextFloat() - .5)));
         } else {
             setX(Global.ARENA_SIZE * Global.random.nextFloat());
             setY(Global.ARENA_SIZE * Global.random.nextFloat());
@@ -93,8 +93,8 @@ public class Bullet extends Entity {
         applyPhysics();
 
         if(source != null) {
-            if (Math.abs(getVelX()) < 1 && Math.abs(getVelY()) < 1) die();
-            if ((getX() > ARENA_SIZE - BORDER) || (getX() < BORDER) || (getY() > ARENA_SIZE - BORDER) || (getY() < BORDER)) die();
+            if (Math.abs(getVelX()) < 1 && Math.abs(getVelY()) < 1) getHandler().remove(getUUID());
+            if ((getX() > ARENA_SIZE - BORDER) || (getX() < BORDER) || (getY() > ARENA_SIZE - BORDER) || (getY() < BORDER)) getHandler().remove(getUUID());
         } else if(target != null){
             double xdis = target.getX() - getX();
             double ydis = target.getY() - getY();
