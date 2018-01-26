@@ -39,6 +39,8 @@ public abstract class Entity {
 
     //Other things:
     private Handler handler;
+
+    //ID management
     private int uuid = -1;
 
 

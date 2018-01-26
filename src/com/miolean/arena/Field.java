@@ -5,19 +5,17 @@ import com.miolean.arena.entities.Entity;
 import com.miolean.arena.entities.Robot;
 
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
+import java.util.*;
 import java.util.List;
 
 public class Field {
 
     private static final int MAX_ROBOTS = 32;
     private static final int MAX_COGS = 200;
-    private static final int MAX_ENTITIES = 255;
+    private static final int MAX_ENTITIES = 255*255;
     private static final int BLOCK_SIZE = 16;
 
-    private HashMap<UByte, Entity> entities;
+    private HashMap<Integer, Entity> entities;
     private List<Robot> robots;
     private List<Cog> cogs;
     private List<Robot> topRobots;
@@ -27,19 +25,41 @@ public class Field {
     }
 
     public void updateAll() {
-        for(Entity e: entities) {
+        while(entities.entrySet().iterator().hasNext()) {
+            Entity e = entities.entrySet().iterator().next().getValue();
             e.update();
         }
     }
 
     public void renderAll(Graphics g) {
-        for (Entity e: entities) {
+        while(entities.entrySet().iterator().hasNext()) {
+            Entity e = entities.entrySet().iterator().next().getValue();
             e.render(g);
         }
     }
 
-    public List<Entity> getEntities() { return entities; }
-    public List<Robot> getTopRobots() { return topRobots;}
-    public List<Robot> getRobots() { return robots;}
-    public List<Cog> getCogs() { return cogs;}
+    public void add(Entity e) {
+        entities.remove(e.getUUID());
+
+        int uuid;
+        do { uuid = Global.random.nextInt(MAX_ENTITIES);
+        } while(entities.get(uuid) != null);
+
+        entities.put(uuid, e);
+        e.appear(uuid);
+    }
+
+    public void remove(Entity e) {
+        e.die();
+        entities.remove(e.getUUID());
+    }
+
+    public Entity fromUUID(int uuid) {
+        return entities.get(uuid);
+    }
+
+    public Collection<Entity> getEntities() { return entities.values();}
+    public Collection<Robot> getTopRobots() { return topRobots;}
+    public Collection<Robot> getRobots() { return robots;}
+    public Collection<Cog> getCogs() { return cogs;}
 }

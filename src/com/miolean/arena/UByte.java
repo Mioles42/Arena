@@ -49,4 +49,8 @@ public final class UByte implements Serializable {
         }
         return result;
     }
+    @Override
+    public int hashCode() {
+        return value;
+    }
 }
