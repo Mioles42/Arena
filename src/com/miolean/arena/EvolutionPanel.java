@@ -1,5 +1,6 @@
 package com.miolean.arena;
 
+import com.miolean.arena.entities.Field;
 import com.miolean.arena.entities.Robot;
 
 import javax.swing.*;
@@ -13,16 +14,16 @@ public class EvolutionPanel extends JPanel{
 
     JScrollPane scrollPane;
 
-    java.util.List<com.miolean.arena.entities.Robot> robots;
+    Field field;
 
     private static final int INDEX_UMEM = 0;
     private static final int INDEX_PMEM = 1;
     private static final int INDEX_SMEM = 2;
     private static final int INDEX_WMEM = 3;
 
-    public EvolutionPanel(java.util.List<com.miolean.arena.entities.Robot> robots) {
+    public EvolutionPanel(Field field) {
 
-        this.robots = robots;
+        this.field = field;
 
         GridBagConstraints c;
         LayoutManager layout = new GridBagLayout();
@@ -70,10 +71,10 @@ public class EvolutionPanel extends JPanel{
     void updateInfo() {
         String result = "";
 
-        for(int i = 0; i < robots.size()-1; i++) {
-            Robot t = robots.get(i);
+        for(int i = 0; i < field.getTopRobots().size(); i++) {
+            Robot t = field.getTopRobots().get(i);
 
-            result += "<p><b>[" + (i+1) + "]</b>  ";
+            result += "<p><b>[" + (10-i) + "]</b>  ";
             if(!t.isAlive()) result += "<s><font color=\"red\">";
             result += "<a href=tank_greatest_"+i + ">";
             result += t.getName() + " [Fitness: " + String.format("%.2f", t.getFitness()) + "]</a>";

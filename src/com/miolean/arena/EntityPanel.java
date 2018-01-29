@@ -1,9 +1,6 @@
 package com.miolean.arena;
 
-import com.miolean.arena.entities.Bullet;
-import com.miolean.arena.entities.Cog;
-import com.miolean.arena.entities.ControlledRobot;
-import com.miolean.arena.entities.Entity;
+import com.miolean.arena.entities.*;
 import com.miolean.arena.entities.Robot;
 
 import javax.swing.*;
@@ -11,6 +8,8 @@ import javax.swing.event.HyperlinkListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.Collections;
 
 public class EntityPanel extends JPanel implements ActionListener{
 
@@ -22,18 +21,15 @@ public class EntityPanel extends JPanel implements ActionListener{
 
     JScrollPane scrollPane;
 
-    java.util.List<com.miolean.arena.entities.Robot> robots;
-    Entity[] entities;
-
+    Field field;
 
     JComboBox<String> comboBox;
     private static final int INDEX_TANKS = 1;
     private static final int INDEX_ENTITIES = 0;
 
-    public EntityPanel(java.util.List<com.miolean.arena.entities.Robot> robots, Entity[] entities) {
+    public EntityPanel(Field field) {
 
-        this.entities = entities;
-        this.robots = robots;
+        this.field = field;
 
         GridBagConstraints c;
         LayoutManager layout = new GridBagLayout();
@@ -122,23 +118,27 @@ public class EntityPanel extends JPanel implements ActionListener{
         String result = "";
 
         if(comboBox.getSelectedIndex() == INDEX_TANKS) {
-            result += "<p>Total Robots: " + robots.size() + "</p>";
+            result += "<p>Total Robots: " + field.getRobots().size() + "</p>";
 
-            for (int i = 0; i < robots.size(); i++) {
-                com.miolean.arena.entities.Robot t = robots.get(i);
+            for (int i = 0; i < field.getRobots().size(); i++) {
+                com.miolean.arena.entities.Robot t = field.getRobots().get(i);
 
                 result += "<b>[" + t.getClass().getSimpleName() + "]</b><font color=\"blue\">  ";
                 result += "<a href=tank_num_" + i + ">";
                 result += t.getName() + " [Fitness: " + String.format("%.2f", t.getFitness()) + "]</a>";
                 result += "</font>";
+                if(! t.isAlive()) result += " [DEAD, uuid " + t.getUUID() + " ] ";
                 result += "<br />";
+
 
             }
         } else if(comboBox.getSelectedIndex() == INDEX_ENTITIES) {
 
-            for (int i = 0; i < entities.length; i++) {
-                if(entities[i] == null) continue;
-                Entity e = entities[i];
+            java.util.List<Entity> entities = new ArrayList<>(field.getEntities().values());
+
+            for (int i = 0; i < entities.size(); i++) {
+                if(entities.get(i) == null) continue;
+                Entity e = entities.get(i);
 
                 if(e instanceof com.miolean.arena.entities.Robot && ! (e instanceof ControlledRobot)) result += "<font color=\"blue\">";
                 else if(e instanceof Cog) result += "<font color=\"orange\">";
@@ -152,6 +152,8 @@ public class EntityPanel extends JPanel implements ActionListener{
                     result += "<a href=tank_num_" + i + ">";
                     result += ((com.miolean.arena.entities.Robot)e).getName() + " [Fitness: " + String.format("%.2f", ((Robot)e).getFitness()) + "]</a>";
                 }
+                if(! e.isAlive()) result += " DEAD ";
+
                 result += "</font>";
                 result += "<br />";
 

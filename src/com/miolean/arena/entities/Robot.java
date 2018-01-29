@@ -30,7 +30,7 @@ import static com.miolean.arena.UByte.ubDeepCopy;
 
 //Robot has all sorts of methods that appear unused but are actually reflected.
 @SuppressWarnings("unused")
-public class Robot extends Entity {
+public class Robot extends Entity implements Comparable<Robot>{
 
     //General constants
     protected static final int SIZE = 40;
@@ -125,13 +125,13 @@ public class Robot extends Entity {
     }
 
     //Create a totally blank Robot (for whatever reason)
-    Robot(Handler handler) {
-        super(SIZE, SIZE, 10, handler);
+    Robot(Field field) {
+        super(SIZE, SIZE, 10, field);
     }
 
     //Create a Robot from a parent
-    public Robot(Robot parent, Handler handler) {
-        super(SIZE, SIZE, DEFAULT_STAT_VALUE, handler);
+    public Robot(Robot parent, Field field) {
+        super(SIZE, SIZE, DEFAULT_STAT_VALUE, field);
         name = Global.wordRandom.nextWord();
         name = name.substring(0, 1).toUpperCase() + name.substring(1);
         generation = parent.generation + 1;
@@ -154,9 +154,9 @@ public class Robot extends Entity {
     }
 
     //Create a Robot from a file
-    public Robot(InputStream file, Handler handler) {
+    public Robot(InputStream file, Field field) {
 
-        super(SIZE, SIZE, DEFAULT_STAT_VALUE, handler);
+        super(SIZE, SIZE, DEFAULT_STAT_VALUE, field);
         //0: Initial values.
 
         name = "Unnamed";
@@ -514,7 +514,14 @@ public class Robot extends Entity {
 
     @Override
     public boolean intersectsWith(Entity e) {
+        //Seeing that Tanks don't actually do anything upon intersection, saying they intersect anyway
+        //is a massive waste of resources...
+        //but it turns out we use this function for other things than checking whether to actually intersect.
+        //We can strike a compromise by only caring about TrackerDots
+
+
         if(e == null) return false;
+        if(! (e instanceof TrackerDot)) return false;
         double distanceSquared = (getX() - e.getX())*(getX() - e.getX())+(getY() - e.getY())*(getY() - e.getY());
         double minDistance = (SIZE/2.0 + e.getWidth()/2.0) * (SIZE/2.0 + e.getWidth()/2.0);
 
@@ -527,12 +534,12 @@ public class Robot extends Entity {
 
     @Override
     public String toString() {
-        return name;
+        return name + getUUID();
     }
 
     void fire() {
         if(lastFireTime + MAX_BULLET_RECHARGE - stats[STAT_HASTE].val() < Global.time) {
-            Bullet bullet = new Bullet(this, getHandler());
+            Bullet bullet = new Bullet(this, getField());
             add(bullet);
             lastFireTime = Global.time;
         }
@@ -573,8 +580,8 @@ public class Robot extends Entity {
     }
 
     void reproduce() {
-        Robot offspring = new Robot(this, getHandler());
-        add(this);
+        Robot offspring = new Robot(this, getField());
+        add(offspring);
     }
 
     public void onDeath() {
@@ -609,7 +616,7 @@ public class Robot extends Entity {
             }
 
             //Since everything appears to be in order, let's try to parse that as a gene. (Normally we'd run it.)
-            result += "§k" + Integer.toHexString(i) + " ";
+            result += "§k" + i + " ";
             result += (genes[i] == null)? "§rNULL \n" : "§g" + KMEM[genes[i].val()].getMeaning().getName() + " §k(";
             result += (genes[i+1] == null)? "§rNULL \n" : "§b" + genes[i+1].val() + " §k[" + WMEM[genes[i+1].val()].val() + "], ";
             result += (genes[i+2] == null)? "§rNULL \n" : "§b" + genes[i+2].val() + " §k[" + WMEM[genes[i+2].val()].val() + "],";
@@ -633,7 +640,7 @@ public class Robot extends Entity {
         String result = "§b";
 
         for(int i = 0; i < genes.length; i++) {
-            if(i%4 == 0) result += "\n" + Integer.toHexString(i/16) + Integer.toHexString(i%16) + "\t";
+            if(i%4 == 0) result += "\n" + i/16 + i%16 + "\t";
             result += "§k|  " + genes[i].val() +"\t§b";
         }
 
@@ -695,7 +702,7 @@ public class Robot extends Entity {
     public void _ACCR (int arg0, int arg1, int arg2) {WMEM[arg0] = ub((int) getAccR());}
     // 4 TODO Implement new Sight Block methods
     public void _VIEW (int arg0, int arg1, int arg2) {viewDistance = WMEM[arg0].val();}
-    public void _NEAR (int arg0, int arg1, int arg2) {WMEM[arg0] = ub(getHandler().withinDistance(getX(), getY(), viewDistance));}
+    public void _NEAR (int arg0, int arg1, int arg2) {}
     public void _NRST (int arg0, int arg1, int arg2) {}
     // 5
     public void _HEAL (int arg0, int arg1, int arg2) {heal(1);}
@@ -714,17 +721,17 @@ public class Robot extends Entity {
     public void _BWXOR(int arg0, int arg1, int arg2) {WMEM[arg0] = ub(arg1 ^ arg2);}
     public void _INCR (int arg0, int arg1, int arg2) {WMEM[arg0] = ub(WMEM[arg0].val() + 1);}
     // 7
-    public void _OTYPE(int arg0, int arg1, int arg2) {if(getHandler().getByUUID(WMEM[arg1],WMEM[arg2]) instanceof Robot) WMEM[arg0] = ub(typeOf(getHandler().getByUUID(WMEM[arg1],WMEM[arg2])));}
-    public void _OHP  (int arg0, int arg1, int arg2) {if(getHandler().getByUUID(WMEM[arg1],WMEM[arg2]) instanceof Robot) WMEM[arg0] = ub((int) (getHandler().getByUUID(WMEM[arg1],WMEM[arg2]).getHealth()));}
-    public void _OCOG (int arg0, int arg1, int arg2) {if(getHandler().getByUUID(WMEM[arg1],WMEM[arg2]) instanceof Robot) WMEM[arg0] = ub((int)((Robot) getHandler().getByUUID(WMEM[arg1],WMEM[arg2])).cogs);}
+    public void _OTYPE(int arg0, int arg1, int arg2) {if(getField().fromUUID(WMEM[arg1],WMEM[arg2]) instanceof Robot) WMEM[arg0] = ub(typeOf(getField().fromUUID(WMEM[arg1],WMEM[arg2])));}
+    public void _OHP  (int arg0, int arg1, int arg2) {if(getField().fromUUID(WMEM[arg1],WMEM[arg2]) instanceof Robot) WMEM[arg0] = ub((int) (getField().fromUUID(WMEM[arg1],WMEM[arg2]).getHealth()));}
+    public void _OCOG (int arg0, int arg1, int arg2) {if(getField().fromUUID(WMEM[arg1],WMEM[arg2]) instanceof Robot) WMEM[arg0] = ub((int)((Robot) getField().fromUUID(WMEM[arg1],WMEM[arg2])).cogs);}
     // 8
     public void _WALL (int arg0, int arg1, int arg2) {} //TODO Implement _WALL() [when Walls exist]
     public void _SPIT (int arg0, int arg1, int arg2) {} //TODO Implement _SPIT() [when Cogs exist]
     public void _LED (int arg0, int arg1, int arg2) {flashR = (WMEM[arg0].val()); flashG = (WMEM[arg1].val()); flashB = (WMEM[arg2].val());}
-    public void _OLEDR(int arg0, int arg1, int arg2) {if(getHandler().getByUUID(WMEM[arg1],WMEM[arg2]) instanceof Robot)  WMEM[arg0] = ub(((Robot) getHandler().getByUUID(WMEM[arg1],WMEM[arg2])).flashR);}
-    public void _OLEDG(int arg0, int arg1, int arg2) {if(getHandler().getByUUID(WMEM[arg1],WMEM[arg2]) instanceof Robot) WMEM[arg0] = ub(((Robot) getHandler().getByUUID(WMEM[arg1],WMEM[arg2])).flashG);}
-    public void _OLEDB(int arg0, int arg1, int arg2) {if(getHandler().getByUUID(WMEM[arg1],WMEM[arg2]) instanceof Robot) WMEM[arg0] = ub(((Robot) getHandler().getByUUID(WMEM[arg1],WMEM[arg2])).flashB);}
-    // 9
+    public void _OLEDR(int arg0, int arg1, int arg2) {if(getField().fromUUID(WMEM[arg1],WMEM[arg2]) instanceof Robot)  WMEM[arg0] = ub(((Robot) getField().fromUUID(WMEM[arg1],WMEM[arg2])).flashR);}
+    public void _OLEDG(int arg0, int arg1, int arg2) {if(getField().fromUUID(WMEM[arg1],WMEM[arg2]) instanceof Robot) WMEM[arg0] = ub(((Robot) getField().fromUUID(WMEM[arg1],WMEM[arg2])).flashG);}
+    public void _OLEDB(int arg0, int arg1, int arg2) {if(getField().fromUUID(WMEM[arg1],WMEM[arg2]) instanceof Robot) WMEM[arg0] = ub(((Robot) getField().fromUUID(WMEM[arg1],WMEM[arg2])).flashB);}
+    // getField
     public void _UUIDM(int arg0, int arg1, int arg2) {WMEM[arg0] = ub(getUUID());}
     public void _UUIDL(int arg0, int arg1, int arg2) {WMEM[arg0] = ub(getUUID());}
     public void _HP   (int arg0, int arg1, int arg2) {WMEM[arg0] = ub((int) getHealth());}
@@ -824,4 +831,9 @@ public class Robot extends Entity {
     public void setCogs(double cogs) { this.cogs = cogs; }
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
+
+    @Override
+    public int compareTo(Robot o) {
+        return (int) (fitness - o.getFitness());
+    }
 }

@@ -1,6 +1,7 @@
 package com.miolean.arena;
 
 import com.miolean.arena.entities.Entity;
+import com.miolean.arena.entities.Field;
 
 import java.awt.*;
 
@@ -9,20 +10,15 @@ import java.awt.*;
  */
 public class Renderer {
 
-    private Entity[] entities;
+    private Field field;
 
-    Renderer(Entity[] entities) {
-        this.entities = entities;
+    Renderer(Field field) {
+        this.field = field;
     }
 
     void render(Graphics g) {
 
 
-        for(Entity e: entities) {
-            if(e == null) continue;
-            e.render(g);
-        }
-
-
+        field.renderAll(g);
     }
 }

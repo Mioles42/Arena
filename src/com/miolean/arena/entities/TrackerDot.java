@@ -7,8 +7,8 @@ import java.awt.*;
 public class TrackerDot extends Entity {
 
 
-    public TrackerDot(double x, double y, int persistence, Handler handler) {
-        super(4, 4, persistence, handler);
+    public TrackerDot(double x, double y, int persistence, Field field) {
+        super(4, 4, persistence, field);
         setX(x);
         setY(y);
     }

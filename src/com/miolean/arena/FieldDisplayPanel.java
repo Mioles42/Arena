@@ -1,147 +1,98 @@
 package com.miolean.arena;
 
-import com.miolean.arena.entities.Bullet;
-import com.miolean.arena.entities.Cog;
-import com.miolean.arena.entities.ControlledRobot;
-import com.miolean.arena.entities.Entity;
+import com.miolean.arena.entities.*;
 import com.miolean.arena.entities.Robot;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.ArrayList;
 
 import static com.miolean.arena.Global.ARENA_SIZE;
 import static com.miolean.arena.Global.BORDER;
 
-public class MainPanel extends JPanel implements Runnable, KeyListener, MouseListener, WindowListener, MouseMotionListener {
+public class FieldDisplayPanel extends JPanel implements KeyListener, MouseListener, MouseMotionListener, ActiveRobotListener{
 
     private com.miolean.arena.Renderer renderer;
-    private Handler handler;
-    private com.miolean.arena.Window window;
+
+    java.util.List<ActiveRobotListener> listenerList = new ArrayList<>();
 
     Entity viewholder;
+    Field field;
 
     private boolean isRunning = true;
 
 
-    public static void main(String[] args) {
-        Thread gameThread = new Thread(new MainPanel());
-        gameThread.run();
-    }
+    public FieldDisplayPanel(Field field) {
 
-    private MainPanel() {
+        this.field = field;
 
         requestFocus();
 
-        Entity[] entities = new Entity[256];
+        renderer = new com.miolean.arena.Renderer(field);
 
-        renderer = new com.miolean.arena.Renderer(entities);
-        handler = new Handler(entities);
-      
-        window = new Window(this, handler.topRobots, entities, handler.getRobots());
+        viewholder = new ControlledRobot(300, 300, field);
+        field.add(viewholder);
 
-        entities[0] = new ControlledRobot(300, 300, handler);
-        viewholder = entities[0];
-
-        Bullet rogue = new Bullet(null, handler);
-        handler.add(rogue);
+        Bullet rogue = new Bullet(null, field);
         rogue.setX(200);
         rogue.setY(200);
+        field.add(rogue);
 
-        com.miolean.arena.entities.Robot dummy = new Robot(Global.class.getClassLoader().getResourceAsStream("gen/cain.ergo"), handler);
-        window.setActiveTank(dummy);
+        com.miolean.arena.entities.Robot dummy = new Robot(Global.class.getClassLoader().getResourceAsStream("gen/cain.ergo"), field);
         dummy.setHealth(256);
 
-        handler.add(dummy);
+        field.add(dummy);
 
         this.setBackground(new Color(170, 170, 160));
 
         this.addKeyListener(this);
         this.addMouseListener(this);
         this.addMouseMotionListener(this);
-        window.addWindowListener(this);
-
-        window.setSize(1200, 700);
-        window.setName("Arena");
-        window.setLocation(20, 200);
-        window.setVisible(true);
 
         requestFocus();
     }
 
-    public void paint(Graphics g) {
-        super.paint(g);
+    public void paintComponent(Graphics g) {
+        super.paintComponent(g);
         render(g);
     }
 
-    public void run() {
-        System.out.println("Running...");
 
-        long lastUpdate = System.currentTimeMillis();
-        long lastRender = System.currentTimeMillis();
-        long lastDisplay = System.currentTimeMillis();
-        long lastDistribute = System.currentTimeMillis();
-
-        while(isRunning) {
-
-            long time = System.currentTimeMillis();
-
-            if(time > lastUpdate + Global.updateCycle) {
-                handler.update();
-                lastUpdate = time;
-            }
-            time = System.currentTimeMillis();
-
-            if(time > lastRender + Global.renderCycle) {
-                repaint();
-                lastRender = time;
-            }
-            time = System.currentTimeMillis();
-
-            if(time > lastDisplay + Global.displayCycle) {
-                window.display();
-                lastDisplay = time;
-            }
-            time = System.currentTimeMillis();
-
-            if(time > lastDistribute + Global.distributeCycle) {
-                handler.distribute();
-                lastDistribute = time;
-            }
-        }
-    }
 
     public void setViewholder(int x, int y) {
-        Entity e = handler.entityAtLocation(x, y);
+        Entity e = field.atLocation(x, y);
 
         if (e == null) {
             if (viewholder instanceof ControlledRobot) {
                 viewholder.setX(x);
                 viewholder.setY(y);
             } else {
-                e = new ControlledRobot(x, y, handler);
-                handler.add(e);
+                e = new ControlledRobot(x, y, field);
+                field.add(e);
                 viewholder = e;
             }
 
         } else {
-            if (viewholder instanceof ControlledRobot) handler.remove(viewholder.getUUID());
+            if (viewholder instanceof ControlledRobot) field.remove(viewholder);
             viewholder = e;
         }
 
         if (viewholder instanceof com.miolean.arena.entities.Robot && !(viewholder instanceof ControlledRobot))
-            window.setActiveTank((com.miolean.arena.entities.Robot) viewholder);
+            alertInfoholderChange((Robot)e);
+        alertViewholderChange(e);
     }
 
     public void setViewholder(Entity e) {
 
         if(e == null) throw new NumberFormatException("Null viewholder.");
 
-        if (viewholder instanceof ControlledRobot) handler.remove(viewholder.getUUID());
+        if (viewholder instanceof ControlledRobot) field.remove(viewholder);
         viewholder = e;
 
         if (viewholder instanceof com.miolean.arena.entities.Robot && !(viewholder instanceof ControlledRobot))
-            window.setActiveTank((com.miolean.arena.entities.Robot) viewholder);
+            alertInfoholderChange((Robot)e);
+        alertViewholderChange(e);
     }
 
     private void render(Graphics g) {
@@ -149,7 +100,7 @@ public class MainPanel extends JPanel implements Runnable, KeyListener, MouseLis
         g.setColor(Color.BLACK);
         g.drawString((int) (1000.0/Global.updateCycle) + "tk/s", 15, 25);
         g.drawString("Time:" + Global.time + "tks", 15, 45);
-        g.drawString("Entities: " + handler.numEntities + " (Cogs: " + handler.numCogs + ", Tanks: " + handler.numTanks + ")", 15, 65);
+        g.drawString("Entities: " + field.getEntities().size() + " (Cogs: " + field.getCogs().size() + ", Tanks: " + field.getRobots().size() + ")", 15, 65);
         g.drawOval(this.getWidth()/2, this.getHeight()/2, 2, 2);
 
         g.translate((int) (-viewholder.getX() + this.getWidth()/2), (int) (-viewholder.getY() + this.getHeight()/2));
@@ -199,7 +150,7 @@ public class MainPanel extends JPanel implements Runnable, KeyListener, MouseLis
         char key = e.getKeyChar();
         if(key == 'l') {
             System.out.println("============Top robots============");
-            for(com.miolean.arena.entities.Robot t: handler.topRobots) {
+            for(com.miolean.arena.entities.Robot t: field.getTopRobots()) {
                 System.out.println("Robot " + t + " [Fitness " + t.getFitness() + "]");
             }
         }
@@ -227,7 +178,7 @@ public class MainPanel extends JPanel implements Runnable, KeyListener, MouseLis
         if(key == 'd') Global.KEY[Global.KEY_D] = false;
         if(key == ' ') Global.KEY[Global.KEY_SPACE] = false;
         if(e.getKeyCode() == KeyEvent.VK_ESCAPE) {
-            System.out.println("com.miolean.arena.Window closing...");
+            System.out.println("com.miolean.arena.GeneralDisplayPanel closing...");
             System.exit(0);
         }
     }
@@ -246,18 +197,18 @@ public class MainPanel extends JPanel implements Runnable, KeyListener, MouseLis
         }
 
         if(e.getButton() == MouseEvent.BUTTON3) {
-            Cog cog = new Cog(100, handler);
+            Cog cog = new Cog(30, field);
             cog.setX(x);
             cog.setY(y);
-            handler.add(cog);
+            field.add(cog);
         }
 
         if(e.getButton() == MouseEvent.BUTTON2) {
-            com.miolean.arena.entities.Robot creation = new com.miolean.arena.entities.Robot(Global.class.getResourceAsStream("cain.ergo"), handler);
+            com.miolean.arena.entities.Robot creation = new com.miolean.arena.entities.Robot(Global.class.getResourceAsStream("cain.ergo"), field);
             creation.setX(x);
             creation.setY(y);
             creation.setName("creation");
-            handler.add(creation);
+            field.add(creation);
         }
     }
     @Override public void mousePressed(MouseEvent e) {}
@@ -266,17 +217,29 @@ public class MainPanel extends JPanel implements Runnable, KeyListener, MouseLis
     @Override public void mouseExited(MouseEvent e) {}
     @Override public void mouseDragged(MouseEvent e) {}
     @Override public void mouseMoved(MouseEvent e) {}
-    @Override public void windowOpened(WindowEvent e) {}
-    @Override public void windowClosing(WindowEvent e) {
-        isRunning = false;
-        for(Robot t: handler.topRobots) {
-            System.out.println(t);
-        }
-        System.exit(0);
+
+    public void addActiveRobotListener(ActiveRobotListener l) {
+        listenerList.add(l);
     }
-    @Override public void windowClosed(WindowEvent e) {}
-    @Override public void windowIconified(WindowEvent e) {}
-    @Override public void windowDeiconified(WindowEvent e) {}
-    @Override public void windowActivated(WindowEvent e) {}
-    @Override public void windowDeactivated(WindowEvent e) {}
+
+    public void removeActiveRobotListener(ActiveRobotListener l) {
+        listenerList.remove(l);
+    }
+
+    @Override
+    public void viewholderChanged(Entity e) {
+        viewholder = e;
+    }
+
+    @Override
+    public void infoholderChanged(Robot e) {
+        //We don't really care about this
+    }
+
+    public void alertViewholderChange(Entity e) {
+        for(ActiveRobotListener arl: listenerList) arl.viewholderChanged(e);
+    }
+    public void alertInfoholderChange(Robot e) {
+        for(ActiveRobotListener arl: listenerList) arl.infoholderChanged(e);
+    }
 }

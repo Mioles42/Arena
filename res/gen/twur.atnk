@@ -1,0 +1,45 @@
+## Code genetically generated on 16 January 2018. #/
+
+edit meta 0:
+    at 0:
+    _IMOV 42 3 0
+    _IMOV 43 0 0
+    _IRAND 44 0 0
+    _ADD 45 44 42
+
+    at 64:
+    _KRAND 45 0 0
+    _PSTO 1 44 45
+    _INCR 44 0 0
+    _WRAND 45 0 0
+    _COMP 44 45 0
+    _IGOG 64 0 0
+
+edit program 0:
+    at 04: _SWAP 34 0 0
+    at 15: _WRAND 0 3 0
+    at 20: _FORWD 2 0 0
+    at 24: _LED 2 2 1
+    at 28: _IMOV 1 0 0
+    at 32: _IMOV 2 255 0
+    at 37: _IGOG 84 0 0
+    at 78: _WRAND 0 0 0
+    at 84: _TURNR 86 0 0
+    at 98: _OLEDG 255 0 0
+    at 107: _FORWD 0 0 0
+    at 113: _IRAND 0 0 0
+    at 117: _PGET 81 169 247
+    at 121: _PROD 0 0 0
+    at 126: _POSY 81 86 0
+    at 133: _OLEDB 0 0 0
+    at 139: _OLEDB 0 103 255
+    at 143: _OVELR 255 0 0
+    at 162: _SGET 0 0 0
+    at 169: _PGET 85 0 0
+    at 176: _SRAND 149 0 0
+    at 182: _PGET 85 84 34
+    at 194: _TURNL 84 255 83
+    at 198: _STAT 243 51 85
+    at 202: _WRAND 37 22 164
+    at 233: _TURNL 255 199 194
+    at 246: _NEAR 255 255 255

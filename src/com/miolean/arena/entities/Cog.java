@@ -10,8 +10,8 @@ public class Cog extends Entity {
 
     private int value;
 
-    public Cog(int value, Handler handler) {
-        super((int) (5*Math.sqrt(value)), (int) (5*Math.sqrt(value)), 1, handler);
+    public Cog(int value, Field field) {
+        super((int) (5*Math.sqrt(value)), (int) (5*Math.sqrt(value)), 1, field);
         this.value = value;
     }
 
@@ -41,7 +41,7 @@ public class Cog extends Entity {
     public void intersect(Entity e) {
         if(e instanceof Robot) {
             ((Robot) e).setCogs(((Robot) e).getCogs() + value);
-            die();
+            getField().remove(this);
         }
     }
 

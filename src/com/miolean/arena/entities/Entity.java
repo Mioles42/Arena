@@ -1,7 +1,5 @@
 package com.miolean.arena.entities;
 
-import com.miolean.arena.Handler;
-
 import java.awt.*;
 
 import static com.miolean.arena.Global.ARENA_SIZE;
@@ -38,17 +36,17 @@ public abstract class Entity {
     private double health = 1;
 
     //Other things:
-    private Handler handler;
+    private Field field;
 
     //ID management
     private int uuid = -1;
 
 
-    Entity(int width, int height, int health, Handler handler) {
+    Entity(int width, int height, int health, Field field) {
         this.width = width;
         this.height = height;
         this.health = health;
-        this.handler = handler;
+        this.field = field;
     }
 
 
@@ -73,8 +71,13 @@ public abstract class Entity {
         if(y < BORDER) y = BORDER;
     }
 
+    void tick() {
+        update();
+        if(health <= 0) field.remove(this);
+    }
+
     public abstract void render(Graphics g);
-    public abstract void update();
+    protected abstract void update();
     public abstract boolean intersectsWith(Entity e);
     public abstract void intersect(Entity e);
     protected abstract void onBirth();
@@ -95,7 +98,7 @@ public abstract class Entity {
     public int getUUID() { return uuid; }
     public int getWidth() { return width; }
     public int getHeight() { return height;}
-    public Handler getHandler() { return handler; }
+    public Field getField() { return field; }
     public void setX(double x) { this.x = x; }
     public void setY(double y) { this.y = y; }
     public void setR(double r) { this.r = r; }
@@ -106,24 +109,20 @@ public abstract class Entity {
     public void setAccY(double accY) { this.accY = accY; }
     public void setAccR(double accR) { this.accR = accR; }
     public void setHealth(double health) { this.health = health;}
-    public void setUUID(int uuid) {this.uuid = uuid;}
 
     public final void die() {
         onDeath();
         health = 0;
-        handler = null;
     }
 
     public final void appear(int uuid) {
-        if(this.uuid == -1) {
-            this.uuid = uuid;
-            onBirth();
-        }
+        this.uuid = uuid;
+        onBirth();
     }
 
     public void damage(double amount) {health -= amount;}
     public void heal(double amount) {health += amount;}
-    public void add(Entity e) {handler.add(e);}
+    public void add(Entity e) {field.add(e);}
 
     @Override
     public String toString() {

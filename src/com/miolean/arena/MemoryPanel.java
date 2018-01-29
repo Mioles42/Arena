@@ -79,8 +79,6 @@ public class MemoryPanel extends JPanel {
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 
         textPane = new JTextPane();
-        textPane.setEditable(false);
-        textPane.setHighlighter(null);
         c = new GridBagConstraints();
         c.gridx = 0;
         c.gridy = 1;
@@ -142,7 +140,9 @@ public class MemoryPanel extends JPanel {
 
             }
 
-            try { doc.insertString(doc.getLength(), next.substring(1), style); }
+            try {
+                doc.insertString(doc.getLength(), next.substring(1), style);
+            }
             catch (BadLocationException e){}
         }
 
@@ -161,7 +161,5 @@ public class MemoryPanel extends JPanel {
         } catch (Exception e) {
             System.err.println("Error caught from Swing internals");
         }
-
-        //repaint();
     }
 }

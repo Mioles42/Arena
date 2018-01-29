@@ -1,6 +1,7 @@
 package com.miolean.arena;
 
 import com.miolean.arena.entities.Entity;
+import com.miolean.arena.entities.Field;
 import com.miolean.arena.entities.Gene;
 import com.miolean.arena.entities.Robot;
 
@@ -15,23 +16,25 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.ArrayList;
 
-public class Window extends JFrame implements ChangeListener ,KeyListener, ListSelectionListener, HyperlinkListener {
+public class GeneralDisplayPanel extends JPanel implements ChangeListener, ListSelectionListener, HyperlinkListener, ActiveRobotListener {
 
     private JSlider slider;
     private JTabbedPane tabbedPane;
-    MainPanel main;
     MemoryPanel memoryPanel;
     EvolutionPanel evolutionPanel;
     EntityPanel entityPanel;
 
-    java.util.List<com.miolean.arena.entities.Robot> topRobots;
-    java.util.List<com.miolean.arena.entities.Robot> robots;
+    java.util.List<ActiveRobotListener> listenerList = new ArrayList<ActiveRobotListener>();
+    Entity viewholder;
+    Entity infoholder;
 
-    Window(MainPanel mainPanel, java.util.List<com.miolean.arena.entities.Robot> topRobots, Entity[] entities, java.util.List<com.miolean.arena.entities.Robot> robots) {
-        this.main = mainPanel;
-        this.topRobots = topRobots;
-        this.robots = robots;
+    Field field;
+
+
+    GeneralDisplayPanel(Field field) {
+        this.field = field;
 
         LayoutManager layout = new GridBagLayout();
         setLayout(layout);
@@ -42,40 +45,19 @@ public class Window extends JFrame implements ChangeListener ,KeyListener, ListS
             e.printStackTrace();
         }
 
-        makeMainLayout(topRobots, entities, robots);
+        makeMainLayout();
     }
 
-    public void makeMainLayout(java.util.List<com.miolean.arena.entities.Robot> topRobots, Entity[] entities, java.util.List<com.miolean.arena.entities.Robot> robots) {
+    public void makeMainLayout() {
         JPanel genomePanel = new JPanel();
         memoryPanel = new MemoryPanel(null);
-        evolutionPanel = new EvolutionPanel(topRobots);
-        entityPanel = new EntityPanel(robots, entities);
-
-        JPanel usedSetPanel = new JPanel();
+        evolutionPanel = new EvolutionPanel(field);
+        entityPanel = new EntityPanel(field);
 
         evolutionPanel.addHyperlinkListener(this);
         entityPanel.addHyperlinkListener(this);
 
-        //Add the main panel:
-        JPanel mainContainer = new JPanel();
-        mainContainer.setLayout(new BorderLayout());
-
-        GridBagConstraints c = new GridBagConstraints();
-        c.fill = GridBagConstraints.BOTH;
-        c.gridx = 0;
-        c.gridy = 0;
-        c.gridheight = 2;
-        c.gridwidth = 1;
-        c.ipadx = 5;
-        c.ipady = 5;
-        c.weightx = .7;
-        c.weighty = .5;
-        mainContainer.add(main, BorderLayout.CENTER);
-        mainContainer.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createEmptyBorder(10, 10, 10, 10),
-                BorderFactory.createLoweredBevelBorder()
-        ));
-        this.add(mainContainer, c);
+        GridBagConstraints c;
 
         //Add the info panel:
         //Because of the way borders work we have to use multiple panels...
@@ -96,7 +78,7 @@ public class Window extends JFrame implements ChangeListener ,KeyListener, ListS
         c.weightx = .2;
         c.weighty = .5;
 
-        //ImageIcon genomeIcon = new ImageIcon(Window.class.getClassLoader().getResource("tex/list.png"));
+        //ImageIcon genomeIcon = new ImageIcon(GeneralDisplayPanel.class.getClassLoader().getResource("tex/list.png"));
 
         makeGenomePanel(genomePanel);
 
@@ -212,48 +194,46 @@ public class Window extends JFrame implements ChangeListener ,KeyListener, ListS
     }
 
     @Override
-    public void keyTyped(KeyEvent e) {
-        main.requestFocus();
-        main.keyTyped(e);
-    }
-
-    @Override
-    public void keyPressed(KeyEvent e) {
-        main.keyPressed(e);
-    }
-
-    @Override
-    public void keyReleased(KeyEvent e) {
-        main.keyReleased(e);
-
-    }
-
-    public void setActiveTank(Robot robot) {
-        memoryPanel.source = robot;
-    }
-
-    @Override
     public void hyperlinkUpdate(HyperlinkEvent e) {
-        if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
-
-            if(e.getDescription().contains("tank_greatest_")) {
-                int i = Integer.parseInt(e.getDescription().replace("tank_greatest_", ""));
-                setActiveTank(topRobots.get(i));
-                if (topRobots.get(i).isAlive()) main.viewholder = topRobots.get(i);
-                tabbedPane.setSelectedIndex(0);
-            } else if(e.getDescription().contains("tank_num_")) {
-                int i = Integer.parseInt(e.getDescription().replace("tank_num_", ""));
-                setActiveTank(robots.get(i));
-                if (robots.get(i).isAlive()) main.viewholder = robots.get(i);
-                tabbedPane.setSelectedIndex(0);
-            }
+        if(e.getEventType() == HyperlinkEvent.EventType.ACTIVATED){
+            infoholder = field.fromHTML(e.getDescription());
+            alertInfoholderChange(((Robot)infoholder));
         }
     }
-  
+
     @Override
     public void valueChanged(ListSelectionEvent e) {
-        System.out.println("Viewholder selected from entities list, set to " + main.viewholder);
         Entity n = (Entity) ((JList)e.getSource()).getSelectedValue();
-        if(n != null) main.setViewholder(n);
+        if(n != null) {
+            viewholder = n;
+            alertViewholderChange(n);
+        }
+    }
+
+    public void addActiveRobotListener(ActiveRobotListener l) {
+        listenerList.add(l);
+    }
+
+    public void removeActiveRobotListener(ActiveRobotListener l) {
+        listenerList.remove(l);
+    }
+
+    @Override
+    public void viewholderChanged(Entity e) {
+        viewholder = e;
+    }
+
+    @Override
+    public void infoholderChanged(Robot e) {
+
+        memoryPanel.source = e;
+    }
+
+    public void alertViewholderChange(Entity e) {
+        for(ActiveRobotListener arl: listenerList) arl.viewholderChanged(e);
+    }
+    public void alertInfoholderChange(Robot e) {
+        for(ActiveRobotListener arl: listenerList) arl.infoholderChanged(e);
+        memoryPanel.source = e;
     }
 }

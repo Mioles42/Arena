@@ -21,8 +21,8 @@ public class Bullet extends Entity {
     private Robot target;
     private int damage;
 
-    public Bullet(Robot source, Handler handler) {
-        super(SIZE, SIZE, 1, handler);
+    public Bullet(Robot source, Field field) {
+        super(SIZE, SIZE, 1, field);
         this.source = source;
 
         if(source != null) {
@@ -93,8 +93,8 @@ public class Bullet extends Entity {
         applyPhysics();
 
         if(source != null) {
-            if (Math.abs(getVelX()) < 1 && Math.abs(getVelY()) < 1) getHandler().remove(getUUID());
-            if ((getX() > ARENA_SIZE - BORDER) || (getX() < BORDER) || (getY() > ARENA_SIZE - BORDER) || (getY() < BORDER)) getHandler().remove(getUUID());
+            if (Math.abs(getVelX()) < 1 && Math.abs(getVelY()) < 1) getField().remove(getUUID());
+            if ((getX() > ARENA_SIZE - BORDER) || (getX() < BORDER) || (getY() > ARENA_SIZE - BORDER) || (getY() < BORDER)) getField().remove(getUUID());
         } else if(target != null){
             double xdis = target.getX() - getX();
             double ydis = target.getY() - getY();
@@ -118,7 +118,7 @@ public class Bullet extends Entity {
 
             for(int i = 0; i < ROGUE_OBSERVATION; i++) {
 
-                Entity attemptedTarget = getHandler().getByUUID(UByte.rand(), UByte.rand());
+                Entity attemptedTarget = getField().fromUUID(Global.random.nextInt(Field.MAX_ENTITIES));
 
                 if (attemptedTarget != null && attemptedTarget instanceof Robot) {
                     double axdis = attemptedTarget.getX() - getX();
@@ -135,7 +135,7 @@ public class Bullet extends Entity {
             setVelR(0.1);
 
             for(int i = 0; i < ROGUE_OBSERVATION; i++){
-                Entity attemptedTarget = getHandler().getByUUID(UByte.rand(), UByte.rand());
+                Entity attemptedTarget = getField().fromUUID(Global.random.nextInt(Field.MAX_ENTITIES));
                 if(attemptedTarget != null && attemptedTarget instanceof Robot) {
                     target = (Robot) attemptedTarget;
                     System.out.println("Found target");

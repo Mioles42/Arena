@@ -6,11 +6,13 @@ import static com.miolean.arena.UByte.ub;
 
 public class ControlledRobot extends Robot {
 
-    public ControlledRobot(int x, int y, Handler handler) {
-        super(handler);
+    public ControlledRobot(int x, int y, Field field) {
+        super(field);
         setX(x);
         setY(y);
         setHealth(100);
+        setName("Controlled Bot");
+        setFitness(-1);
 
         //Do better default stats.
         stats[STAT_SPEED] = ub(20);
