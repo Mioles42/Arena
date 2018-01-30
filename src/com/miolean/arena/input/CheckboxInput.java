@@ -2,9 +2,9 @@ package com.miolean.arena.input;
 
 
 import javax.swing.*;
-import java.awt.*;
 
-public class CheckboxInput<E> extends Input {
+public class CheckboxInput<E extends Boolean> extends Input<E> {
+
 
     public CheckboxInput(String name, String description) {
         super(name, description);
