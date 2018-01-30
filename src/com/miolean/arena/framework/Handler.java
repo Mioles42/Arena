@@ -1,27 +1,23 @@
-package com.miolean.arena;
+package com.miolean.arena.framework;
 
 import com.miolean.arena.entities.*;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 /**
  * Created by commandm on 2/19/17.
  */
-public class Handler {
+public class Handler implements Perpetual {
 
     Field field;
     private int lastUUIDUsed = 0;
 
     public static Robot BASE_ROBOT;
 
-    Handler(Field field) {
+    public Handler(Field field) {
 
         this.field = field;
     }
 
-    public void update() {
+    public void tick(Object... o) {
         field.updateAll();
     }
 
@@ -62,4 +58,9 @@ public class Handler {
             field.add(robot);
         }
     }
+
+    public void stop() {}
+    public void start() {}
+    public void pause() {}
+    public void resume() {}
 }

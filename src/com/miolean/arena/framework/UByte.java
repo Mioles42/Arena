@@ -1,4 +1,4 @@
-package com.miolean.arena;
+package com.miolean.arena.framework;
 
 import java.io.Serializable;
 

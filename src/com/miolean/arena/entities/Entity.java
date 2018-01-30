@@ -2,8 +2,8 @@ package com.miolean.arena.entities;
 
 import java.awt.*;
 
-import static com.miolean.arena.Global.ARENA_SIZE;
-import static com.miolean.arena.Global.BORDER;
+import static com.miolean.arena.framework.Global.ARENA_SIZE;
+import static com.miolean.arena.framework.Global.BORDER;
 
 /**
  * Created by commandm on 2/16/17.

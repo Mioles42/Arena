@@ -1,7 +1,5 @@
 package com.miolean.arena.entities;
 
-import com.miolean.arena.Handler;
-
 import java.awt.*;
 
 public class TrackerDot extends Entity {

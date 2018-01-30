@@ -1,18 +1,16 @@
 package com.miolean.arena.entities;
 
-import com.miolean.arena.Global;
-import com.miolean.arena.Handler;
-import com.miolean.arena.UByte;
+import com.miolean.arena.framework.Global;
+import com.miolean.arena.framework.UByte;
 
 import java.awt.*;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Scanner;
 
-import static com.miolean.arena.Global.ARENA_SIZE;
-import static com.miolean.arena.Global.BORDER;
-import static com.miolean.arena.UByte.ub;
-import static com.miolean.arena.UByte.ubDeepCopy;
+import static com.miolean.arena.framework.Global.ARENA_SIZE;
+import static com.miolean.arena.framework.UByte.ub;
+import static com.miolean.arena.framework.UByte.ubDeepCopy;
 
 /**
  * Created by commandm on 5/13/17.

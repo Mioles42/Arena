@@ -1,9 +1,10 @@
-package com.miolean.arena;
+package com.miolean.arena.ui;
 
 import com.miolean.arena.entities.Entity;
 import com.miolean.arena.entities.Field;
 import com.miolean.arena.entities.Gene;
 import com.miolean.arena.entities.Robot;
+import com.miolean.arena.framework.Global;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -14,8 +15,6 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import java.awt.*;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.util.ArrayList;
 
 public class GeneralDisplayPanel extends JPanel implements ChangeListener, ListSelectionListener, HyperlinkListener, ActiveRobotListener {
@@ -33,7 +32,7 @@ public class GeneralDisplayPanel extends JPanel implements ChangeListener, ListS
     Field field;
 
 
-    GeneralDisplayPanel(Field field) {
+    public GeneralDisplayPanel(Field field) {
         this.field = field;
 
         LayoutManager layout = new GridBagLayout();

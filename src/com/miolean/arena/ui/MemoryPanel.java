@@ -1,4 +1,4 @@
-package com.miolean.arena;
+package com.miolean.arena.ui;
 
 import com.miolean.arena.entities.Robot;
 
@@ -10,12 +10,11 @@ import java.util.regex.Pattern;
 
 public class MemoryPanel extends JPanel {
 
-    JTextPane textPane;
-    JSpinner spinner;
-    JComboBox<String> comboBox;
-    JLabel label;
-    JScrollPane scrollPane;
-    Point scrollPosition;
+    private JTextPane textPane;
+    private JSpinner spinner;
+    private JComboBox<String> comboBox;
+    private JScrollPane scrollPane;
+    private Point scrollPosition;
 
     com.miolean.arena.entities.Robot source;
 
@@ -24,7 +23,7 @@ public class MemoryPanel extends JPanel {
     private static final int INDEX_SMEM = 2;
     private static final int INDEX_WMEM = 3;
 
-    public MemoryPanel(Robot source) {
+    MemoryPanel(Robot source) {
 
         this.source = source;
 
@@ -33,7 +32,7 @@ public class MemoryPanel extends JPanel {
         setLayout(layout);
 
 
-        label = new JLabel();
+        JLabel label = new JLabel();
         c = new GridBagConstraints();
         c.gridx = 0;
         c.gridy = 0;
@@ -143,7 +142,7 @@ public class MemoryPanel extends JPanel {
             try {
                 doc.insertString(doc.getLength(), next.substring(1), style);
             }
-            catch (BadLocationException e){}
+            catch (BadLocationException ignored){}
         }
 
         try {

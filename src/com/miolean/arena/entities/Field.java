@@ -1,11 +1,7 @@
 package com.miolean.arena.entities;
 
-import com.miolean.arena.Global;
-import com.miolean.arena.UByte;
-import com.miolean.arena.entities.Cog;
-import com.miolean.arena.entities.Entity;
-import com.miolean.arena.entities.Robot;
-import sun.plugin.dom.exception.InvalidStateException;
+import com.miolean.arena.framework.Global;
+import com.miolean.arena.framework.UByte;
 
 import java.awt.*;
 import java.util.*;

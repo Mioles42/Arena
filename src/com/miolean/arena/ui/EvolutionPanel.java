@@ -1,4 +1,4 @@
-package com.miolean.arena;
+package com.miolean.arena.ui;
 
 import com.miolean.arena.entities.Field;
 import com.miolean.arena.entities.Robot;

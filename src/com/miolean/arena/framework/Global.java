@@ -1,6 +1,5 @@
-package com.miolean.arena;
+package com.miolean.arena.framework;
 
-import com.miolean.arena.entities.Robot;
 import com.miolean.random.WordRandom;
 
 import java.util.Random;
@@ -17,11 +16,11 @@ public class Global {
     public static int time;
 
     //Milliseconds per tick, for each of the different cycles
-    static int updateCycle = 50;
-    static int displayCycle = 100;
-    static int renderCycle = 10;
-    static int distributeCycle = 20;
-    static double distributeRatio = 0.3; //distributes per update
+    public static int updateCycle = 50;
+    public static int displayCycle = 100;
+    public static int renderCycle = 10;
+    public static int distributeCycle = 20;
+    public static double distributeRatio = 0.3; //distributes per update
 
     //Publicly accessible random instance
     public static Random random = new Random();

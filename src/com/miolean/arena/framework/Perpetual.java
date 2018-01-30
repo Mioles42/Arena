@@ -1,7 +1,7 @@
-package com.miolean.arena;
+package com.miolean.arena.framework;
 
 public interface Perpetual {
-    void tick();
+    void tick(Object... args);
     void pause();
     void start();
     void resume();

@@ -1,4 +1,4 @@
-package com.miolean.arena;
+package com.miolean.arena.ui;
 
 import com.miolean.arena.entities.*;
 import com.miolean.arena.entities.Robot;
@@ -9,7 +9,6 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
-import java.util.Collections;
 
 public class EntityPanel extends JPanel implements ActionListener{
 

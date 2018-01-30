@@ -1,8 +1,7 @@
 package com.miolean.arena.entities;
-import com.miolean.arena.Handler;
 
-import static com.miolean.arena.Global.*;
-import static com.miolean.arena.UByte.ub;
+import static com.miolean.arena.framework.Global.*;
+import static com.miolean.arena.framework.UByte.ub;
 
 public class ControlledRobot extends Robot {
 

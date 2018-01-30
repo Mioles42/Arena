@@ -1,6 +1,8 @@
-package com.miolean.arena;
+package com.miolean.arena.framework;
 
 import com.miolean.arena.entities.Field;
+import com.miolean.arena.ui.FieldDisplayPanel;
+import com.miolean.arena.ui.GeneralDisplayPanel;
 
 import javax.swing.*;
 import java.awt.*;
@@ -26,7 +28,7 @@ public class Main implements Runnable, WindowListener {
 
     private Main() {
         field = new Field();
-        fieldDisplayPanel = new FieldDisplayPanel(field);
+        fieldDisplayPanel = new com.miolean.arena.ui.FieldDisplayPanel(field);
         generalDisplayPanel = new GeneralDisplayPanel(field);
         initializeGUI();
 
@@ -92,7 +94,7 @@ public class Main implements Runnable, WindowListener {
             long time = System.currentTimeMillis();
 
             if(time > lastUpdate + Global.updateCycle) {
-                handler.update();
+                handler.tick();
                 lastUpdate = time;
             }
             time = System.currentTimeMillis();

@@ -1,14 +1,12 @@
 package com.miolean.arena.entities;
 
-import com.miolean.arena.Global;
-import com.miolean.arena.Handler;
-import com.miolean.arena.UByte;
+import com.miolean.arena.framework.Global;
 
 import java.awt.*;
 import java.awt.geom.Point2D;
 
-import static com.miolean.arena.Global.ARENA_SIZE;
-import static com.miolean.arena.Global.BORDER;
+import static com.miolean.arena.framework.Global.ARENA_SIZE;
+import static com.miolean.arena.framework.Global.BORDER;
 
 public class Bullet extends Entity {
 

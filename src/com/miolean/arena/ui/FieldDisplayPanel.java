@@ -1,19 +1,21 @@
-package com.miolean.arena;
+package com.miolean.arena.ui;
 
 import com.miolean.arena.entities.*;
 import com.miolean.arena.entities.Robot;
+import com.miolean.arena.framework.Global;
+import com.miolean.arena.framework.Renderer;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
 
-import static com.miolean.arena.Global.ARENA_SIZE;
-import static com.miolean.arena.Global.BORDER;
+import static com.miolean.arena.framework.Global.ARENA_SIZE;
+import static com.miolean.arena.framework.Global.BORDER;
 
 public class FieldDisplayPanel extends JPanel implements KeyListener, MouseListener, MouseMotionListener, ActiveRobotListener{
 
-    private com.miolean.arena.Renderer renderer;
+    private com.miolean.arena.framework.Renderer renderer;
 
     java.util.List<ActiveRobotListener> listenerList = new ArrayList<>();
 
@@ -29,7 +31,7 @@ public class FieldDisplayPanel extends JPanel implements KeyListener, MouseListe
 
         requestFocus();
 
-        renderer = new com.miolean.arena.Renderer(field);
+        renderer = new Renderer(field);
 
         viewholder = new ControlledRobot(300, 300, field);
         field.add(viewholder);
@@ -114,7 +116,7 @@ public class FieldDisplayPanel extends JPanel implements KeyListener, MouseListe
         g.setColor(Color.RED);
         g.drawRect(10, 10, ARENA_SIZE - BORDER, ARENA_SIZE - BORDER);
 
-        renderer.render(g);
+        renderer.tick(g);
 
         g.translate((int) -(-viewholder.getX() + this.getWidth()/2), (int) -(-viewholder.getY() + this.getHeight()/2));
 
