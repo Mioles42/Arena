@@ -31,6 +31,7 @@ public abstract class Entity {
     //Size components:
     private int width;
     private int height;
+    private double mass = 1;
 
     //Entities can also be destroyed:
     private double health = 1;
@@ -71,6 +72,26 @@ public abstract class Entity {
         if(y < BORDER) y = BORDER;
     }
 
+    void repel(Entity e) {
+        double compoundVel = Math.sqrt(velX*velX + velY*velY);
+        double relX = x - e.getX();
+        double relY = y  - e.getY();
+
+        double collisionAngle = Math.atan(relY/relX);
+        double forceAngle = ((velX > 0)? Math.PI:0) + Math.atan(velY/velX);
+        double reflectAngle = 2*collisionAngle-forceAngle;
+
+        double percentMass = mass / (mass + e.getMass()); //basically for translating momentum into force
+
+        force(compoundVel * (1-percentMass), reflectAngle);
+        e.force(compoundVel * percentMass, reflectAngle + Math.PI);
+    }
+
+    void force(double direction, double magnitude) {
+        accX += magnitude * Math.cos(direction) / mass;
+        accY += magnitude * Math.sin(direction) / mass;
+    }
+
     void tick() {
         update();
         if(health <= 0) field.remove(this);
@@ -95,6 +116,7 @@ public abstract class Entity {
     public double getAccY() { return accY; }
     public double getAccR() { return accR; }
     public double getHealth() { return health; }
+    public double getMass() { return mass; }
     public int getUUID() { return uuid; }
     public int getWidth() { return width; }
     public int getHeight() { return height;}
@@ -109,6 +131,7 @@ public abstract class Entity {
     public void setAccY(double accY) { this.accY = accY; }
     public void setAccR(double accR) { this.accR = accR; }
     public void setHealth(double health) { this.health = health;}
+    public void setMass(double mass) { this.mass = mass;}
 
     public final void die() {
         onDeath();

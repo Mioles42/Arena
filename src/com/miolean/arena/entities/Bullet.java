@@ -147,7 +147,10 @@ public class Bullet extends Entity {
         if( e instanceof TrackerDot) return false;
         if(e == null || e == source || (e instanceof Bullet && ((Bullet) e).source == source)) return false; //Don't interact with your own source
 
-        //This is going to be hell if we don't make up some shorthands
+        repel(e);
+
+        //This is going to be tedious if we don't make up some shorthands.
+        //I know, memory usage and so forth, but it'll be OK
         double x = getX();
         double y = getY();
         double velX = getVelX();

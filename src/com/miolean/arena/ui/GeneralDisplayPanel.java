@@ -77,7 +77,7 @@ public class GeneralDisplayPanel extends JPanel implements ChangeListener, ListS
         c.weightx = .2;
         c.weighty = .5;
 
-        //ImageIcon genomeIcon = new ImageIcon(GeneralDisplayPanel.class.getClassLoader().getResource("tex/list.png"));
+        //ImageIcon genomeIcon = new ImageIcon(GeneralDisplayPanel.class.getClassLoader().getResource("img/list.png"));
 
         makeGenomePanel(genomePanel);
 
