@@ -92,6 +92,9 @@ public class Bullet extends Entity {
 
         applyPhysics();
 
+        if(target != null && target.getHealth() <= 0) target = null;
+        if(source != null && source.getHealth() <= 0) source = null;
+
         if(source != null) {
             if (Math.abs(getVelX()) < 1 && Math.abs(getVelY()) < 1) getField().remove(getUUID());
             if ((getX() > ARENA_SIZE - BORDER) || (getX() < BORDER) || (getY() > ARENA_SIZE - BORDER) || (getY() < BORDER)) getField().remove(getUUID());
@@ -186,7 +189,7 @@ public class Bullet extends Entity {
     public void intersect(Entity e) {
 
         repel(e);
-        e.damage(damage);
+        if(! (e instanceof Cog)) e.damage(damage);
         damage(1);
     }
 
