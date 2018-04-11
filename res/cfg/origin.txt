@@ -41,7 +41,7 @@
     /40/ VIEW   /"Set sight range"              /30 /0.1/
     /41/ NEAR   /"Number nearby"                /30 /0  /
 ^5 Action
-    /50/ HEAL   / "Heal"                        /100/1  /
+    /50/ HEAL   / "Heal"                        /100/0  /
     /51/ FORWD  / "Forwards"                    /250/0  /
     /52/ REVRS  / "Reverse"                     /100/0  /
     /53/ FIRE   / "Fire"                        /110/0  /

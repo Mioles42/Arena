@@ -74,22 +74,34 @@ public abstract class Entity {
 
     void repel(Entity e) {
         double compoundVel = Math.sqrt(velX*velX + velY*velY);
-        double relX = x - e.getX();
-        double relY = y  - e.getY();
+        double rposX = x - e.getX();
+        double rposY = y  - e.getY();
 
-        double collisionAngle = Math.atan(relY/relX);
+        //Lay down the law for impossibly direct collisions
+        double velX = (Math.abs(this.velX) < 1)? this.velX+1:this.velX;
+        double velY = (Math.abs(this.velY) < 1)? this.velY+1:this.velY;
+        if(rposX == 0) rposX = 1;
+        if(rposY == 0) rposY = 1;
+
+
+        double collisionAngle = Math.atan(rposY/rposX);
         double forceAngle = ((velX > 0)? Math.PI:0) + Math.atan(velY/velX);
         double reflectAngle = 2*collisionAngle-forceAngle;
 
         double percentMass = mass / (mass + e.getMass()); //basically for translating momentum into force
 
-        force(compoundVel * (1-percentMass), reflectAngle);
-        e.force(compoundVel * percentMass, reflectAngle + Math.PI);
+        move(reflectAngle,compoundVel * (1-percentMass));
+        e.move( reflectAngle + Math.PI,compoundVel * (percentMass));
     }
 
-    void force(double direction, double magnitude) {
+    void accelerate(double direction, double magnitude) {
         accX += magnitude * Math.cos(direction) / mass;
         accY += magnitude * Math.sin(direction) / mass;
+    }
+
+    void move(double direction, double magnitude) {
+        velX += magnitude * Math.cos(direction) / mass;
+        velY += magnitude * Math.sin(direction) / mass;
     }
 
     void tick() {

@@ -34,6 +34,8 @@ public class Bullet extends Entity {
             setY(Global.ARENA_SIZE * Global.random.nextFloat());
             damage = 5;
         }
+
+        setMass(3);
     }
 
 
@@ -147,7 +149,6 @@ public class Bullet extends Entity {
         if( e instanceof TrackerDot) return false;
         if(e == null || e == source || (e instanceof Bullet && ((Bullet) e).source == source)) return false; //Don't interact with your own source
 
-        repel(e);
 
         //This is going to be tedious if we don't make up some shorthands.
         //I know, memory usage and so forth, but it'll be OK
@@ -172,7 +173,10 @@ public class Bullet extends Entity {
             double b = e.getY() - e.getX()*slope - k;
             double g2 = (a*a*b*b) / (a*a + b*b);
 
-            if(g2 < (SIZE/2 + e.getWidth()/2)*(SIZE/2 + e.getWidth()/2)) return true;
+            if(g2 < (SIZE/2 + e.getWidth()/2)*(SIZE/2 + e.getWidth()/2)) {
+                return true;
+            }
+
         }
 
         return false;
@@ -180,6 +184,8 @@ public class Bullet extends Entity {
 
     @Override
     public void intersect(Entity e) {
+
+        repel(e);
         e.damage(damage);
         damage(1);
     }
