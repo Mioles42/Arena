@@ -15,7 +15,9 @@ public class Cog extends Entity {
 
     @Override
     public void render(Graphics g) {
-        g.setColor(new Color(256 - value*4, 128 + value*4, 150));
+        g.setColor(Color.GRAY);
+        try { g.setColor(new Color(256 - value*4, 128 + value*4, 150));}
+        catch (Exception e) {System.out.println("Tried to set a cog's color with value " + value);}
         g.fillRect((int) getX() - getWidth()/2, (int) getY() - getHeight()/2, getWidth(), getHeight());
         g.setColor(Color.black);
         g.drawRect((int) (getX() - getWidth()/2), (int) (getY() - getHeight()/2), getWidth(), getHeight());

@@ -56,7 +56,7 @@ public class Robot extends Entity implements Comparable<Robot>{
     private boolean greater = false;
 
     //Stat constants
-    static final int STAT_HASTE = 0x0; //shot speed
+    static final int STAT_FIRE_SPEED = 0x0; //shot speed
     static final int STAT_DAMAGE = 0x1; //shot damage
     static final int STAT_REGEN = 0x2; //regeneration
     static final int STAT_SPEED = 0x3; //acceleration (translates to speed due to drag)
@@ -536,7 +536,7 @@ public class Robot extends Entity implements Comparable<Robot>{
     }
 
     void fire() {
-        if(lastFireTime + MAX_BULLET_RECHARGE - stats[STAT_HASTE].val() < getField().getTime()) {
+        if(lastFireTime + MAX_BULLET_RECHARGE - stats[STAT_FIRE_SPEED].val() < getField().getTime()) {
             Bullet bullet = new Bullet(this, getField());
             add(bullet);
             lastFireTime = getField().getTime();
@@ -583,6 +583,20 @@ public class Robot extends Entity implements Comparable<Robot>{
     }
 
     public void onDeath() {
+        if(cogs <= 5) cogs=5;
+        Cog cog;
+        int value;
+        int maxValue = (int)(cogs/4)+1;
+        while(cogs > 1) {
+            value = (int) Math.min(Global.random.nextInt(maxValue-1)+1, cogs);
+            cog = new Cog(value, getField());
+            cogs -= value;
+            cog.setX(getX());
+            cog.setY(getY());
+            cog.setVelX(10*(Global.random.nextFloat()-0.5));
+            cog.setVelY(10*(Global.random.nextFloat()-0.5));
+            add(cog);
+        }
     }
 
     @Override
@@ -704,7 +718,6 @@ public class Robot extends Entity implements Comparable<Robot>{
     public void _NRST (int arg0, int arg1, int arg2) {}
     // 5
     public void _HEAL (int arg0, int arg1, int arg2) {
-        System.out.println("Last heal: " + lastHealTime + ", current time: " + getField().getTime());
         if(lastHealTime + MAX_HEAL_RECHARGE - stats[STAT_REGEN].val()/4 < getField().getTime() ) {
             cogs--;
             heal(1);
