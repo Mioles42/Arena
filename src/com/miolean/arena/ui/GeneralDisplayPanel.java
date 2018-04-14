@@ -17,6 +17,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import java.awt.*;
+import java.io.OutputStream;
 import java.util.ArrayList;
 
 public class GeneralDisplayPanel extends JPanel implements HyperlinkListener, ActiveRobotListener {
@@ -125,7 +126,8 @@ public class GeneralDisplayPanel extends JPanel implements HyperlinkListener, Ac
         c.gridy = 0;
         c.weightx = .2;
         c.weighty = .3;
-        controlPanel.add(Option.robotSize.open(), c);
+
+        //controlPanel.add(Option.speedOptions.open(), c);
 
 
 
@@ -188,6 +190,10 @@ public class GeneralDisplayPanel extends JPanel implements HyperlinkListener, Ac
         if(e.getEventType() == HyperlinkEvent.EventType.ACTIVATED){
             infoholder = field.fromHTML(e.getDescription());
             alertInfoholderChange(((Robot)infoholder));
+            if(infoholder.isAlive()) {
+                viewholder = infoholder;
+                alertViewholderChange(viewholder);
+            }
             tabbedPane.setSelectedComponent(memoryPanel);
         }
     }
