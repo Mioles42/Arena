@@ -57,7 +57,6 @@ public class Cog extends Entity {
 
     @Override
     public String toHTML() {
-        //TODO
-        return null;
+        return "<font color=\"orange\">" + value + "-Cog";
     }
 }

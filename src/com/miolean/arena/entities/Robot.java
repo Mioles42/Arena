@@ -1,6 +1,6 @@
 package com.miolean.arena.entities;
 
-import com.miolean.arena.framework.Global;
+import com.miolean.arena.framework.Option;
 import com.miolean.arena.framework.UByte;
 
 import java.awt.*;
@@ -8,7 +8,7 @@ import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Scanner;
 
-import static com.miolean.arena.framework.Global.ARENA_SIZE;
+import static com.miolean.arena.framework.Option.ARENA_SIZE;
 import static com.miolean.arena.framework.UByte.ub;
 import static com.miolean.arena.framework.UByte.ubDeepCopy;
 
@@ -92,6 +92,7 @@ public class Robot extends Entity implements Comparable<Robot>{
     private int viewDistance = 10;
     private long lastFireTime = getField().getTime();
     private long lastHealTime = getField().getTime();
+  
     private static int totalKWeight;
     private boolean generateLog = false;
 
@@ -132,7 +133,7 @@ public class Robot extends Entity implements Comparable<Robot>{
     //Create a Robot from a parent
     public Robot(Robot parent, Field field) {
         super(SIZE, SIZE, DEFAULT_STAT_VALUE, field);
-        name = Global.wordRandom.nextWord();
+        name = Option.wordRandom.nextWord();
         name = name.substring(0, 1).toUpperCase() + name.substring(1);
         generation = parent.generation + 1;
 
@@ -147,9 +148,9 @@ public class Robot extends Entity implements Comparable<Robot>{
         //Stats
         for(int i = 0; i < stats.length; i++) stats[i] = ub(DEFAULT_STAT_VALUE);
 
-        int maxOffset = Global.ARENA_SIZE / 4;
-        setX(parent.getX() + maxOffset * (Global.random.nextFloat()*2-1));
-        setY(parent.getY() + maxOffset * (Global.random.nextFloat()*2-1));
+        int maxOffset = Option.ARENA_SIZE / 4;
+        setX(parent.getX() + maxOffset * (Option.random.nextFloat()*2-1));
+        setY(parent.getY() + maxOffset * (Option.random.nextFloat()*2-1));
         cogs = INITIAL_COGS;
     }
 
@@ -601,8 +602,14 @@ public class Robot extends Entity implements Comparable<Robot>{
 
     @Override
     public String toHTML() {
-        //TODO
-        return "This should be HTML";
+        String result = "";
+
+        result += "<a href=ergo_uuid_"+getUUID() + ">";
+        if(!isAlive()) result += "<font color=\"red\">";
+        else result += "<font color=\"blue\">";
+        result += getName() + " [Fitness: " + String.format("%.2f", getFitness()) + "]";
+        if(!isAlive()) result += "</font>";
+        return result;
     }
 
     public void onBirth() {
@@ -805,7 +812,7 @@ public class Robot extends Entity implements Comparable<Robot>{
     public void _PRAND(int arg0, int arg1, int arg2) {if(PMEM[arg1] != null) WMEM[arg0] = randomExists(PMEM[arg1]);}
     public void _SRAND(int arg0, int arg1, int arg2) {if(SMEM[arg1] != null) WMEM[arg0] = randomExists(SMEM[arg1]);}
     public void _WRAND(int arg0, int arg1, int arg2) {WMEM[arg0] = randomExists(WMEM);}
-    public void _IRAND(int arg0, int arg1, int arg2) {WMEM[arg0] = ub((int) (Global.random.nextFloat() * 255));}
+    public void _IRAND(int arg0, int arg1, int arg2) {WMEM[arg0] = ub((int) (Option.random.nextFloat() * 255));}
 
 
     static UByte randomExists(UByte[] memory) {
@@ -813,7 +820,7 @@ public class Robot extends Entity implements Comparable<Robot>{
         int totalExist = 0;
         for(UByte u: memory) if(u != ub(0)) totalExist++;
 
-        int selection = (int) (totalExist * Global.random.nextFloat());
+        int selection = (int) (totalExist * Option.random.nextFloat());
         int i;
         for(i = 0; selection > 0; i++) {
             if(memory[i] != ub(0)) selection--;
@@ -824,7 +831,7 @@ public class Robot extends Entity implements Comparable<Robot>{
 
     static UByte randomGene() {
 
-        int rand = (int) (Global.random.nextFloat() * totalKWeight);
+        int rand = (int) (Option.random.nextFloat() * totalKWeight);
         int selection = 0;
         while(rand > 0 && selection < KMEM.length) {
             if(KMEM[selection] != null) rand -= KMEM[selection].weight;

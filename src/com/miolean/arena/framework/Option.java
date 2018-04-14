@@ -1,5 +1,6 @@
 package com.miolean.arena.framework;
 
+import com.miolean.arena.input.NumericalInput;
 import com.miolean.random.WordRandom;
 
 import java.util.Random;
@@ -10,10 +11,11 @@ import java.util.Random;
  */
 
 
-public class Global {
+public class Option {
 
-    //Number of ticks in-simulation
-    public static int time;
+    public static NumericalInput updateSpeed = new NumericalInput("Update speed", "The number of update actions to run per second", 1, 1000, 20);
+    public static NumericalInput displaySpeed = new NumericalInput("Display speed", "The number of info-display actions to run per second", 1, 1000, 20);
+    public static NumericalInput renderSpeed = new NumericalInput("Render speed", "The number of render actions to run per second", 1, 1000, 20);
 
     //Milliseconds per tick, for each of the different cycles
     public static int updateCycle = 50;

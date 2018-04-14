@@ -78,6 +78,7 @@ public class MemoryPanel extends JPanel {
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 
         textPane = new JTextPane();
+        textPane.setEditable(false);
         c = new GridBagConstraints();
         c.gridx = 0;
         c.gridy = 1;

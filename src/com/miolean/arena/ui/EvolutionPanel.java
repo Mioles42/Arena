@@ -6,6 +6,8 @@ import com.miolean.arena.entities.Robot;
 import javax.swing.*;
 import javax.swing.event.HyperlinkListener;
 import java.awt.*;
+import java.util.Collection;
+import java.util.Collections;
 
 public class EvolutionPanel extends JPanel{
 
@@ -71,16 +73,11 @@ public class EvolutionPanel extends JPanel{
     void updateInfo() {
         String result = "";
 
-        for(int i = 0; i < field.getTopRobots().size(); i++) {
+        for(int i = field.getTopRobots().size()-1; i >= 0; i--) {
             Robot t = field.getTopRobots().get(i);
-
             result += "<p><b>[" + (10-i) + "]</b>  ";
-            if(!t.isAlive()) result += "<s><font color=\"red\">";
-            result += "<a href=tank_greatest_"+i + ">";
-            result += t.getName() + " [Fitness: " + String.format("%.2f", t.getFitness()) + "]</a>";
-            if(!t.isAlive()) result += "</font></s>";
+            result += t.toHTML();
             result += "</p>";
-
         }
 
 

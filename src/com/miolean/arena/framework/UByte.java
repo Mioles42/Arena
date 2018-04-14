@@ -32,7 +32,7 @@ public final class UByte implements Serializable {
     }
   
     public static UByte rand() {
-        return new UByte((int) (256 * Global.random.nextFloat()));
+        return new UByte((int) (256 * Option.random.nextFloat()));
     }
 
     public static UByte[][] ubDeepCopy(UByte[][] array) {

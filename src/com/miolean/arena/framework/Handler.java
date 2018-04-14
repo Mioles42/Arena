@@ -37,36 +37,6 @@ public class Handler implements Perpetual {
 //    }
 
 
-
-    public void distribute() {
-
-        if(Global.random.nextFloat() < 0.05) {
-            Cog cog = new Cog(5 + (int) (10 * Global.random.nextFloat()), field);
-            cog.setX(Global.random.nextFloat() * Global.ARENA_SIZE);
-            cog.setY(Global.random.nextFloat() * Global.ARENA_SIZE);
-            cog.setR(Global.random.nextFloat() * Global.ARENA_SIZE);
-            field.add(cog);
-        }
-
-        if(Global.random.nextFloat() < 0.005) {
-            Bullet bullet = new Bullet(null, field);
-            bullet.setX(Global.random.nextFloat() * Global.ARENA_SIZE);
-            bullet.setY(Global.random.nextFloat() * Global.ARENA_SIZE);
-            bullet.setR(Global.random.nextFloat() * Global.ARENA_SIZE);
-            field.add(bullet);
-        }
-
-        if(Global.random.nextFloat() < 0.01) {
-            Robot robot;
-            robot = new Robot(field.getTopRobots().get(Global.random.nextInt(field.getTopRobots().size())), field);
-
-            robot.setX(Global.random.nextFloat() * Global.ARENA_SIZE);
-            robot.setY(Global.random.nextFloat() * Global.ARENA_SIZE);
-            robot.setR(Global.random.nextFloat() * Global.ARENA_SIZE);
-            field.add(robot);
-        }
-    }
-
     public void stop() {}
     public void start() {}
     public void pause() {}
