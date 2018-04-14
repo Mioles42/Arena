@@ -31,6 +31,7 @@ public abstract class Entity {
     //Size components:
     private int width;
     private int height;
+    private double mass = 1;
 
     //Entities can also be destroyed:
     private double health = 1;
@@ -71,6 +72,38 @@ public abstract class Entity {
         if(y < BORDER) y = BORDER;
     }
 
+    void repel(Entity e) {
+        double compoundVel = Math.sqrt(velX*velX + velY*velY);
+        double rposX = x - e.getX();
+        double rposY = y  - e.getY();
+
+        //Lay down the law for impossibly direct collisions
+        double velX = (Math.abs(this.velX) < 1)? this.velX+1:this.velX;
+        double velY = (Math.abs(this.velY) < 1)? this.velY+1:this.velY;
+        if(rposX == 0) rposX = 1;
+        if(rposY == 0) rposY = 1;
+
+
+        double collisionAngle = Math.atan(rposY/rposX);
+        double forceAngle = ((velX > 0)? Math.PI:0) + Math.atan(velY/velX);
+        double reflectAngle = 2*collisionAngle-forceAngle;
+
+        double percentMass = mass / (mass + e.getMass()); //basically for translating momentum into force
+
+        move(reflectAngle,compoundVel * (1-percentMass));
+        e.move( reflectAngle + Math.PI,compoundVel * (percentMass));
+    }
+
+    void accelerate(double direction, double magnitude) {
+        accX += magnitude * Math.cos(direction) / mass;
+        accY += magnitude * Math.sin(direction) / mass;
+    }
+
+    void move(double direction, double magnitude) {
+        velX += magnitude * Math.cos(direction) / mass;
+        velY += magnitude * Math.sin(direction) / mass;
+    }
+
     void tick() {
         update();
         if(health <= 0) field.remove(this);
@@ -95,6 +128,7 @@ public abstract class Entity {
     public double getAccY() { return accY; }
     public double getAccR() { return accR; }
     public double getHealth() { return health; }
+    public double getMass() { return mass; }
     public int getUUID() { return uuid; }
     public int getWidth() { return width; }
     public int getHeight() { return height;}
@@ -109,10 +143,12 @@ public abstract class Entity {
     public void setAccY(double accY) { this.accY = accY; }
     public void setAccR(double accR) { this.accR = accR; }
     public void setHealth(double health) { this.health = health;}
+    public void setMass(double mass) { this.mass = mass;}
     protected void setUUID(int uuid) {
         if(isAlive()) throw new IllegalStateException("Cannot change UUID of live entity");
         else this.uuid = uuid;
     }
+
 
     public final void die() {
         onDeath();

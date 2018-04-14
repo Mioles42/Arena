@@ -34,6 +34,8 @@ public class Bullet extends Entity {
             setY(Option.ARENA_SIZE * Option.random.nextFloat());
             damage = 5;
         }
+
+        setMass(3);
     }
 
 
@@ -89,6 +91,9 @@ public class Bullet extends Entity {
     public void update() {
 
         applyPhysics();
+
+        if(target != null && target.getHealth() <= 0) target = null;
+        if(source != null && source.getHealth() <= 0) source = null;
 
         if(source != null) {
             if (Math.abs(getVelX()) < 1 && Math.abs(getVelY()) < 1) getField().remove(getUUID());
@@ -147,7 +152,9 @@ public class Bullet extends Entity {
         if( e instanceof TrackerDot) return false;
         if(e == null || e == source || (e instanceof Bullet && ((Bullet) e).source == source)) return false; //Don't interact with your own source
 
-        //This is going to be hell if we don't make up some shorthands
+
+        //This is going to be tedious if we don't make up some shorthands.
+        //I know, memory usage and so forth, but it'll be OK
         double x = getX();
         double y = getY();
         double velX = getVelX();
@@ -169,7 +176,10 @@ public class Bullet extends Entity {
             double b = e.getY() - e.getX()*slope - k;
             double g2 = (a*a*b*b) / (a*a + b*b);
 
-            if(g2 < (SIZE/2 + e.getWidth()/2)*(SIZE/2 + e.getWidth()/2)) return true;
+            if(g2 < (SIZE/2 + e.getWidth()/2)*(SIZE/2 + e.getWidth()/2)) {
+                return true;
+            }
+
         }
 
         return false;
@@ -177,7 +187,9 @@ public class Bullet extends Entity {
 
     @Override
     public void intersect(Entity e) {
-        e.damage(damage);
+
+        repel(e);
+        if(! (e instanceof Cog)) e.damage(damage);
         damage(1);
     }
 

@@ -34,6 +34,7 @@ public class Robot extends Entity implements Comparable<Robot>{
     protected static final int SIZE = 40;
     private static final int DEFAULT_STAT_VALUE = 10;
     private static final int MAX_BULLET_RECHARGE = 40;
+    private static final int MAX_HEAL_RECHARGE = 64;
     private static final int INITIAL_COGS = 40;
     private static final int HARD_COG_DEFICIT_LIMIT = -40;
     private static final double DIFFICULTY = 0.05;
@@ -55,7 +56,7 @@ public class Robot extends Entity implements Comparable<Robot>{
     private boolean greater = false;
 
     //Stat constants
-    static final int STAT_HASTE = 0x0; //shot speed
+    static final int STAT_FIRE_SPEED = 0x0; //shot speed
     static final int STAT_DAMAGE = 0x1; //shot damage
     static final int STAT_REGEN = 0x2; //regeneration
     static final int STAT_SPEED = 0x3; //acceleration (translates to speed due to drag)
@@ -89,7 +90,9 @@ public class Robot extends Entity implements Comparable<Robot>{
     private String name = "";
 
     private int viewDistance = 10;
-    private long lastFireTime = Option.time;
+    private long lastFireTime = getField().getTime();
+    private long lastHealTime = getField().getTime();
+  
     private static int totalKWeight;
     private boolean generateLog = false;
 
@@ -512,22 +515,20 @@ public class Robot extends Entity implements Comparable<Robot>{
 
     @Override
     public boolean intersectsWith(Entity e) {
-        //Seeing that Tanks don't actually do anything upon intersection, saying they intersect anyway
-        //is a massive waste of resources...
-        //but it turns out we use this function for other things than checking whether to actually intersect.
-        //We can strike a compromise by only caring about TrackerDots
-
 
         if(e == null) return false;
-        if(! (e instanceof TrackerDot)) return false;
-        double distanceSquared = (getX() - e.getX())*(getX() - e.getX())+(getY() - e.getY())*(getY() - e.getY());
-        double minDistance = (SIZE/2.0 + e.getWidth()/2.0) * (SIZE/2.0 + e.getWidth()/2.0);
+        if(! (e instanceof Robot || e instanceof TrackerDot)) return false;
 
-        return distanceSquared <= minDistance;
+
+        return (Math.sqrt(getWidth() * getWidth() / 2 + e.getWidth() * e.getWidth() / 2)
+            > Math.sqrt((getX() - e.getX())*(getX() - e.getX())+(getY() - e.getY())*(getY() - e.getY())));
     }
 
     @Override
     public void intersect(Entity e) {
+        System.out.println("Intersecting with " + e);
+        repel(e);
+        e.damage(getMass());
     }
 
     @Override
@@ -536,10 +537,10 @@ public class Robot extends Entity implements Comparable<Robot>{
     }
 
     void fire() {
-        if(lastFireTime + MAX_BULLET_RECHARGE - stats[STAT_HASTE].val() < Option.time) {
+        if(lastFireTime + MAX_BULLET_RECHARGE - stats[STAT_FIRE_SPEED].val() < getField().getTime()) {
             Bullet bullet = new Bullet(this, getField());
             add(bullet);
-            lastFireTime = Option.time;
+            lastFireTime = getField().getTime();
         }
     }
 
@@ -583,6 +584,20 @@ public class Robot extends Entity implements Comparable<Robot>{
     }
 
     public void onDeath() {
+        if(cogs <= 5) cogs=5;
+        Cog cog;
+        int value;
+        int maxValue = (int)(cogs/4)+1;
+        while(cogs > 1) {
+            value = (int) Math.min(Global.random.nextInt(maxValue-1)+1, cogs);
+            cog = new Cog(value, getField());
+            cogs -= value;
+            cog.setX(getX());
+            cog.setY(getY());
+            cog.setVelX(10*(Global.random.nextFloat()-0.5));
+            cog.setVelY(10*(Global.random.nextFloat()-0.5));
+            add(cog);
+        }
     }
 
     @Override
@@ -709,7 +724,13 @@ public class Robot extends Entity implements Comparable<Robot>{
     public void _NEAR (int arg0, int arg1, int arg2) {}
     public void _NRST (int arg0, int arg1, int arg2) {}
     // 5
-    public void _HEAL (int arg0, int arg1, int arg2) {heal(1);}
+    public void _HEAL (int arg0, int arg1, int arg2) {
+        if(lastHealTime + MAX_HEAL_RECHARGE - stats[STAT_REGEN].val()/4 < getField().getTime() ) {
+            cogs--;
+            heal(1);
+            lastHealTime=getField().getTime();
+        }
+    }
     public void _FORWD(int arg0, int arg1, int arg2) {forward(WMEM[arg0].val());}
     public void _REVRS(int arg0, int arg1, int arg2) {forward(-WMEM[arg0].val());}
     public void _FIRE (int arg0, int arg1, int arg2) {fire();}
