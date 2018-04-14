@@ -2,7 +2,7 @@ package com.miolean.arena.ui;
 
 import com.miolean.arena.entities.*;
 import com.miolean.arena.entities.Robot;
-import com.miolean.arena.framework.Global;
+import com.miolean.arena.framework.Option;
 import com.miolean.arena.framework.Renderer;
 
 import javax.swing.*;
@@ -10,8 +10,8 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
 
-import static com.miolean.arena.framework.Global.ARENA_SIZE;
-import static com.miolean.arena.framework.Global.BORDER;
+import static com.miolean.arena.framework.Option.ARENA_SIZE;
+import static com.miolean.arena.framework.Option.BORDER;
 
 public class FieldDisplayPanel extends JPanel implements KeyListener, MouseListener, MouseMotionListener, ActiveRobotListener{
 
@@ -41,7 +41,7 @@ public class FieldDisplayPanel extends JPanel implements KeyListener, MouseListe
         rogue.setY(200);
         field.add(rogue);
 
-        com.miolean.arena.entities.Robot dummy = new Robot(Global.class.getClassLoader().getResourceAsStream("gen/cain.ergo"), field);
+        com.miolean.arena.entities.Robot dummy = new Robot(Option.class.getClassLoader().getResourceAsStream("gen/cain.ergo"), field);
         dummy.setHealth(256);
 
         field.add(dummy);
@@ -100,8 +100,8 @@ public class FieldDisplayPanel extends JPanel implements KeyListener, MouseListe
     private void render(Graphics g) {
 
         g.setColor(Color.BLACK);
-        g.drawString((int) (1000.0/Global.updateCycle) + "tk/s", 15, 25);
-        g.drawString("Time:" + Global.time + "tks", 15, 45);
+        g.drawString((int) (1000.0/ Option.updateCycle) + "tk/s", 15, 25);
+        g.drawString("Time:" + Option.time + "tks", 15, 45);
         g.drawString("Entities: " + field.getEntities().size() + " (Cogs: " + field.getCogs().size() + ", Tanks: " + field.getRobots().size() + ")", 15, 65);
         g.drawOval(this.getWidth()/2, this.getHeight()/2, 2, 2);
 
@@ -159,26 +159,26 @@ public class FieldDisplayPanel extends JPanel implements KeyListener, MouseListe
     }
     @Override public void keyPressed(KeyEvent e) {
         char key = e.getKeyChar();
-        if(key == 'q') Global.KEY[Global.KEY_Q] = true;
-        if(key == 'w') Global.KEY[Global.KEY_W] = true;
-        if(key == 'e') Global.KEY[Global.KEY_E] = true;
-        if(key == 'r') Global.KEY[Global.KEY_R] = true;
-        if(key == 'a') Global.KEY[Global.KEY_A] = true;
-        if(key == 's') Global.KEY[Global.KEY_S] = true;
-        if(key == 'd') Global.KEY[Global.KEY_D] = true;
-        if(key == 'f') Global.KEY[Global.KEY_F] = true;
-        if(key == ' ') Global.KEY[Global.KEY_SPACE] = true;
+        if(key == 'q') Option.KEY[Option.KEY_Q] = true;
+        if(key == 'w') Option.KEY[Option.KEY_W] = true;
+        if(key == 'e') Option.KEY[Option.KEY_E] = true;
+        if(key == 'r') Option.KEY[Option.KEY_R] = true;
+        if(key == 'a') Option.KEY[Option.KEY_A] = true;
+        if(key == 's') Option.KEY[Option.KEY_S] = true;
+        if(key == 'd') Option.KEY[Option.KEY_D] = true;
+        if(key == 'f') Option.KEY[Option.KEY_F] = true;
+        if(key == ' ') Option.KEY[Option.KEY_SPACE] = true;
     }
     @Override public void keyReleased(KeyEvent e) {
         char key = e.getKeyChar();
-        if(key == 'q') Global.KEY[Global.KEY_Q] = false;
-        if(key == 'w') Global.KEY[Global.KEY_W] = false;
-        if(key == 'e') Global.KEY[Global.KEY_E] = false;
-        if(key == 'r') Global.KEY[Global.KEY_R] = false;
-        if(key == 'a') Global.KEY[Global.KEY_A] = false;
-        if(key == 's') Global.KEY[Global.KEY_S] = false;
-        if(key == 'd') Global.KEY[Global.KEY_D] = false;
-        if(key == ' ') Global.KEY[Global.KEY_SPACE] = false;
+        if(key == 'q') Option.KEY[Option.KEY_Q] = false;
+        if(key == 'w') Option.KEY[Option.KEY_W] = false;
+        if(key == 'e') Option.KEY[Option.KEY_E] = false;
+        if(key == 'r') Option.KEY[Option.KEY_R] = false;
+        if(key == 'a') Option.KEY[Option.KEY_A] = false;
+        if(key == 's') Option.KEY[Option.KEY_S] = false;
+        if(key == 'd') Option.KEY[Option.KEY_D] = false;
+        if(key == ' ') Option.KEY[Option.KEY_SPACE] = false;
         if(e.getKeyCode() == KeyEvent.VK_ESCAPE) {
             System.out.println("com.miolean.arena.GeneralDisplayPanel closing...");
             System.exit(0);
@@ -206,7 +206,7 @@ public class FieldDisplayPanel extends JPanel implements KeyListener, MouseListe
         }
 
         if(e.getButton() == MouseEvent.BUTTON2) {
-            com.miolean.arena.entities.Robot creation = new com.miolean.arena.entities.Robot(Global.class.getResourceAsStream("cain.ergo"), field);
+            com.miolean.arena.entities.Robot creation = new com.miolean.arena.entities.Robot(Option.class.getResourceAsStream("cain.ergo"), field);
             creation.setX(x);
             creation.setY(y);
             creation.setName("creation");

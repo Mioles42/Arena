@@ -1,6 +1,6 @@
 package com.miolean.arena.entities;
 
-import com.miolean.arena.framework.Global;
+import com.miolean.arena.framework.Option;
 import com.miolean.arena.framework.UByte;
 
 import java.awt.*;
@@ -25,11 +25,14 @@ public class Field {
         robots = new ArrayList<>();
         cogs = new ArrayList<>();
         topRobots = new ArrayList<>();
-        topRobots.add(new Robot(Global.class.getClassLoader().getResourceAsStream("gen/default.ergo"), this));
+        topRobots.add(new Robot(Option.class.getClassLoader().getResourceAsStream("gen/default.ergo"), this));
         topRobots.get(0).setName("Dummy");
     }
 
     public void updateAll() {
+
+        distribute();
+
         for(Entity e: entities.values()) {
 
             e.tick();
@@ -54,6 +57,7 @@ public class Field {
         }
         Collections.sort(topRobots);
         while(topRobots.size() > TOP_LIST_LENGTH) topRobots.remove(0);
+        for(int i = 0; i < topRobots.size(); i++) if(! topRobots.get(i).isAlive()) topRobots.get(i).setUUID(-(i+1+200));
     }
 
     public void renderAll(Graphics g) {
@@ -70,7 +74,7 @@ public class Field {
         entities.remove(e.getUUID());
 
         int uuid;
-        do { uuid = Global.random.nextInt(MAX_ENTITIES-1) + 1; //Don't select 0.
+        do { uuid = Option.random.nextInt(MAX_ENTITIES-1) + 1; //Don't select 0.
         } while(entities.get(uuid) != null);
 
         entities.put(uuid, e);
@@ -95,6 +99,7 @@ public class Field {
     public void remove(int uuid) { remove(fromUUID(uuid)); }
 
     public Entity fromUUID(int uuid) {
+        if(uuid < 0) return topRobots.get(uuid*-1-200-1);
         return entities.get(uuid);
     }
     public Entity fromUUID(UByte great, UByte less) {return entities.get(great.val() * 255 + less.val());}
@@ -109,11 +114,32 @@ public class Field {
     }
 
     public Entity fromHTML(String html) {
-        if(html.contains("tank_greatest")) {
-            html = html.replaceAll("tank_greatest_", "");
-            return topRobots.get(Integer.parseInt(html));
+        if(html.contains("ergo_uuid_")) {
+            html = html.replaceAll("ergo_uuid_", "");
+            return fromUUID(Integer.parseInt(html));
         }
         return null;
+    }
+
+    public void distribute() {
+
+        if(Option.random.nextFloat() < 0.015) {
+            Cog cog = new Cog(5 + (int) (10 * Option.random.nextFloat()), this);
+            cog.setX(Option.random.nextFloat() * Option.ARENA_SIZE);
+            cog.setY(Option.random.nextFloat() * Option.ARENA_SIZE);
+            cog.setR(Option.random.nextFloat() * Option.ARENA_SIZE);
+            add(cog);
+        }
+
+        if(Option.random.nextFloat() < 0.003) {
+            Robot robot;
+            robot = new Robot(getTopRobots().get(Option.random.nextInt(getTopRobots().size())), this);
+
+            robot.setX(Option.random.nextFloat() * Option.ARENA_SIZE);
+            robot.setY(Option.random.nextFloat() * Option.ARENA_SIZE);
+            robot.setR(Option.random.nextFloat() * Option.ARENA_SIZE);
+            add(robot);
+        }
     }
 
     public ConcurrentHashMap<Integer, Entity> getEntities() { return entities;}

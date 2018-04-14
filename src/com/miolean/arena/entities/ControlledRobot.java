@@ -1,6 +1,6 @@
 package com.miolean.arena.entities;
 
-import static com.miolean.arena.framework.Global.*;
+import static com.miolean.arena.framework.Option.*;
 import static com.miolean.arena.framework.UByte.ub;
 
 public class ControlledRobot extends Robot {
@@ -47,5 +47,10 @@ public class ControlledRobot extends Robot {
     @Override
     public void onDeath() {
 
+    }
+
+    @Override
+    public String toHTML() {
+        return "<font color=\"gray\">Controlled Bot";
     }
 }

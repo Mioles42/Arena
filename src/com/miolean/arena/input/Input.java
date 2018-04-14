@@ -7,13 +7,12 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class Input<E> {
+public abstract class Input {
 
     private List<ChangeListener> listenerList = new ArrayList<>();
 
     private String name;
     private String description;
-    private E value;
 
     public Input(String name, String description) {
         this.name = name;
@@ -21,11 +20,11 @@ public abstract class Input<E> {
     }
 
     public abstract JPanel open();
+    public abstract Object getValue();
+    public abstract void setValue(Object value);
 
-    public E getValue() { return value; }
     public String getName() { return name; }
     public String getDescription() { return description; }
-    public void setValue(E o) {value = o;}
 
     private void alertListeners() {
         for(ChangeListener l: listenerList) l.stateChanged(new ChangeEvent(this));

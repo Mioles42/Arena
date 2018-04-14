@@ -1,12 +1,12 @@
 package com.miolean.arena.entities;
 
-import com.miolean.arena.framework.Global;
+import com.miolean.arena.framework.Option;
 
 import java.awt.*;
 import java.awt.geom.Point2D;
 
-import static com.miolean.arena.framework.Global.ARENA_SIZE;
-import static com.miolean.arena.framework.Global.BORDER;
+import static com.miolean.arena.framework.Option.ARENA_SIZE;
+import static com.miolean.arena.framework.Option.BORDER;
 
 public class Bullet extends Entity {
 
@@ -27,11 +27,11 @@ public class Bullet extends Entity {
             setX(source.getX());
             setY(source.getY());
             damage = source.stats[Robot.STAT_DAMAGE].val();
-            setVelX((15 + source.stats[Robot.STAT_BULLET_SPEED].val()) * Math.cos(source.getR() + source.stats[Robot.STAT_BULLET_SPREAD].val() / 128.0 * (Global.random.nextFloat() - .5)));
-            setVelY((15 + source.stats[Robot.STAT_BULLET_SPEED].val()) * -Math.sin(source.getR() + source.stats[Robot.STAT_BULLET_SPREAD].val() / 128.0 * (Global.random.nextFloat() - .5)));
+            setVelX((15 + source.stats[Robot.STAT_BULLET_SPEED].val()) * Math.cos(source.getR() + source.stats[Robot.STAT_BULLET_SPREAD].val() / 128.0 * (Option.random.nextFloat() - .5)));
+            setVelY((15 + source.stats[Robot.STAT_BULLET_SPEED].val()) * -Math.sin(source.getR() + source.stats[Robot.STAT_BULLET_SPREAD].val() / 128.0 * (Option.random.nextFloat() - .5)));
         } else {
-            setX(Global.ARENA_SIZE * Global.random.nextFloat());
-            setY(Global.ARENA_SIZE * Global.random.nextFloat());
+            setX(Option.ARENA_SIZE * Option.random.nextFloat());
+            setY(Option.ARENA_SIZE * Option.random.nextFloat());
             damage = 5;
         }
     }
@@ -116,7 +116,7 @@ public class Bullet extends Entity {
 
             for(int i = 0; i < ROGUE_OBSERVATION; i++) {
 
-                Entity attemptedTarget = getField().fromUUID(Global.random.nextInt(Field.MAX_ENTITIES));
+                Entity attemptedTarget = getField().fromUUID(Option.random.nextInt(Field.MAX_ENTITIES));
 
                 if (attemptedTarget != null && attemptedTarget instanceof Robot) {
                     double axdis = attemptedTarget.getX() - getX();
@@ -133,7 +133,7 @@ public class Bullet extends Entity {
             setVelR(0.1);
 
             for(int i = 0; i < ROGUE_OBSERVATION; i++){
-                Entity attemptedTarget = getField().fromUUID(Global.random.nextInt(Field.MAX_ENTITIES));
+                Entity attemptedTarget = getField().fromUUID(Option.random.nextInt(Field.MAX_ENTITIES));
                 if(attemptedTarget != null && attemptedTarget instanceof Robot) {
                     target = (Robot) attemptedTarget;
                     System.out.println("Found target");
@@ -193,7 +193,13 @@ public class Bullet extends Entity {
 
     @Override
     public String toHTML() {
-        //TODO
-        return null;
+        String result = "";
+
+        if(source != null) {
+            result += "<font color=\"red\">" + source.getName() + "'s Bullet";
+        } else {
+            result += "<font color=\"maroon\">Rogue Bullet";
+        }
+        return result;
     }
 }

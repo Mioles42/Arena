@@ -4,7 +4,9 @@ import com.miolean.arena.entities.Entity;
 import com.miolean.arena.entities.Field;
 import com.miolean.arena.entities.Gene;
 import com.miolean.arena.entities.Robot;
-import com.miolean.arena.framework.Global;
+import com.miolean.arena.framework.Option;
+import com.miolean.arena.input.CheckboxInput;
+import com.miolean.arena.input.NumericalInput;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
@@ -48,6 +50,9 @@ public class GeneralDisplayPanel extends JPanel implements ChangeListener, ListS
     }
 
     public void makeMainLayout() {
+
+        CheckboxInput input = new CheckboxInput("Test", "Enable/disable nothing at all");
+
         JPanel genomePanel = new JPanel();
         memoryPanel = new MemoryPanel(null);
         evolutionPanel = new EvolutionPanel(field);
@@ -125,6 +130,10 @@ public class GeneralDisplayPanel extends JPanel implements ChangeListener, ListS
         controlPanel.setLayout(new GridBagLayout());
         c = new GridBagConstraints();
         c.fill = GridBagConstraints.HORIZONTAL;
+        c.gridx = 0;
+        c.gridy = 0;
+        c.weightx = .2;
+        c.weighty = .3;
         controlPanel.add(slider, c);
 
 
@@ -187,8 +196,8 @@ public class GeneralDisplayPanel extends JPanel implements ChangeListener, ListS
     @Override
     public void stateChanged(ChangeEvent e) {
         if(e.getSource() == slider) {
-            Global.updateCycle = (int) (1000.0/slider.getValue());
-            Global.distributeCycle = (int) (Global.distributeRatio * 1000.0/slider.getValue());
+            Option.updateCycle = (int) (1000.0/slider.getValue());
+            Option.distributeCycle = (int) (Option.distributeRatio * 1000.0/slider.getValue());
         }
     }
 
@@ -197,6 +206,7 @@ public class GeneralDisplayPanel extends JPanel implements ChangeListener, ListS
         if(e.getEventType() == HyperlinkEvent.EventType.ACTIVATED){
             infoholder = field.fromHTML(e.getDescription());
             alertInfoholderChange(((Robot)infoholder));
+            tabbedPane.setSelectedComponent(memoryPanel);
         }
     }
 

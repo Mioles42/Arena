@@ -2,8 +2,8 @@ package com.miolean.arena.entities;
 
 import java.awt.*;
 
-import static com.miolean.arena.framework.Global.ARENA_SIZE;
-import static com.miolean.arena.framework.Global.BORDER;
+import static com.miolean.arena.framework.Option.ARENA_SIZE;
+import static com.miolean.arena.framework.Option.BORDER;
 
 /**
  * Created by commandm on 2/16/17.
@@ -109,6 +109,10 @@ public abstract class Entity {
     public void setAccY(double accY) { this.accY = accY; }
     public void setAccR(double accR) { this.accR = accR; }
     public void setHealth(double health) { this.health = health;}
+    protected void setUUID(int uuid) {
+        if(isAlive()) throw new IllegalStateException("Cannot change UUID of live entity");
+        else this.uuid = uuid;
+    }
 
     public final void die() {
         onDeath();

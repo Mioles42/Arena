@@ -122,11 +122,8 @@ public class EntityPanel extends JPanel implements ActionListener{
             for (int i = 0; i < field.getRobots().size(); i++) {
                 com.miolean.arena.entities.Robot t = field.getRobots().get(i);
 
-                result += "<b>[" + t.getClass().getSimpleName() + "]</b><font color=\"blue\">  ";
-                result += "<a href=tank_num_" + i + ">";
-                result += t.getName() + " [Fitness: " + String.format("%.2f", t.getFitness()) + "]</a>";
-                result += "</font>";
-                if(! t.isAlive()) result += " [DEAD, uuid " + t.getUUID() + " ] ";
+
+                result += t.toHTML();
                 result += "<br />";
 
 
@@ -138,23 +135,7 @@ public class EntityPanel extends JPanel implements ActionListener{
             for (int i = 0; i < entities.size(); i++) {
                 if(entities.get(i) == null) continue;
                 Entity e = entities.get(i);
-
-                if(e instanceof com.miolean.arena.entities.Robot && ! (e instanceof ControlledRobot)) result += "<font color=\"blue\">";
-                else if(e instanceof Cog) result += "<font color=\"orange\">";
-                else if(e instanceof ControlledRobot) result += "<font color=\"grey\">";
-                else if(e instanceof Bullet) result += "<font color=\"red\">";
-                else result += "<font color=\"black\">";
-
-                result += "<b>[" + e.getClass().getSimpleName() + "]</b>";
-
-                if(e instanceof com.miolean.arena.entities.Robot && ! (e instanceof ControlledRobot)) {
-                    result += "<a href=tank_num_" + i + ">";
-                    result += ((com.miolean.arena.entities.Robot)e).getName() + " [Fitness: " + String.format("%.2f", ((Robot)e).getFitness()) + "]</a>";
-                }
-                if(! e.isAlive()) result += " DEAD ";
-
-                result += "</font>";
-                result += "<br />";
+                result += e.toHTML() + "<br/>";
 
             }
         }

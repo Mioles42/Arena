@@ -44,6 +44,11 @@ public class Main implements Runnable, WindowListener {
         window.setLayout(new GridBagLayout());
         window.addWindowListener(this);
 
+        JMenuBar menuBar = new JMenuBar();
+
+
+        window.setJMenuBar(menuBar);
+
         //Add the main panel:
         JPanel mainContainer = new JPanel();
         mainContainer.setLayout(new BorderLayout());
@@ -93,24 +98,19 @@ public class Main implements Runnable, WindowListener {
 
             long time = System.currentTimeMillis();
 
-            if(time > lastUpdate + Global.updateCycle) {
+            if(time > lastUpdate + Option.updateCycle) {
                 handler.tick();
                 lastUpdate = time;
             }
             time = System.currentTimeMillis();
 
-            if(time > lastRender + Global.renderCycle) {
+            if(time > lastRender + Option.renderCycle) {
                 fieldDisplayPanel.repaint();
                 lastRender = time;
             }
             time = System.currentTimeMillis();
 
-            if(time > lastDistribute + Global.distributeCycle) {
-                handler.distribute();
-                lastDistribute = time;
-            }
-
-            if(time > lastDisplay + Global.displayCycle) {
+            if(time > lastDisplay + Option.displayCycle) {
                 generalDisplayPanel.display();
                 lastDisplay = time;
             }
