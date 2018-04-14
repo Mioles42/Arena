@@ -20,6 +20,8 @@ public class Field {
     private List<Cog> cogs;
     private List<Robot> topRobots;
 
+    private int time = 0;
+
     public Field() {
         entities = new ConcurrentHashMap<>();
         robots = new ArrayList<>();
@@ -30,6 +32,9 @@ public class Field {
     }
 
     public void updateAll() {
+
+        time++;
+
         for(Entity e: entities.values()) {
 
             e.tick();
@@ -38,7 +43,7 @@ public class Field {
             if(entities.get(e.getUUID()) == null) continue;
 
             for(Entity g: entities.values()) {
-                if(e.intersectsWith(g)) e.intersect(g);
+                if(e != g && e.intersectsWith(g)) e.intersect(g);
             }
 
             //Is it still alive?
@@ -100,7 +105,7 @@ public class Field {
     public Entity fromUUID(UByte great, UByte less) {return entities.get(great.val() * 255 + less.val());}
 
     public Entity atLocation(int x, int y) {
-        TrackerDot location = new TrackerDot(x, y, 0,this);
+        TrackerDot location = new TrackerDot(x, y, 4,0,this);
 
         for(Entity e: entities.values()) {
             if(e != null && e.intersectsWith(location)) return e;
@@ -120,4 +125,8 @@ public class Field {
     public List<Robot> getTopRobots() { return topRobots;}
     public List<Robot> getRobots() { return robots;}
     public List<Cog> getCogs() { return cogs;}
+
+    public int getTime() {
+        return time;
+    }
 }
