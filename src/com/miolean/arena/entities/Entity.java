@@ -1,6 +1,7 @@
 package com.miolean.arena.entities;
 
 import java.awt.*;
+import java.io.Serializable;
 
 import static com.miolean.arena.framework.Option.ARENA_SIZE;
 import static com.miolean.arena.framework.Option.BORDER;
@@ -12,7 +13,7 @@ import static com.miolean.arena.framework.Option.BORDER;
  * They can also interact with Entities with which they intersect.
  */
 
-public abstract class Entity {
+public abstract class Entity implements Serializable {
 
     //Motion components:
     private double x; //X position, in pixels
