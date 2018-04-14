@@ -19,9 +19,8 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import java.awt.*;
 import java.util.ArrayList;
 
-public class GeneralDisplayPanel extends JPanel implements ChangeListener, ListSelectionListener, HyperlinkListener, ActiveRobotListener {
+public class GeneralDisplayPanel extends JPanel implements HyperlinkListener, ActiveRobotListener {
 
-    private JSlider slider;
     private JTabbedPane tabbedPane;
     MemoryPanel memoryPanel;
     EvolutionPanel evolutionPanel;
@@ -50,8 +49,6 @@ public class GeneralDisplayPanel extends JPanel implements ChangeListener, ListS
     }
 
     public void makeMainLayout() {
-
-        CheckboxInput input = new CheckboxInput("Test", "Enable/disable nothing at all");
 
         JPanel genomePanel = new JPanel();
         memoryPanel = new MemoryPanel(null);
@@ -121,12 +118,6 @@ public class GeneralDisplayPanel extends JPanel implements ChangeListener, ListS
         ));
         this.add(controlPanelPanel, c);
 
-        slider = new JSlider();
-        slider.setMaximum(1000);
-        slider.setMinimum(1);
-        slider.setValue(20);
-        slider.setFocusable(false);
-        slider.addChangeListener(this);
         controlPanel.setLayout(new GridBagLayout());
         c = new GridBagConstraints();
         c.fill = GridBagConstraints.HORIZONTAL;
@@ -134,7 +125,7 @@ public class GeneralDisplayPanel extends JPanel implements ChangeListener, ListS
         c.gridy = 0;
         c.weightx = .2;
         c.weighty = .3;
-        controlPanel.add(slider, c);
+        controlPanel.add(Option.robotSize.open(), c);
 
 
 
@@ -192,15 +183,6 @@ public class GeneralDisplayPanel extends JPanel implements ChangeListener, ListS
         genomePanel.add(scrollPane, c);
     }
 
-
-    @Override
-    public void stateChanged(ChangeEvent e) {
-        if(e.getSource() == slider) {
-            Option.updateCycle = (int) (1000.0/slider.getValue());
-            Option.distributeCycle = (int) (Option.distributeRatio * 1000.0/slider.getValue());
-        }
-    }
-
     @Override
     public void hyperlinkUpdate(HyperlinkEvent e) {
         if(e.getEventType() == HyperlinkEvent.EventType.ACTIVATED){
@@ -210,14 +192,6 @@ public class GeneralDisplayPanel extends JPanel implements ChangeListener, ListS
         }
     }
 
-    @Override
-    public void valueChanged(ListSelectionEvent e) {
-        Entity n = (Entity) ((JList)e.getSource()).getSelectedValue();
-        if(n != null) {
-            viewholder = n;
-            alertViewholderChange(n);
-        }
-    }
 
     public void addActiveRobotListener(ActiveRobotListener l) {
         listenerList.add(l);
@@ -234,7 +208,6 @@ public class GeneralDisplayPanel extends JPanel implements ChangeListener, ListS
 
     @Override
     public void infoholderChanged(Robot e) {
-
         memoryPanel.source = e;
     }
 

@@ -92,25 +92,28 @@ public class Main implements Runnable, WindowListener {
         long lastUpdate = System.currentTimeMillis();
         long lastRender = System.currentTimeMillis();
         long lastDisplay = System.currentTimeMillis();
-        long lastDistribute = System.currentTimeMillis();
 
         while(isRunning) {
 
+            int updateCycle = (int) (1000.0/Option.updateSpeed.getValue());
+            int renderCycle = (int) (1000.0/Option.renderSpeed.getValue());
+            int displayCycle = (int) (1000.0/Option.displaySpeed.getValue());
+
             long time = System.currentTimeMillis();
 
-            if(time > lastUpdate + Option.updateCycle) {
+            if(time > lastUpdate + updateCycle) {
                 handler.tick();
                 lastUpdate = time;
             }
             time = System.currentTimeMillis();
 
-            if(time > lastRender + Option.renderCycle) {
+            if(time > lastRender + renderCycle) {
                 fieldDisplayPanel.repaint();
                 lastRender = time;
             }
             time = System.currentTimeMillis();
 
-            if(time > lastDisplay + Option.displayCycle) {
+            if(time > lastDisplay + displayCycle) {
                 generalDisplayPanel.display();
                 lastDisplay = time;
             }

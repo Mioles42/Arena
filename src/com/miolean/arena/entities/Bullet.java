@@ -163,7 +163,7 @@ public class Bullet extends Entity {
         double accY = getAccY();
 
         Rectangle extendedBounds = new Rectangle(new Point((int)x, (int)y));
-        extendedBounds.add(new Point((int) (x-velX-accX), (int) (y-velY-accY)));
+        extendedBounds.add(new Point((int) (x+velX+accX), (int) (y+velY+accY)));
         extendedBounds.setLocation((int) (extendedBounds.getX() - e.getWidth()), (int) (extendedBounds.getY() - e.getHeight()));
         extendedBounds.setSize((int) (extendedBounds.getWidth() + 2*e.getWidth()), (int) (extendedBounds.getHeight() + 2*e.getHeight()));
 

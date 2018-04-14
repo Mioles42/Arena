@@ -31,7 +31,6 @@ import static com.miolean.arena.framework.UByte.ubDeepCopy;
 public class Robot extends Entity implements Comparable<Robot>{
 
     //General constants
-    protected static final int SIZE = 40;
     private static final int DEFAULT_STAT_VALUE = 10;
     private static final int MAX_BULLET_RECHARGE = 40;
     private static final int MAX_HEAL_RECHARGE = 64;
@@ -127,15 +126,16 @@ public class Robot extends Entity implements Comparable<Robot>{
 
     //Create a totally blank Robot (for whatever reason)
     Robot(Field field) {
-        super(SIZE, SIZE, 10, field);
+        super(Option.robotSize.getValue(), Option.robotSize.getValue(), 10, field);
     }
 
     //Create a Robot from a parent
     public Robot(Robot parent, Field field) {
-        super(SIZE, SIZE, DEFAULT_STAT_VALUE, field);
+        super(Option.robotSize.getValue(), Option.robotSize.getValue(), DEFAULT_STAT_VALUE, field);
         name = Option.wordRandom.nextWord();
         name = name.substring(0, 1).toUpperCase() + name.substring(1);
         generation = parent.generation + 1;
+        setMass(10);
 
         UMEM = ubDeepCopy(parent.UMEM);
         PMEM = ubDeepCopy(parent.PMEM);
@@ -157,11 +157,12 @@ public class Robot extends Entity implements Comparable<Robot>{
     //Create a Robot from a file
     public Robot(InputStream file, Field field) {
 
-        super(SIZE, SIZE, DEFAULT_STAT_VALUE, field);
+        super(Option.robotSize.getValue(), Option.robotSize.getValue(), DEFAULT_STAT_VALUE, field);
         //0: Initial values.
 
         name = "Unnamed";
         generation = 0;
+        setMass(10);
 
         //1: Initialize memories.
         UMEM = new UByte[256][];
@@ -350,6 +351,8 @@ public class Robot extends Entity implements Comparable<Robot>{
     @Override
     public void render(Graphics g) {
 
+        int SIZE = getWidth();
+
         g.setColor(Color.black);
         g.drawOval((int) (getX() - SIZE/2), (int) (getY() - SIZE/2), SIZE, SIZE);
 
@@ -428,6 +431,10 @@ public class Robot extends Entity implements Comparable<Robot>{
     public void update() {
 
         double initialCogs = cogs;
+
+        //Reload relevant properties
+        setWidth(Option.robotSize.getValue());
+        setHeight(Option.robotSize.getValue());
 
         //Apply physics
         applyPhysics();
@@ -589,13 +596,13 @@ public class Robot extends Entity implements Comparable<Robot>{
         int value;
         int maxValue = (int)(cogs/4)+1;
         while(cogs > 1) {
-            value = (int) Math.min(Global.random.nextInt(maxValue-1)+1, cogs);
+            value = (int) Math.min(Option.random.nextInt(maxValue-1)+1, cogs);
             cog = new Cog(value, getField());
             cogs -= value;
             cog.setX(getX());
             cog.setY(getY());
-            cog.setVelX(10*(Global.random.nextFloat()-0.5));
-            cog.setVelY(10*(Global.random.nextFloat()-0.5));
+            cog.setVelX(10*(Option.random.nextFloat()-0.5));
+            cog.setVelY(10*(Option.random.nextFloat()-0.5));
             add(cog);
         }
     }

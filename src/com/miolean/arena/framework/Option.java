@@ -17,12 +17,7 @@ public class Option {
     public static NumericalInput displaySpeed = new NumericalInput("Display speed", "The number of info-display actions to run per second", 1, 1000, 20);
     public static NumericalInput renderSpeed = new NumericalInput("Render speed", "The number of render actions to run per second", 1, 1000, 20);
 
-    //Milliseconds per tick, for each of the different cycles
-    public static int updateCycle = 50;
-    public static int displayCycle = 100;
-    public static int renderCycle = 10;
-    public static int distributeCycle = 20;
-    public static double distributeRatio = 0.3; //distributes per update
+    public static NumericalInput robotSize = new NumericalInput("Robot size", "The default robot size", 5, 300, 40);
 
     //Publicly accessible random instance
     public static Random random = new Random();

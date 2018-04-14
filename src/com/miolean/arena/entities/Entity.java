@@ -35,6 +35,8 @@ public abstract class Entity {
 
     //Entities can also be destroyed:
     private double health = 1;
+    private boolean alive = true;
+    private long age = 0;
 
     //Other things:
     private Field field;
@@ -105,8 +107,9 @@ public abstract class Entity {
     }
 
     void tick() {
-        update();
-        if(health <= 0) field.remove(this);
+        if(health <= 0 || field == null) die();
+        else if(age > 0) update();
+        age++;
     }
 
     public abstract void render(Graphics g);
@@ -117,7 +120,7 @@ public abstract class Entity {
     protected abstract void onDeath();
     public abstract String toHTML();
 
-    public boolean isAlive() {return (health > 0);}
+    public boolean isAlive() {return alive;}
     public double getX() { return x; }
     public double getY() { return y; }
     public double getR() { return r; }
@@ -129,6 +132,7 @@ public abstract class Entity {
     public double getAccR() { return accR; }
     public double getHealth() { return health; }
     public double getMass() { return mass; }
+    public long getAge() { return age; }
     public int getUUID() { return uuid; }
     public int getWidth() { return width; }
     public int getHeight() { return height;}
@@ -143,6 +147,8 @@ public abstract class Entity {
     public void setAccY(double accY) { this.accY = accY; }
     public void setAccR(double accR) { this.accR = accR; }
     public void setHealth(double health) { this.health = health;}
+    public void setWidth(int width) { this.width = width;}
+    public void setHeight(int height) { this.height = height;}
     public void setMass(double mass) { this.mass = mass;}
     protected void setUUID(int uuid) {
         if(isAlive()) throw new IllegalStateException("Cannot change UUID of live entity");
@@ -151,11 +157,13 @@ public abstract class Entity {
 
 
     public final void die() {
+        alive = false;
         onDeath();
-        health = 0;
+        field.remove(this);
     }
 
     public final void appear(int uuid) {
+        alive = true;
         this.uuid = uuid;
         onBirth();
     }

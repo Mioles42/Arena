@@ -57,7 +57,8 @@ public class NumericalInput extends Input implements ChangeListener {
 
     @Override
     public void stateChanged(ChangeEvent e) {
-        int value = ((JSlider)e.getSource()).getValue();
+        value = ((JSlider)e.getSource()).getValue();
+        System.out.println(value);
         for(WeakReference w: sliders) {
             if(w.get() == null) {
                 sliders.remove(w);

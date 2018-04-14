@@ -89,13 +89,8 @@ public class Field {
     public void remove(Entity e) {
         if(e instanceof Robot) {
             robots.remove(e);
-            if(robots.contains(e)) {
-            }
-
         }
         if(e instanceof Cog) cogs.remove(e);
-
-        e.die();
         entities.remove(e.getUUID());
     }
 
@@ -126,7 +121,7 @@ public class Field {
 
     public void distribute() {
 
-        if(Option.random.nextFloat() < 0.015) {
+        if(Option.random.nextFloat() < 0.05) {
             Cog cog = new Cog(5 + (int) (10 * Option.random.nextFloat()), this);
             cog.setX(Option.random.nextFloat() * Option.ARENA_SIZE);
             cog.setY(Option.random.nextFloat() * Option.ARENA_SIZE);
@@ -134,7 +129,7 @@ public class Field {
             add(cog);
         }
 
-        if(Option.random.nextFloat() < 0.003) {
+        if(Option.random.nextFloat() < 0.01) {
             Robot robot;
             robot = new Robot(getTopRobots().get(Option.random.nextInt(getTopRobots().size())), this);
 
