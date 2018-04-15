@@ -68,10 +68,22 @@ public abstract class Entity {
         y += velY;
         r += velR;
 
-        if(x > ARENA_SIZE - BORDER) x = ARENA_SIZE - BORDER;
-        if(x < BORDER) x = BORDER;
-        if(y > ARENA_SIZE - BORDER) y = ARENA_SIZE - BORDER;
-        if(y < BORDER) y = BORDER;
+        if(x > ARENA_SIZE - BORDER) {
+            x = ARENA_SIZE - BORDER;
+            velX = -velX;
+        }
+        if(x < BORDER) {
+            x = BORDER;
+            velX = -velX;
+        }
+        if(y > ARENA_SIZE - BORDER){
+            y = ARENA_SIZE - BORDER;
+            velY = -velY;
+        }
+        if(y < BORDER) {
+            y = BORDER;
+            velY = -velY;
+        }
     }
 
     void repel(Entity e) {

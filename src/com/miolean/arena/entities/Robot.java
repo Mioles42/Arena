@@ -533,7 +533,6 @@ public class Robot extends Entity implements Comparable<Robot>{
 
     @Override
     public void intersect(Entity e) {
-        System.out.println("Intersecting with " + e);
         repel(e);
         e.damage(getMass());
     }
