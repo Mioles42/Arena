@@ -8,7 +8,7 @@ import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Scanner;
 
-import static com.miolean.arena.framework.Option.ARENA_SIZE;
+import static com.miolean.arena.entities.Field.ARENA_SIZE;
 import static com.miolean.arena.framework.UByte.ub;
 import static com.miolean.arena.framework.UByte.ubDeepCopy;
 
@@ -148,7 +148,7 @@ public class Robot extends Entity implements Comparable<Robot>{
         //Stats
         for(int i = 0; i < stats.length; i++) stats[i] = ub(DEFAULT_STAT_VALUE);
 
-        int maxOffset = Option.ARENA_SIZE / 4;
+        int maxOffset = ARENA_SIZE / 4;
         setX(parent.getX() + maxOffset * (Option.random.nextFloat()*2-1));
         setY(parent.getY() + maxOffset * (Option.random.nextFloat()*2-1));
         cogs = INITIAL_COGS;

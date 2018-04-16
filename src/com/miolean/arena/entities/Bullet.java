@@ -5,8 +5,8 @@ import com.miolean.arena.framework.Option;
 import java.awt.*;
 import java.awt.geom.Point2D;
 
-import static com.miolean.arena.framework.Option.ARENA_SIZE;
-import static com.miolean.arena.framework.Option.BORDER;
+import static com.miolean.arena.entities.Field.ARENA_SIZE;
+import static com.miolean.arena.entities.Field.BORDER;
 
 public class Bullet extends Entity {
 
@@ -30,8 +30,8 @@ public class Bullet extends Entity {
             setVelX((15 + source.stats[Robot.STAT_BULLET_SPEED].val()) * Math.cos(source.getR() + source.stats[Robot.STAT_BULLET_SPREAD].val() / 128.0 * (Option.random.nextFloat() - .5)));
             setVelY((15 + source.stats[Robot.STAT_BULLET_SPEED].val()) * -Math.sin(source.getR() + source.stats[Robot.STAT_BULLET_SPREAD].val() / 128.0 * (Option.random.nextFloat() - .5)));
         } else {
-            setX(Option.ARENA_SIZE * Option.random.nextFloat());
-            setY(Option.ARENA_SIZE * Option.random.nextFloat());
+            setX(ARENA_SIZE * Option.random.nextFloat());
+            setY(ARENA_SIZE * Option.random.nextFloat());
             damage = 5;
         }
 
@@ -184,6 +184,11 @@ public class Bullet extends Entity {
 
         return false;
     }
+
+
+    //Unfortunately there's no quick way to fill in the skips for bullets
+    @Override
+    public boolean quickIntersects(Entity e) {return true;}
 
     @Override
     public void intersect(Entity e) {
