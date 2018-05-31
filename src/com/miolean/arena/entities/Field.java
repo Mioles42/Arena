@@ -1,20 +1,20 @@
 package com.miolean.arena.entities;
 
+import com.miolean.arena.framework.Debug;
 import com.miolean.arena.framework.Option;
 import com.miolean.arena.framework.UByte;
 
 import java.awt.*;
-import java.io.Serializable;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class Field implements Serializable {
+public class Field {
 
     private static final int MAX_ROBOTS = 32*16;
     private static final int MAX_COGS = 200*4;
     public  static final int MAX_ENTITIES = 255*255;
-    public  static final int TOP_LIST_LENGTH = 5;
+    public  static final int TOP_LIST_LENGTH = 10;
     public static final int ARENA_SIZE = 4*1024;
     public static final int BORDER = 20*2;
 
@@ -36,38 +36,46 @@ public class Field implements Serializable {
 
     public void updateAll() {
 
+        long marker;
         time++;
         distribute();
 
 
         for(Entity e: entities.values()) {
 
+            marker = System.nanoTime();
             e.tick();
+            Debug.logTime("Tick", System.nanoTime() - marker);
 
             //Is it still alive?
             if(entities.get(e.getUUID()) == null) continue;
 
-
+            marker = System.nanoTime();
             for(Entity g: entities.values()) {
                 if(e != g && e.quickIntersects(g) && e.intersectsWith(g)) {
                     e.intersect(g);
                 }
             }
+            Debug.logTime("Intersect", System.nanoTime() - marker);
 
             //Is it still alive?
             if(entities.get(e.getUUID()) == null) continue;
 
 
+            marker = System.nanoTime();
             if(e instanceof Robot && ((Robot) e).getFitness() > 0 && (((Robot) e).getFitness() > topRobots.get(0).getFitness()) || e == topRobots.get(0)) {
                 Robot r = (Robot) e;
                 if(! topRobots.contains(r)) {
                     topRobots.add(r);
                 }
             }
+            Debug.logTime("Fitness", System.nanoTime() - marker);
         }
+        marker = System.nanoTime();
         Collections.sort(topRobots);
         while(topRobots.size() > TOP_LIST_LENGTH) topRobots.remove(0);
         for(int i = 0; i < topRobots.size(); i++) if(! topRobots.get(i).isAlive()) topRobots.get(i).setUUID(-(i+1+200));
+        Debug.logTime("Fitness", System.nanoTime() - marker);
     }
 
     public void renderAll(Graphics g) {
@@ -107,7 +115,7 @@ public class Field implements Serializable {
         if(uuid < 0) return topRobots.get(uuid*-1-200-1);
         return entities.get(uuid);
     }
-    public Entity fromUUID(UByte great, UByte less) {return entities.get(great.val() * 256 + less.val());}
+    public Entity fromUUID(UByte great, UByte less) {return entities.get(great.val() * 255 + less.val());}
 
     public Entity atLocation(int x, int y) {
         TrackerDot location = new TrackerDot(x, y, 4,0,this);

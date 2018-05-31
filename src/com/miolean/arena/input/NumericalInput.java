@@ -33,9 +33,9 @@ public class NumericalInput extends Input implements ChangeListener {
         JSlider slider = new JSlider();
         WeakReference weak = new WeakReference<>(slider);
         sliders.add(weak);
-        slider.setMaximum(1000);
-        slider.setMinimum(1);
-        slider.setValue(20);
+        slider.setMaximum(max);
+        slider.setMinimum(min);
+        slider.setValue(value);
         slider.addChangeListener(this);
 
 

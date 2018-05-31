@@ -58,7 +58,7 @@ public class FieldDisplayPanel extends JPanel implements KeyListener, MouseListe
 
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
-        render(g);
+        render((Graphics2D) g); //It is always safe to make this cast apparently
     }
 
 
@@ -98,12 +98,15 @@ public class FieldDisplayPanel extends JPanel implements KeyListener, MouseListe
         alertViewholderChange(e);
     }
 
-    private void render(Graphics g) {
+    private void render(Graphics2D g) {
+
+        double scale = Option.scale.getValue()/5.0;
 
         g.setColor(Color.BLACK);
         g.drawOval(this.getWidth()/2, this.getHeight()/2, 2, 2);
 
-        g.translate((int) (-viewholder.getX() + this.getWidth()/2), (int) (-viewholder.getY() + this.getHeight()/2));
+        g.translate((int) (-viewholder.getX() + this.getWidth()/2*scale)/scale, (int) (-viewholder.getY() + this.getHeight()/2*scale)/scale);
+        g.scale(1.0/scale,1.0/scale);
 
         g.setColor(Color.GRAY);
         for(int i = 0; i < ARENA_SIZE / 64; i++) {
@@ -115,9 +118,11 @@ public class FieldDisplayPanel extends JPanel implements KeyListener, MouseListe
         g.drawRect(10, 10, ARENA_SIZE - BORDER, ARENA_SIZE - BORDER);
 
         renderer.tick(g);
+        g.scale(scale, scale);
 
         g.translate((int) -(-viewholder.getX() + this.getWidth()/2), (int) -(-viewholder.getY() + this.getHeight()/2));
 
+        //Apply no translations to these things
         g.setColor(new Color(255, 100, 100, 200));
         g.fillRect(15, getHeight()-60, (int) viewholder.getHealth(), 20);
         g.setColor(Color.BLACK);
@@ -127,22 +132,23 @@ public class FieldDisplayPanel extends JPanel implements KeyListener, MouseListe
 
         if(viewholder instanceof com.miolean.arena.entities.Robot) {
             g.setColor(new Color(100, 100, 255, 200));
-            g.fillRect(15, getHeight() - 90, (int)((com.miolean.arena.entities.Robot)viewholder).getCogs(), 20);
+            g.fillRect(15, getHeight() - 90, (int) ((com.miolean.arena.entities.Robot) viewholder).getCogs(), 20);
             g.setColor(Color.BLACK);
-            String label = String.format("%2.2f", ((com.miolean.arena.entities.Robot)viewholder).getCogs());
-            if(((com.miolean.arena.entities.Robot)viewholder).getCogs() < 20) g.drawString(label, 18 + (int) ((com.miolean.arena.entities.Robot)viewholder).getCogs(), getHeight()-75);
-            else g.drawString(label, 18, getHeight()-75);
-            g.drawRect(15, getHeight() - 90, (int) ((com.miolean.arena.entities.Robot)viewholder).getCogs(), 20);
+            String label = String.format("%2.2f", ((com.miolean.arena.entities.Robot) viewholder).getCogs());
+            if (((com.miolean.arena.entities.Robot) viewholder).getCogs() < 20)
+                g.drawString(label, 18 + (int) ((com.miolean.arena.entities.Robot) viewholder).getCogs(), getHeight() - 75);
+            else g.drawString(label, 18, getHeight() - 75);
+            g.drawRect(15, getHeight() - 90, (int) ((com.miolean.arena.entities.Robot) viewholder).getCogs(), 20);
 
             g.setColor(new Color(100, 255, 100, 200));
-            g.fillRect(15, getHeight() - 120, (int) ((com.miolean.arena.entities.Robot)viewholder).getFitness(), 20);
+            g.fillRect(15, getHeight() - 120, (int) ((com.miolean.arena.entities.Robot) viewholder).getFitness(), 20);
             g.setColor(Color.BLACK);
-            label = String.format("%2.2f", ((com.miolean.arena.entities.Robot)viewholder).getFitness());
-            if(((com.miolean.arena.entities.Robot)viewholder).getFitness() < 20) g.drawString(label, (int) (18 + ((com.miolean.arena.entities.Robot)viewholder).getFitness()), getHeight()-105);
-            else g.drawString(label, 18, getHeight()-105);
-            g.drawRect(15, getHeight() - 120, (int) ((com.miolean.arena.entities.Robot)viewholder).getFitness(), 20);
+            label = String.format("%2.2f", ((com.miolean.arena.entities.Robot) viewholder).getFitness());
+            if (((com.miolean.arena.entities.Robot) viewholder).getFitness() < 20)
+                g.drawString(label, (int) (18 + ((com.miolean.arena.entities.Robot) viewholder).getFitness()), getHeight() - 105);
+            else g.drawString(label, 18, getHeight() - 105);
+            g.drawRect(15, getHeight() - 120, (int) ((com.miolean.arena.entities.Robot) viewholder).getFitness(), 20);
         }
-
 
     }
 

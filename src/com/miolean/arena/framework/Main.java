@@ -1,10 +1,12 @@
 package com.miolean.arena.framework;
 
 import com.miolean.arena.entities.Field;
+import com.miolean.arena.input.Input;
 import com.miolean.arena.ui.FieldDisplayPanel;
 import com.miolean.arena.ui.GeneralDisplayPanel;
 
 import javax.swing.*;
+import javax.xml.bind.annotation.XmlElementDecl;
 import java.awt.*;
 import java.awt.event.*;
 
@@ -12,6 +14,8 @@ public class Main implements Runnable, WindowListener, ActionListener {
 
     private FieldDisplayPanel fieldDisplayPanel;
     private GeneralDisplayPanel generalDisplayPanel;
+
+    JMenu optionMenu = new JMenu("Option");
 
     Field field;
     JFrame window;
@@ -47,14 +51,12 @@ public class Main implements Runnable, WindowListener, ActionListener {
         JMenuBar menuBar = new JMenuBar();
         window.setJMenuBar(menuBar);
 
-        JMenu optionMenu = new JMenu("Option");
         menuBar.add(optionMenu);
-        JMenuItem item = new JMenuItem("Run speed...");
-        item.addActionListener(this);
-        item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.ALT_MASK));
-        item.setActionCommand(Option.speedOptions.getName());
 
-        optionMenu.add(item);
+
+        quickAddMenuItem(Option.speedOptions, optionMenu, "Run speed...", KeyStroke.getKeyStroke(KeyEvent.VK_R, InputEvent.ALT_MASK));
+        quickAddMenuItem(Option.scale, optionMenu, "Scale...", null);
+
 
         //Add the main panel:
         JPanel mainContainer = new JPanel();
@@ -93,6 +95,14 @@ public class Main implements Runnable, WindowListener, ActionListener {
         fieldDisplayPanel.addActiveRobotListener(generalDisplayPanel);
     }
 
+    private void quickAddMenuItem(Input input, JMenu parent, String text, KeyStroke accelerator) {
+        JMenuItem item = new JMenuItem(text);
+        item.addActionListener(this);
+        item.setAccelerator(accelerator);
+        item.setActionCommand(input.getName());
+        parent.add(item);
+    }
+
     public void run() {
         System.out.println("Running...");
 
@@ -111,7 +121,7 @@ public class Main implements Runnable, WindowListener, ActionListener {
             if(time > lastUpdate + updateCycle) {
                 handler.tick();
                 lastUpdate = System.nanoTime();
-                Debug.logTime("Update", System.nanoTime()-time);
+                Debug.logTime("Update", -(System.nanoTime()-time));
             }
             time = System.nanoTime();
 
@@ -150,9 +160,8 @@ public class Main implements Runnable, WindowListener, ActionListener {
             JMenuItem m = (JMenuItem) e.getSource();
             System.out.println(m.getActionCommand());
             JPanel launchedPanel = null;
-            if(m.getActionCommand().equals(Option.speedOptions.getName())) {
-                launchedPanel = Option.speedOptions.open();
-            }
+            Input option = Option.fromName(m.getActionCommand());
+            if(option != null) launchedPanel = option.open();
 
             if(launchedPanel != null) {
                 JDialog dialog = new JDialog();

@@ -1,9 +1,11 @@
 package com.miolean.arena.framework;
 
 import com.miolean.arena.input.CompoundInput;
+import com.miolean.arena.input.Input;
 import com.miolean.arena.input.NumericalInput;
 import com.miolean.random.WordRandom;
 
+import java.util.List;
 import java.util.Random;
 
 /**
@@ -19,8 +21,12 @@ public class Option {
     public static NumericalInput renderSpeed = new NumericalInput("Render speed", "The number of render actions to run per second", 1, 1000, 50);
 
     public static NumericalInput robotSize = new NumericalInput("Robot size", "The default robot size", 5, 300, 40);
+    public static NumericalInput scale = new NumericalInput("Render scale", "The magnification of the field display", 1, 60, 5);
 
     public static CompoundInput speedOptions = new CompoundInput("Field speed options", "Affect the performance of Ergo", updateSpeed, displaySpeed, renderSpeed);
+
+
+    private static Input[] inputs = {updateSpeed, displaySpeed, renderSpeed, robotSize, scale, speedOptions};
 
     //Publicly accessible random instance
     public static Random random = new Random();
@@ -30,7 +36,6 @@ public class Option {
 
 
     public static boolean[] KEY = new boolean[9];
-
 
     //Key constants
     public static final int KEY_Q = 0;
@@ -42,5 +47,10 @@ public class Option {
     public static final int KEY_D = 6;
     public static final int KEY_F = 7;
     public static final int KEY_SPACE = 8;
+
+    public static Input fromName(String name) {
+        for(Input i: inputs) if(i.getName().equals(name)) return i;
+        return null;
+    }
 
 }
