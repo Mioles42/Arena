@@ -13,7 +13,7 @@ public class Field {
     private static final int MAX_ROBOTS = 32*16;
     private static final int MAX_COGS = 200*4;
     public  static final int MAX_ENTITIES = 255*255;
-    public  static final int TOP_LIST_LENGTH = 10;
+    public  static final int TOP_LIST_LENGTH = 5;
     public static final int ARENA_SIZE = 4*1024;
     public static final int BORDER = 20*2;
 
