@@ -27,9 +27,7 @@ public class Option {
     public static WordRandom wordRandom = new WordRandom();
 
     //1 pixel= 1 tank-meter, I suppose
-    public static final int ARENA_SIZE = 2*1024;
 
-    public static final int BORDER = 20;
 
     public static boolean[] KEY = new boolean[9];
 

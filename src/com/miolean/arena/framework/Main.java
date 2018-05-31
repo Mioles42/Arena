@@ -96,33 +96,41 @@ public class Main implements Runnable, WindowListener, ActionListener {
     public void run() {
         System.out.println("Running...");
 
-        long lastUpdate = System.currentTimeMillis();
-        long lastRender = System.currentTimeMillis();
-        long lastDisplay = System.currentTimeMillis();
+        long lastUpdate = System.nanoTime();
+        long lastRender = System.nanoTime();
+        long lastDisplay = System.nanoTime();
+
+        int updateCycle = (int) (1000000000.0/Option.updateSpeed.getValue());
+        int renderCycle = (int) (1000000000.0/Option.renderSpeed.getValue());
+        int displayCycle = (int) (1000000000.0/Option.displaySpeed.getValue());
 
         while(isRunning) {
 
-            int updateCycle = (int) (1000.0/Option.updateSpeed.getValue());
-            int renderCycle = (int) (1000.0/Option.renderSpeed.getValue());
-            int displayCycle = (int) (1000.0/Option.displaySpeed.getValue());
-
-            long time = System.currentTimeMillis();
+            long time = System.nanoTime();
 
             if(time > lastUpdate + updateCycle) {
                 handler.tick();
-                lastUpdate = time;
+                lastUpdate = System.nanoTime();
+                Debug.logTime("Update", System.nanoTime()-time);
             }
-            time = System.currentTimeMillis();
+            time = System.nanoTime();
 
             if(time > lastRender + renderCycle) {
                 fieldDisplayPanel.repaint();
-                lastRender = time;
+                lastRender = System.nanoTime();
+                Debug.logTime("Render", System.nanoTime()-time);
             }
-            time = System.currentTimeMillis();
+            time = System.nanoTime();
 
             if(time > lastDisplay + displayCycle) {
                 generalDisplayPanel.display();
-                lastDisplay = time;
+                lastDisplay = System.nanoTime();
+                Debug.logTime("Display", System.nanoTime()-time);
+
+                //Updating the value of the cycles is actually also on the display cycle
+                updateCycle = (int) (1000000000.0/Option.updateSpeed.getValue());
+                renderCycle = (int) (1000000000.0/Option.renderSpeed.getValue());
+                displayCycle = (int) (1000000000.0/Option.displaySpeed.getValue());
             }
         }
     }
