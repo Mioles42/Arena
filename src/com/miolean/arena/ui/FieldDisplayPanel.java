@@ -101,12 +101,7 @@ public class FieldDisplayPanel extends JPanel implements KeyListener, MouseListe
     private void render(Graphics g) {
 
         g.setColor(Color.BLACK);
-        g.drawString("Time:" + field.getTime() + "tks", 15, 45);
-        g.drawString("Entities: " + field.getEntities().size() + " (Cogs: " + field.getCogs().size() + ", Tanks: " + field.getRobots().size() + ")", 15, 65);
-        g.drawString(Debug.getDebugLog(), 15, 85);
         g.drawOval(this.getWidth()/2, this.getHeight()/2, 2, 2);
-
-
 
         g.translate((int) (-viewholder.getX() + this.getWidth()/2), (int) (-viewholder.getY() + this.getHeight()/2));
 
