@@ -4,11 +4,12 @@ import com.miolean.arena.framework.Option;
 import com.miolean.arena.framework.UByte;
 
 import java.awt.*;
+import java.io.Serializable;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class Field {
+public class Field implements Serializable {
 
     private static final int MAX_ROBOTS = 32*16;
     private static final int MAX_COGS = 200*4;
@@ -106,7 +107,7 @@ public class Field {
         if(uuid < 0) return topRobots.get(uuid*-1-200-1);
         return entities.get(uuid);
     }
-    public Entity fromUUID(UByte great, UByte less) {return entities.get(great.val() * 255 + less.val());}
+    public Entity fromUUID(UByte great, UByte less) {return entities.get(great.val() * 256 + less.val());}
 
     public Entity atLocation(int x, int y) {
         TrackerDot location = new TrackerDot(x, y, 4,0,this);

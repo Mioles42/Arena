@@ -755,15 +755,15 @@ public class Robot extends Entity implements Comparable<Robot>{
     // B
 
     // C
-    public void _OPOSX(int arg0, int arg1, int arg2) {}
-    public void _OVELX(int arg0, int arg1, int arg2) {}
-    public void _OACCX(int arg0, int arg1, int arg2) {}
-    public void _OPOSY(int arg0, int arg1, int arg2) {}
-    public void _OVELY(int arg0, int arg1, int arg2) {}
-    public void _OACCY(int arg0, int arg1, int arg2) {}
-    public void _OPOSR(int arg0, int arg1, int arg2) {}
-    public void _OVELR(int arg0, int arg1, int arg2) {}
-    public void _OACCR(int arg0, int arg1, int arg2) {}
+    public void _OPOSX(int arg0, int arg1, int arg2) {if(getField().fromUUID(WMEM[arg1],  WMEM[arg2]) != null) WMEM[arg0] = ub((int) getField().fromUUID(WMEM[arg1],  WMEM[arg2]).getX());}
+    public void _OVELX(int arg0, int arg1, int arg2) {if(getField().fromUUID(WMEM[arg1],  WMEM[arg2]) != null) WMEM[arg0] = ub((int) getField().fromUUID(WMEM[arg1],  WMEM[arg2]).getVelX());}
+    public void _OACCX(int arg0, int arg1, int arg2) {if(getField().fromUUID(WMEM[arg1],  WMEM[arg2]) != null) WMEM[arg0] = ub((int) getField().fromUUID(WMEM[arg1],  WMEM[arg2]).getAccX());}
+    public void _OPOSY(int arg0, int arg1, int arg2) {if(getField().fromUUID(WMEM[arg1],  WMEM[arg2]) != null) WMEM[arg0] = ub((int) getField().fromUUID(WMEM[arg1],  WMEM[arg2]).getY());}
+    public void _OVELY(int arg0, int arg1, int arg2) {if(getField().fromUUID(WMEM[arg1],  WMEM[arg2]) != null) WMEM[arg0] = ub((int) getField().fromUUID(WMEM[arg1],  WMEM[arg2]).getVelY());}
+    public void _OACCY(int arg0, int arg1, int arg2) {if(getField().fromUUID(WMEM[arg1],  WMEM[arg2]) != null) WMEM[arg0] = ub((int) getField().fromUUID(WMEM[arg1],  WMEM[arg2]).getAccY());}
+    public void _OPOSR(int arg0, int arg1, int arg2) {if(getField().fromUUID(WMEM[arg1],  WMEM[arg2]) != null) WMEM[arg0] = ub((int) getField().fromUUID(WMEM[arg1],  WMEM[arg2]).getR());}
+    public void _OVELR(int arg0, int arg1, int arg2) {if(getField().fromUUID(WMEM[arg1],  WMEM[arg2]) != null) WMEM[arg0] = ub((int) getField().fromUUID(WMEM[arg1],  WMEM[arg2]).getVelR());}
+    public void _OACCR(int arg0, int arg1, int arg2) {if(getField().fromUUID(WMEM[arg1],  WMEM[arg2]) != null) WMEM[arg0] = ub((int) getField().fromUUID(WMEM[arg1],  WMEM[arg2]).getAccR());}
     // D
     public void _LSMEM(int arg0, int arg1, int arg2) {}
     public void _SMEMX(int arg0, int arg1, int arg2) {}
