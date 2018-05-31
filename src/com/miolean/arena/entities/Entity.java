@@ -3,8 +3,8 @@ package com.miolean.arena.entities;
 import java.awt.*;
 import java.io.Serializable;
 
-import static com.miolean.arena.framework.Option.ARENA_SIZE;
-import static com.miolean.arena.framework.Option.BORDER;
+import static com.miolean.arena.entities.Field.ARENA_SIZE;
+import static com.miolean.arena.entities.Field.BORDER;
 
 /**
  * Created by commandm on 2/16/17.
@@ -36,6 +36,8 @@ public abstract class Entity implements Serializable {
 
     //Entities can also be destroyed:
     private double health = 1;
+    private boolean alive = true;
+    private long age = 0;
 
     //Other things:
     private Field field;
@@ -67,10 +69,22 @@ public abstract class Entity implements Serializable {
         y += velY;
         r += velR;
 
-        if(x > ARENA_SIZE - BORDER) x = ARENA_SIZE - BORDER;
-        if(x < BORDER) x = BORDER;
-        if(y > ARENA_SIZE - BORDER) y = ARENA_SIZE - BORDER;
-        if(y < BORDER) y = BORDER;
+        if(x > ARENA_SIZE - BORDER) {
+            x = ARENA_SIZE - BORDER;
+            velX = -velX;
+        }
+        if(x < BORDER) {
+            x = BORDER;
+            velX = -velX;
+        }
+        if(y > ARENA_SIZE - BORDER){
+            y = ARENA_SIZE - BORDER;
+            velY = -velY;
+        }
+        if(y < BORDER) {
+            y = BORDER;
+            velY = -velY;
+        }
     }
 
     void repel(Entity e) {
@@ -95,6 +109,26 @@ public abstract class Entity implements Serializable {
         e.move( reflectAngle + Math.PI,compoundVel * (percentMass));
     }
 
+    boolean quickIntersects(Entity e) {
+        //The idea is to decide ASAP that e doesn't intersect.
+
+        //First check: Are these things moving?
+        if(Math.abs(e.getVelX()) < 0.05 && Math.abs(velX) < 0.05
+                && Math.abs(e.getVelY()) < 0.05 && Math.abs(velY) < 0.05) {
+            //Neither of these appear to really be moving, so it's unlikely that they intersect.
+            return false;
+        }
+
+        //Second check: Are these things close enough to come into contact?
+        int maxBounds = Math.max(Math.max(width, height), Math.max(e.width, e.height));
+        if(Math.abs(x - e.getX()) > maxBounds || Math.abs(y - e.getY()) > maxBounds) return false;
+
+
+        //We have to assume that this might intersect then, unfortunately.
+        return true;
+
+    }
+
     void accelerate(double direction, double magnitude) {
         accX += magnitude * Math.cos(direction) / mass;
         accY += magnitude * Math.sin(direction) / mass;
@@ -106,8 +140,9 @@ public abstract class Entity implements Serializable {
     }
 
     void tick() {
-        update();
-        if(health <= 0) field.remove(this);
+        if(health <= 0 || field == null) die();
+        else if(age > 0) update();
+        age++;
     }
 
     public abstract void render(Graphics g);
@@ -118,7 +153,7 @@ public abstract class Entity implements Serializable {
     protected abstract void onDeath();
     public abstract String toHTML();
 
-    public boolean isAlive() {return (health > 0);}
+    public boolean isAlive() {return alive;}
     public double getX() { return x; }
     public double getY() { return y; }
     public double getR() { return r; }
@@ -130,6 +165,7 @@ public abstract class Entity implements Serializable {
     public double getAccR() { return accR; }
     public double getHealth() { return health; }
     public double getMass() { return mass; }
+    public long getAge() { return age; }
     public int getUUID() { return uuid; }
     public int getWidth() { return width; }
     public int getHeight() { return height;}
@@ -144,6 +180,8 @@ public abstract class Entity implements Serializable {
     public void setAccY(double accY) { this.accY = accY; }
     public void setAccR(double accR) { this.accR = accR; }
     public void setHealth(double health) { this.health = health;}
+    public void setWidth(int width) { this.width = width;}
+    public void setHeight(int height) { this.height = height;}
     public void setMass(double mass) { this.mass = mass;}
     protected void setUUID(int uuid) {
         if(isAlive()) throw new IllegalStateException("Cannot change UUID of live entity");
@@ -152,11 +190,13 @@ public abstract class Entity implements Serializable {
 
 
     public final void die() {
+        alive = false;
         onDeath();
-        health = 0;
+        field.remove(this);
     }
 
     public final void appear(int uuid) {
+        alive = true;
         this.uuid = uuid;
         onBirth();
     }

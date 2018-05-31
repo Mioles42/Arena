@@ -2,6 +2,7 @@ package com.miolean.arena.ui;
 
 import com.miolean.arena.entities.*;
 import com.miolean.arena.entities.Robot;
+import com.miolean.arena.framework.Debug;
 import com.miolean.arena.framework.Option;
 import com.miolean.arena.framework.Renderer;
 
@@ -10,8 +11,8 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
 
-import static com.miolean.arena.framework.Option.ARENA_SIZE;
-import static com.miolean.arena.framework.Option.BORDER;
+import static com.miolean.arena.entities.Field.ARENA_SIZE;
+import static com.miolean.arena.entities.Field.BORDER;
 
 public class FieldDisplayPanel extends JPanel implements KeyListener, MouseListener, MouseMotionListener, ActiveRobotListener{
 
@@ -66,7 +67,7 @@ public class FieldDisplayPanel extends JPanel implements KeyListener, MouseListe
         Entity e = field.atLocation(x, y);
 
         if (e == null) {
-            if (viewholder instanceof ControlledRobot) {
+            if (viewholder instanceof ControlledRobot && viewholder.isAlive()) {
                 viewholder.setX(x);
                 viewholder.setY(y);
             } else {
@@ -100,10 +101,12 @@ public class FieldDisplayPanel extends JPanel implements KeyListener, MouseListe
     private void render(Graphics g) {
 
         g.setColor(Color.BLACK);
-        g.drawString((int) (1000.0/ Option.updateCycle) + "tk/s", 15, 25);
         g.drawString("Time:" + field.getTime() + "tks", 15, 45);
         g.drawString("Entities: " + field.getEntities().size() + " (Cogs: " + field.getCogs().size() + ", Tanks: " + field.getRobots().size() + ")", 15, 65);
+        g.drawString(Debug.getDebugLog(), 15, 85);
         g.drawOval(this.getWidth()/2, this.getHeight()/2, 2, 2);
+
+
 
         g.translate((int) (-viewholder.getX() + this.getWidth()/2), (int) (-viewholder.getY() + this.getHeight()/2));
 
