@@ -82,7 +82,9 @@ public class GeneralDisplayPanel extends JPanel implements HyperlinkListener, Ac
 
         //ImageIcon genomeIcon = new ImageIcon(GeneralDisplayPanel.class.getClassLoader().getResource("img/list.png"));
 
-        makeGenomePanel(genomePanel);
+
+        //Let's be honest: the genome panel is a huge pain and not very helpful.
+        //makeGenomePanel(genomePanel);
 
         tabbedPane.addTab("Program Memory", memoryPanel);
         tabbedPane.addTab("Entities", entityPanel);
@@ -140,50 +142,50 @@ public class GeneralDisplayPanel extends JPanel implements HyperlinkListener, Ac
         evolutionPanel.updateInfo();
         entityPanel.updateInfo();
     }
-
-    public void makeGenomePanel(JPanel genomePanel) {
-
-        genomePanel.setLayout(new GridBagLayout());
-
-        int category = -1;
-
-        DefaultMutableTreeNode root = new DefaultMutableTreeNode("");
-        DefaultMutableTreeNode branch = null;
-        DefaultMutableTreeNode twig;
-
-
-        for(int i = 0; i < com.miolean.arena.entities.Robot.KMEM.length; i++) {
-            if(i/16 > category) {
-                if(branch != null) root.add(branch);
-                category = i/16;
-                branch = new DefaultMutableTreeNode(Integer.toHexString(category).toUpperCase() + "  " + Gene.GENE_CATEGORIES[category]);
-                //Add a new section!
-            }
-            if(com.miolean.arena.entities.Robot.KMEM[i] != null) {
-                 twig = new DefaultMutableTreeNode(Integer.toHexString(i).toUpperCase() + "|  " + com.miolean.arena.entities.Robot.KMEM[i]);
-                 branch.add(twig);
-            }
-        }
-
-        root.add(branch);
-
-        GridBagConstraints c = new GridBagConstraints();
-        c.fill = GridBagConstraints.BOTH;
-        c.gridx = 0;
-        c.gridy = 0;
-        c.gridheight = 1;
-        c.gridwidth = 1;
-        c.ipadx = 5;
-        c.ipady = 5;
-        c.weightx = .1;
-        c.weighty = .1;
-
-        JTree tree = new JTree(root);
-        tree.setEditable(false);
-        tree.setFocusable(false);
-        JScrollPane scrollPane = new JScrollPane(tree);
-        genomePanel.add(scrollPane, c);
-    }
+//
+//    public void makeGenomePanel(JPanel genomePanel) {
+//
+//        genomePanel.setLayout(new GridBagLayout());
+//
+//        int category = -1;
+//
+//        DefaultMutableTreeNode root = new DefaultMutableTreeNode("");
+//        DefaultMutableTreeNode branch = null;
+//        DefaultMutableTreeNode twig;
+//
+//
+//        for(int i = 0; i < com.miolean.arena.entities.Robot.KMEM.length; i++) {
+//            if(i/16 > category) {
+//                if(branch != null) root.add(branch);
+//                category = i/16;
+//                branch = new DefaultMutableTreeNode(Integer.toHexString(category).toUpperCase() + "  " + Gene.GENE_CATEGORIES[category]);
+//                //Add a new section!
+//            }
+//            if(com.miolean.arena.entities.Robot.KMEM[i] != null) {
+//                 twig = new DefaultMutableTreeNode(Integer.toHexString(i).toUpperCase() + "|  " + com.miolean.arena.entities.Robot.KMEM[i]);
+//                 branch.add(twig);
+//            }
+//        }
+//
+//        root.add(branch);
+//
+//        GridBagConstraints c = new GridBagConstraints();
+//        c.fill = GridBagConstraints.BOTH;
+//        c.gridx = 0;
+//        c.gridy = 0;
+//        c.gridheight = 1;
+//        c.gridwidth = 1;
+//        c.ipadx = 5;
+//        c.ipady = 5;
+//        c.weightx = .1;
+//        c.weighty = .1;
+//
+//        JTree tree = new JTree(root);
+//        tree.setEditable(false);
+//        tree.setFocusable(false);
+//        JScrollPane scrollPane = new JScrollPane(tree);
+//        genomePanel.add(scrollPane, c);
+//    }
 
     @Override
     public void hyperlinkUpdate(HyperlinkEvent e) {

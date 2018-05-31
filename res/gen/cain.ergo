@@ -3,7 +3,7 @@ name Cain;
 define program 1;
 
 edit registry:
-    at 01: 1, 254, 255
+    at 01: 1, 254, 255, 200
     at 41: 00
     at 45: 255
 
@@ -16,7 +16,7 @@ edit program 0 at 4:
     at 16:
     _PRINT -- -- --
     _FORWD 02 -- --
-    _LED 02 02 01
+    _HUE 04 -- --
     _IMOV 01 00 --
     _IMOV 02 255 --
 
