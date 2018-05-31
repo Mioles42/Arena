@@ -8,7 +8,7 @@ import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Scanner;
 
-import static com.miolean.arena.framework.Option.ARENA_SIZE;
+import static com.miolean.arena.entities.Field.ARENA_SIZE;
 import static com.miolean.arena.framework.UByte.ub;
 import static com.miolean.arena.framework.UByte.ubDeepCopy;
 
@@ -31,7 +31,6 @@ import static com.miolean.arena.framework.UByte.ubDeepCopy;
 public class Robot extends Entity implements Comparable<Robot>{
 
     //General constants
-    protected static final int SIZE = 40;
     private static final int DEFAULT_STAT_VALUE = 10;
     private static final int MAX_BULLET_RECHARGE = 40;
     private static final int MAX_HEAL_RECHARGE = 64;
@@ -76,9 +75,7 @@ public class Robot extends Entity implements Comparable<Robot>{
     protected UByte[] stats = new UByte[9];
 
     //Flash color:
-    private int flashR = 0x00;
-    private int flashG = 0xBB;
-    private int flashB = 0x00;
+    private UByte hue = ub(100);
 
     //State variables:
     private double fitness = 0;
@@ -97,29 +94,7 @@ public class Robot extends Entity implements Comparable<Robot>{
     private boolean generateLog = false;
 
     static {
-        KMEM = new Gene[256];
-        Scanner in = new Scanner(Robot.class.getClassLoader().getResourceAsStream("cfg/origin.txt"));
-        in.useDelimiter("/");
-
-        in.next();
-        short opcode = (short) Integer.parseInt(in.next().trim(), 16);
-        String method;
-        String description;
-        double cost;
-        int weight;
-
-        while(opcode < 0xFF) {
-            method = in.next().trim();
-            description = in.next().trim();
-            weight = Integer.parseInt(in.next().trim());
-            cost = Double.parseDouble(in.next().trim());
-
-            KMEM[opcode] = new Gene(method, description, cost, weight);
-
-            in.next();
-            opcode = (short) Integer.parseInt(in.next().trim(), 16);
-        }
-
+        KMEM = Gene.loadAll();
         for(Gene g: KMEM) {
             if(g != null) totalKWeight += g.weight;
         }
@@ -127,15 +102,16 @@ public class Robot extends Entity implements Comparable<Robot>{
 
     //Create a totally blank Robot (for whatever reason)
     Robot(Field field) {
-        super(SIZE, SIZE, 10, field);
+        super(Option.robotSize.getValue(), Option.robotSize.getValue(), 10, field);
     }
 
     //Create a Robot from a parent
     public Robot(Robot parent, Field field) {
-        super(SIZE, SIZE, DEFAULT_STAT_VALUE, field);
+        super(Option.robotSize.getValue(), Option.robotSize.getValue(), DEFAULT_STAT_VALUE, field);
         name = Option.wordRandom.nextWord();
         name = name.substring(0, 1).toUpperCase() + name.substring(1);
         generation = parent.generation + 1;
+        setMass(10);
 
         UMEM = ubDeepCopy(parent.UMEM);
         PMEM = ubDeepCopy(parent.PMEM);
@@ -148,7 +124,7 @@ public class Robot extends Entity implements Comparable<Robot>{
         //Stats
         for(int i = 0; i < stats.length; i++) stats[i] = ub(DEFAULT_STAT_VALUE);
 
-        int maxOffset = Option.ARENA_SIZE / 4;
+        int maxOffset = ARENA_SIZE / 4;
         setX(parent.getX() + maxOffset * (Option.random.nextFloat()*2-1));
         setY(parent.getY() + maxOffset * (Option.random.nextFloat()*2-1));
         cogs = INITIAL_COGS;
@@ -157,11 +133,12 @@ public class Robot extends Entity implements Comparable<Robot>{
     //Create a Robot from a file
     public Robot(InputStream file, Field field) {
 
-        super(SIZE, SIZE, DEFAULT_STAT_VALUE, field);
+        super(Option.robotSize.getValue(), Option.robotSize.getValue(), DEFAULT_STAT_VALUE, field);
         //0: Initial values.
 
         name = "Unnamed";
         generation = 0;
+        setMass(10);
 
         //1: Initialize memories.
         UMEM = new UByte[256][];
@@ -205,8 +182,14 @@ public class Robot extends Entity implements Comparable<Robot>{
             //If next is a command: Translate it into its number
             if(next.startsWith("_")) {
                 if(loadMode < 2) throwCompileError("Command in passive memory.");
+                System.out.println("");
                 for(int i = 0; i < KMEM.length; i++) {
-                    if(KMEM[i] != null && KMEM[i].getMeaning().getName().equals(next)) next = i + "";
+                    if(KMEM[i].getMeaning() != null && KMEM[i].getMeaning().getName().equals(next)) next = i + "";
+                }
+
+                if(next.startsWith("_")) {
+                    //So that didn't work
+                    throwCompileError("Could not resolve command " + next);
                 }
             }
 
@@ -350,6 +333,8 @@ public class Robot extends Entity implements Comparable<Robot>{
     @Override
     public void render(Graphics g) {
 
+        int SIZE = getWidth();
+
         g.setColor(Color.black);
         g.drawOval((int) (getX() - SIZE/2), (int) (getY() - SIZE/2), SIZE, SIZE);
 
@@ -417,7 +402,7 @@ public class Robot extends Entity implements Comparable<Robot>{
 
         g.setColor(Color.GRAY);
         g.fillOval((int) x - SIZE/8, (int) y - SIZE/8, SIZE/4, SIZE/4); //Beacon
-        g.setColor(new Color(flashR, flashG, flashB));
+        g.setColor(Color.getHSBColor(hue.val()/256.0f,0.9f,0.5f));
         g.fillOval((int) x - SIZE/10, (int) y - SIZE/10, SIZE/5, SIZE/5); //Beacon
 
         g.setColor(Color.black);
@@ -428,6 +413,10 @@ public class Robot extends Entity implements Comparable<Robot>{
     public void update() {
 
         double initialCogs = cogs;
+
+        //Reload relevant properties
+        setWidth(Option.robotSize.getValue());
+        setHeight(Option.robotSize.getValue());
 
         //Apply physics
         applyPhysics();
@@ -458,22 +447,18 @@ public class Robot extends Entity implements Comparable<Robot>{
         for(; index < genes.length-3; index++) {
             //For every entry in this list of genes (excluding the ones at the end that don't have enough others after them as arguments)
 
-            if(genes==null) System.err.println("List of memories: NULL");
             if(genes[loaded]==null) System.err.println("Loaded: NULL");
             if(genes[loaded][index]==null) System.err.println("Index: NULL");
 
 
             if(genes[loaded] == null) loaded = 0;
-            try {
-                if(genes[loaded][index].val() == 0x00) continue; //Don't even bother with opcode 0x00, standing for "do nothing"
-            } catch(Exception e) {
-                while(true) System.out.println("Something horrible has happened...");
-            }
+
+            if(genes[loaded][index].val() == 0x00) continue; //Don't even bother with opcode 0x00, standing for "do nothing"
+
             if(KMEM[genes[loaded][index].val()] == null) continue; //If the opcode doesn't actually stand for something meaningful, skip it too
 
             //Since everything appears to be in order, let's try to run that as a gene.
             try {
-                //System.out.printf("%s(%d, %d, %d)\n", KMEM[genes[index].val()].getMeaning().getName(), genes[index+1].val(), genes[index+2].val(), genes[index+3].val());
 
                 cogs -= KMEM[genes[loaded][index].val()].cost;
                 if(cogs < 0) break;
@@ -481,7 +466,9 @@ public class Robot extends Entity implements Comparable<Robot>{
                 KMEM[genes[loaded][index].val()].getMeaning().invoke(this, genes[loaded][index+1].val(), genes[loaded][index+2].val(), genes[loaded][index+3].val());
 
 
-            } catch (IllegalAccessException | InvocationTargetException e) { e.printStackTrace(); }
+            } catch (IllegalAccessException | InvocationTargetException e) {
+                e.printStackTrace();
+            }
 
 
             //Assuming nothing went wrong we've completed a command by now. (If something did go wrong, we'll at least have a stack trace.)
@@ -519,14 +506,12 @@ public class Robot extends Entity implements Comparable<Robot>{
         if(e == null) return false;
         if(! (e instanceof Robot || e instanceof TrackerDot)) return false;
 
-
         return (Math.sqrt(getWidth() * getWidth() / 2 + e.getWidth() * e.getWidth() / 2)
             > Math.sqrt((getX() - e.getX())*(getX() - e.getX())+(getY() - e.getY())*(getY() - e.getY())));
     }
 
     @Override
     public void intersect(Entity e) {
-        System.out.println("Intersecting with " + e);
         repel(e);
         e.damage(getMass());
     }
@@ -589,13 +574,13 @@ public class Robot extends Entity implements Comparable<Robot>{
         int value;
         int maxValue = (int)(cogs/4)+1;
         while(cogs > 1) {
-            value = (int) Math.min(Global.random.nextInt(maxValue-1)+1, cogs);
+            value = (int) Math.min(Option.random.nextInt(maxValue-1)+1, cogs);
             cog = new Cog(value, getField());
             cogs -= value;
             cog.setX(getX());
             cog.setY(getY());
-            cog.setVelX(10*(Global.random.nextFloat()-0.5));
-            cog.setVelY(10*(Global.random.nextFloat()-0.5));
+            cog.setVelX(10*(Option.random.nextFloat()-0.5));
+            cog.setVelY(10*(Option.random.nextFloat()-0.5));
             add(cog);
         }
     }
@@ -680,7 +665,10 @@ public class Robot extends Entity implements Comparable<Robot>{
      * All arguments are intended to be within the range [0, 255].
      */
     // 0 (DEV ONLY)
-    public void _SNO (int arg0, int arg1, int arg2) {/* Significant nothing */}
+
+    public void _UNDEF (int arg0, int arg1, int arg2) {index -= 3; /*we really don't want to run this */}
+    public void _NO (int arg0, int arg1, int arg2) {index -= 3; /*we really don't want to run this either */}
+    public void _SNO (int arg0, int arg1, int arg2) {/* Significant nothing - run it, but running it does nothing*/}
     public void _PRINT(int arg0, int arg1, int arg2) {/*System.out.printf("%s says: %s, %s, %s.\n", name, WMEM[arg0].val(), WMEM[arg1].val(), WMEM[arg2].val());*/}
     // 1
     public void _GOTO (int arg0, int arg1, int arg2) {index = WMEM[arg0].val() - 4;}
@@ -752,10 +740,7 @@ public class Robot extends Entity implements Comparable<Robot>{
     // 8
     public void _WALL (int arg0, int arg1, int arg2) {} //TODO Implement _WALL() [when Walls exist]
     public void _SPIT (int arg0, int arg1, int arg2) {} //TODO Implement _SPIT() [when Cogs exist]
-    public void _LED (int arg0, int arg1, int arg2) {flashR = (WMEM[arg0].val()); flashG = (WMEM[arg1].val()); flashB = (WMEM[arg2].val());}
-    public void _OLEDR(int arg0, int arg1, int arg2) {if(getField().fromUUID(WMEM[arg1],WMEM[arg2]) instanceof Robot)  WMEM[arg0] = ub(((Robot) getField().fromUUID(WMEM[arg1],WMEM[arg2])).flashR);}
-    public void _OLEDG(int arg0, int arg1, int arg2) {if(getField().fromUUID(WMEM[arg1],WMEM[arg2]) instanceof Robot) WMEM[arg0] = ub(((Robot) getField().fromUUID(WMEM[arg1],WMEM[arg2])).flashG);}
-    public void _OLEDB(int arg0, int arg1, int arg2) {if(getField().fromUUID(WMEM[arg1],WMEM[arg2]) instanceof Robot) WMEM[arg0] = ub(((Robot) getField().fromUUID(WMEM[arg1],WMEM[arg2])).flashB);}
+    public void _HUE (int arg0, int arg1, int arg2) {hue = WMEM[arg0];}
     // getField
     public void _UUIDM(int arg0, int arg1, int arg2) {WMEM[arg0] = ub(getUUID());}
     public void _UUIDL(int arg0, int arg1, int arg2) {WMEM[arg0] = ub(getUUID());}

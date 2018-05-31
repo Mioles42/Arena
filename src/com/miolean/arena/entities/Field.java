@@ -10,10 +10,12 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class Field {
 
-    private static final int MAX_ROBOTS = 32;
-    private static final int MAX_COGS = 200;
+    private static final int MAX_ROBOTS = 32*16;
+    private static final int MAX_COGS = 200*4;
     public  static final int MAX_ENTITIES = 255*255;
     public  static final int TOP_LIST_LENGTH = 10;
+    public static final int ARENA_SIZE = 4*1024;
+    public static final int BORDER = 20*2;
 
     private ConcurrentHashMap<Integer, Entity> entities;
     private List<Robot> robots;
@@ -36,6 +38,7 @@ public class Field {
         time++;
         distribute();
 
+
         for(Entity e: entities.values()) {
 
             e.tick();
@@ -43,8 +46,11 @@ public class Field {
             //Is it still alive?
             if(entities.get(e.getUUID()) == null) continue;
 
+
             for(Entity g: entities.values()) {
-                if(e != g && e.intersectsWith(g)) e.intersect(g);
+                if(e != g && e.quickIntersects(g) && e.intersectsWith(g)) {
+                    e.intersect(g);
+                }
             }
 
             //Is it still alive?
@@ -89,13 +95,8 @@ public class Field {
     public void remove(Entity e) {
         if(e instanceof Robot) {
             robots.remove(e);
-            if(robots.contains(e)) {
-            }
-
         }
         if(e instanceof Cog) cogs.remove(e);
-
-        e.die();
         entities.remove(e.getUUID());
     }
 
@@ -126,21 +127,21 @@ public class Field {
 
     public void distribute() {
 
-        if(Option.random.nextFloat() < 0.015) {
+        if(Option.random.nextFloat() < 0.05) {
             Cog cog = new Cog(5 + (int) (10 * Option.random.nextFloat()), this);
-            cog.setX(Option.random.nextFloat() * Option.ARENA_SIZE);
-            cog.setY(Option.random.nextFloat() * Option.ARENA_SIZE);
-            cog.setR(Option.random.nextFloat() * Option.ARENA_SIZE);
+            cog.setX(Option.random.nextFloat() * ARENA_SIZE);
+            cog.setY(Option.random.nextFloat() * ARENA_SIZE);
+            cog.setR(Option.random.nextFloat() * ARENA_SIZE);
             add(cog);
         }
 
-        if(Option.random.nextFloat() < 0.003) {
+        if(Option.random.nextFloat() < 0.01) {
             Robot robot;
             robot = new Robot(getTopRobots().get(Option.random.nextInt(getTopRobots().size())), this);
 
-            robot.setX(Option.random.nextFloat() * Option.ARENA_SIZE);
-            robot.setY(Option.random.nextFloat() * Option.ARENA_SIZE);
-            robot.setR(Option.random.nextFloat() * Option.ARENA_SIZE);
+            robot.setX(Option.random.nextFloat() * ARENA_SIZE);
+            robot.setY(Option.random.nextFloat() * ARENA_SIZE);
+            robot.setR(Option.random.nextFloat() * ARENA_SIZE);
             add(robot);
         }
     }

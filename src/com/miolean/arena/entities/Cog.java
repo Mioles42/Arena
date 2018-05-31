@@ -41,7 +41,7 @@ public class Cog extends Entity {
     public void intersect(Entity e) {
         if(e instanceof Robot) {
             ((Robot) e).setCogs(((Robot) e).getCogs() + value);
-            getField().remove(this);
+            die();
         }
     }
 

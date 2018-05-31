@@ -3,6 +3,7 @@ package com.miolean.arena.input;
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.lang.ref.WeakReference;
@@ -57,7 +58,8 @@ public class NumericalInput extends Input implements ChangeListener {
 
     @Override
     public void stateChanged(ChangeEvent e) {
-        int value = ((JSlider)e.getSource()).getValue();
+        value = ((JSlider)e.getSource()).getValue();
+        System.out.println(value);
         for(WeakReference w: sliders) {
             if(w.get() == null) {
                 sliders.remove(w);

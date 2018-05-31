@@ -1,5 +1,6 @@
 package com.miolean.arena.framework;
 
+import com.miolean.arena.input.CompoundInput;
 import com.miolean.arena.input.NumericalInput;
 import com.miolean.random.WordRandom;
 
@@ -14,24 +15,19 @@ import java.util.Random;
 public class Option {
 
     public static NumericalInput updateSpeed = new NumericalInput("Update speed", "The number of update actions to run per second", 1, 1000, 20);
-    public static NumericalInput displaySpeed = new NumericalInput("Display speed", "The number of info-display actions to run per second", 1, 1000, 20);
-    public static NumericalInput renderSpeed = new NumericalInput("Render speed", "The number of render actions to run per second", 1, 1000, 20);
+    public static NumericalInput displaySpeed = new NumericalInput("Display speed", "The number of info-display actions to run per second", 1, 1000, 5);
+    public static NumericalInput renderSpeed = new NumericalInput("Render speed", "The number of render actions to run per second", 1, 1000, 50);
 
-    //Milliseconds per tick, for each of the different cycles
-    public static int updateCycle = 50;
-    public static int displayCycle = 100;
-    public static int renderCycle = 10;
-    public static int distributeCycle = 20;
-    public static double distributeRatio = 0.3; //distributes per update
+    public static NumericalInput robotSize = new NumericalInput("Robot size", "The default robot size", 5, 300, 40);
+
+    public static CompoundInput speedOptions = new CompoundInput("Field speed options", "Affect the performance of Ergo", updateSpeed, displaySpeed, renderSpeed);
 
     //Publicly accessible random instance
     public static Random random = new Random();
     public static WordRandom wordRandom = new WordRandom();
 
     //1 pixel= 1 tank-meter, I suppose
-    public static final int ARENA_SIZE = 2*1024;
 
-    public static final int BORDER = 20;
 
     public static boolean[] KEY = new boolean[9];
 

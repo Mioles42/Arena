@@ -6,16 +6,15 @@ import com.miolean.arena.ui.GeneralDisplayPanel;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
+import java.awt.event.*;
 
-public class Main implements Runnable, WindowListener {
+public class Main implements Runnable, WindowListener, ActionListener {
 
     private FieldDisplayPanel fieldDisplayPanel;
     private GeneralDisplayPanel generalDisplayPanel;
 
     Field field;
-    Thread ergoThread;
+    JFrame window;
     private Handler handler;
     private boolean isRunning = true;
 
@@ -37,17 +36,25 @@ public class Main implements Runnable, WindowListener {
     }
 
     public void initializeGUI() {
-        JFrame window = new JFrame("Ergo");
+        window = new JFrame("Ergo");
         window.setSize(1200, 700);
         window.setLocation(20, 200);
         window.setVisible(true);
         window.setLayout(new GridBagLayout());
+        window.setResizable(true);
         window.addWindowListener(this);
 
         JMenuBar menuBar = new JMenuBar();
-
-
         window.setJMenuBar(menuBar);
+
+        JMenu optionMenu = new JMenu("Option");
+        menuBar.add(optionMenu);
+        JMenuItem item = new JMenuItem("Run speed...");
+        item.addActionListener(this);
+        item.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.ALT_MASK));
+        item.setActionCommand(Option.speedOptions.getName());
+
+        optionMenu.add(item);
 
         //Add the main panel:
         JPanel mainContainer = new JPanel();
@@ -89,30 +96,41 @@ public class Main implements Runnable, WindowListener {
     public void run() {
         System.out.println("Running...");
 
-        long lastUpdate = System.currentTimeMillis();
-        long lastRender = System.currentTimeMillis();
-        long lastDisplay = System.currentTimeMillis();
-        long lastDistribute = System.currentTimeMillis();
+        long lastUpdate = System.nanoTime();
+        long lastRender = System.nanoTime();
+        long lastDisplay = System.nanoTime();
+
+        int updateCycle = (int) (1000000000.0/Option.updateSpeed.getValue());
+        int renderCycle = (int) (1000000000.0/Option.renderSpeed.getValue());
+        int displayCycle = (int) (1000000000.0/Option.displaySpeed.getValue());
 
         while(isRunning) {
 
-            long time = System.currentTimeMillis();
+            long time = System.nanoTime();
 
-            if(time > lastUpdate + Option.updateCycle) {
+            if(time > lastUpdate + updateCycle) {
                 handler.tick();
-                lastUpdate = time;
+                lastUpdate = System.nanoTime();
+                Debug.logTime("Update", System.nanoTime()-time);
             }
-            time = System.currentTimeMillis();
+            time = System.nanoTime();
 
-            if(time > lastRender + Option.renderCycle) {
+            if(time > lastRender + renderCycle) {
                 fieldDisplayPanel.repaint();
-                lastRender = time;
+                lastRender = System.nanoTime();
+                Debug.logTime("Render", System.nanoTime()-time);
             }
-            time = System.currentTimeMillis();
+            time = System.nanoTime();
 
-            if(time > lastDisplay + Option.displayCycle) {
+            if(time > lastDisplay + displayCycle) {
                 generalDisplayPanel.display();
-                lastDisplay = time;
+                lastDisplay = System.nanoTime();
+                Debug.logTime("Display", System.nanoTime()-time);
+
+                //Updating the value of the cycles is actually also on the display cycle
+                updateCycle = (int) (1000000000.0/Option.updateSpeed.getValue());
+                renderCycle = (int) (1000000000.0/Option.renderSpeed.getValue());
+                displayCycle = (int) (1000000000.0/Option.displaySpeed.getValue());
             }
         }
     }
@@ -124,4 +142,27 @@ public class Main implements Runnable, WindowListener {
     @Override public void windowDeiconified(WindowEvent e) {}
     @Override public void windowActivated(WindowEvent e) {}
     @Override public void windowDeactivated(WindowEvent e) {}
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+
+        if(e.getSource() instanceof JMenuItem) {
+            JMenuItem m = (JMenuItem) e.getSource();
+            System.out.println(m.getActionCommand());
+            JPanel launchedPanel = null;
+            if(m.getActionCommand().equals(Option.speedOptions.getName())) {
+                launchedPanel = Option.speedOptions.open();
+            }
+
+            if(launchedPanel != null) {
+                JDialog dialog = new JDialog();
+                dialog.setTitle(m.getText());
+                dialog.add(launchedPanel);
+                dialog.pack();
+                dialog.setLocation(window.getX() + 40, window.getY() + 40);
+                dialog.setModal(true);
+                dialog.setVisible(true);
+            }
+        }
+    }
 }

@@ -17,15 +17,16 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import java.awt.*;
+import java.io.OutputStream;
 import java.util.ArrayList;
 
-public class GeneralDisplayPanel extends JPanel implements ChangeListener, ListSelectionListener, HyperlinkListener, ActiveRobotListener {
+public class GeneralDisplayPanel extends JPanel implements HyperlinkListener, ActiveRobotListener {
 
-    private JSlider slider;
     private JTabbedPane tabbedPane;
     MemoryPanel memoryPanel;
     EvolutionPanel evolutionPanel;
     EntityPanel entityPanel;
+    DebugPanel debugPanel;
 
     java.util.List<ActiveRobotListener> listenerList = new ArrayList<ActiveRobotListener>();
     Entity viewholder;
@@ -50,8 +51,6 @@ public class GeneralDisplayPanel extends JPanel implements ChangeListener, ListS
     }
 
     public void makeMainLayout() {
-
-        CheckboxInput input = new CheckboxInput("Test", "Enable/disable nothing at all");
 
         JPanel genomePanel = new JPanel();
         memoryPanel = new MemoryPanel(null);
@@ -84,17 +83,13 @@ public class GeneralDisplayPanel extends JPanel implements ChangeListener, ListS
 
         //ImageIcon genomeIcon = new ImageIcon(GeneralDisplayPanel.class.getClassLoader().getResource("img/list.png"));
 
-        makeGenomePanel(genomePanel);
+
+        debugPanel = new DebugPanel();
 
         tabbedPane.addTab("Program Memory", memoryPanel);
         tabbedPane.addTab("Entities", entityPanel);
-        tabbedPane.addTab("Genome", genomePanel);
         tabbedPane.addTab("Evolution", evolutionPanel);
-
-        JLabel genomeLabel = new JLabel("Genome", JLabel.CENTER);
-        genomeLabel.setVerticalTextPosition(JLabel.BOTTOM);
-        genomeLabel.setHorizontalTextPosition(JLabel.CENTER);
-        tabbedPane.setTabComponentAt(2, genomeLabel);
+        tabbedPane.addTab("Debug", debugPanel);
 
         infoPanelPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         this.add(infoPanelPanel, c);
@@ -121,12 +116,6 @@ public class GeneralDisplayPanel extends JPanel implements ChangeListener, ListS
         ));
         this.add(controlPanelPanel, c);
 
-        slider = new JSlider();
-        slider.setMaximum(1000);
-        slider.setMinimum(1);
-        slider.setValue(20);
-        slider.setFocusable(false);
-        slider.addChangeListener(this);
         controlPanel.setLayout(new GridBagLayout());
         c = new GridBagConstraints();
         c.fill = GridBagConstraints.HORIZONTAL;
@@ -134,7 +123,8 @@ public class GeneralDisplayPanel extends JPanel implements ChangeListener, ListS
         c.gridy = 0;
         c.weightx = .2;
         c.weighty = .3;
-        controlPanel.add(slider, c);
+
+        //controlPanel.add(Option.speedOptions.open(), c);
 
 
 
@@ -146,78 +136,66 @@ public class GeneralDisplayPanel extends JPanel implements ChangeListener, ListS
         memoryPanel.updateInfo();
         evolutionPanel.updateInfo();
         entityPanel.updateInfo();
+        debugPanel.updateInfo();
     }
-
-    public void makeGenomePanel(JPanel genomePanel) {
-
-        genomePanel.setLayout(new GridBagLayout());
-
-        int category = -1;
-
-        DefaultMutableTreeNode root = new DefaultMutableTreeNode("");
-        DefaultMutableTreeNode branch = null;
-        DefaultMutableTreeNode twig;
-
-
-        for(int i = 0; i < com.miolean.arena.entities.Robot.KMEM.length; i++) {
-            if(i/16 > category) {
-                if(branch != null) root.add(branch);
-                category = i/16;
-                branch = new DefaultMutableTreeNode(Integer.toHexString(category).toUpperCase() + "  " + Gene.GENE_CATEGORIES[category]);
-                //Add a new section!
-            }
-            if(com.miolean.arena.entities.Robot.KMEM[i] != null) {
-                 twig = new DefaultMutableTreeNode(Integer.toHexString(i).toUpperCase() + "|  " + com.miolean.arena.entities.Robot.KMEM[i]);
-                 branch.add(twig);
-            }
-        }
-
-        root.add(branch);
-
-        GridBagConstraints c = new GridBagConstraints();
-        c.fill = GridBagConstraints.BOTH;
-        c.gridx = 0;
-        c.gridy = 0;
-        c.gridheight = 1;
-        c.gridwidth = 1;
-        c.ipadx = 5;
-        c.ipady = 5;
-        c.weightx = .1;
-        c.weighty = .1;
-
-        JTree tree = new JTree(root);
-        tree.setEditable(false);
-        tree.setFocusable(false);
-        JScrollPane scrollPane = new JScrollPane(tree);
-        genomePanel.add(scrollPane, c);
-    }
-
-
-    @Override
-    public void stateChanged(ChangeEvent e) {
-        if(e.getSource() == slider) {
-            Option.updateCycle = (int) (1000.0/slider.getValue());
-            Option.distributeCycle = (int) (Option.distributeRatio * 1000.0/slider.getValue());
-        }
-    }
+//
+//    public void makeGenomePanel(JPanel genomePanel) {
+//
+//        genomePanel.setLayout(new GridBagLayout());
+//
+//        int category = -1;
+//
+//        DefaultMutableTreeNode root = new DefaultMutableTreeNode("");
+//        DefaultMutableTreeNode branch = null;
+//        DefaultMutableTreeNode twig;
+//
+//
+//        for(int i = 0; i < com.miolean.arena.entities.Robot.KMEM.length; i++) {
+//            if(i/16 > category) {
+//                if(branch != null) root.add(branch);
+//                category = i/16;
+//                branch = new DefaultMutableTreeNode(Integer.toHexString(category).toUpperCase() + "  " + Gene.GENE_CATEGORIES[category]);
+//                //Add a new section!
+//            }
+//            if(com.miolean.arena.entities.Robot.KMEM[i] != null) {
+//                 twig = new DefaultMutableTreeNode(Integer.toHexString(i).toUpperCase() + "|  " + com.miolean.arena.entities.Robot.KMEM[i]);
+//                 branch.add(twig);
+//            }
+//        }
+//
+//        root.add(branch);
+//
+//        GridBagConstraints c = new GridBagConstraints();
+//        c.fill = GridBagConstraints.BOTH;
+//        c.gridx = 0;
+//        c.gridy = 0;
+//        c.gridheight = 1;
+//        c.gridwidth = 1;
+//        c.ipadx = 5;
+//        c.ipady = 5;
+//        c.weightx = .1;
+//        c.weighty = .1;
+//
+//        JTree tree = new JTree(root);
+//        tree.setEditable(false);
+//        tree.setFocusable(false);
+//        JScrollPane scrollPane = new JScrollPane(tree);
+//        genomePanel.add(scrollPane, c);
+//    }
 
     @Override
     public void hyperlinkUpdate(HyperlinkEvent e) {
         if(e.getEventType() == HyperlinkEvent.EventType.ACTIVATED){
             infoholder = field.fromHTML(e.getDescription());
             alertInfoholderChange(((Robot)infoholder));
+            if(infoholder.isAlive()) {
+                viewholder = infoholder;
+                alertViewholderChange(viewholder);
+            }
             tabbedPane.setSelectedComponent(memoryPanel);
         }
     }
 
-    @Override
-    public void valueChanged(ListSelectionEvent e) {
-        Entity n = (Entity) ((JList)e.getSource()).getSelectedValue();
-        if(n != null) {
-            viewholder = n;
-            alertViewholderChange(n);
-        }
-    }
 
     public void addActiveRobotListener(ActiveRobotListener l) {
         listenerList.add(l);
@@ -234,7 +212,6 @@ public class GeneralDisplayPanel extends JPanel implements ChangeListener, ListS
 
     @Override
     public void infoholderChanged(Robot e) {
-
         memoryPanel.source = e;
     }
 

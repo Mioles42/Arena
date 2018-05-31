@@ -16,7 +16,7 @@ edit program 0 at 4:
     at 16:
     _PRINT -- -- --
     _FORWD 02 -- --
-    _LED 02 02 01
+    _HUE 02 02 01
     _IMOV 01 00 --
     _IMOV 02 255 --
 
