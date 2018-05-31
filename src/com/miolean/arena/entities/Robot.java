@@ -459,8 +459,6 @@ public class Robot extends Entity implements Comparable<Robot>{
 
             //Since everything appears to be in order, let's try to run that as a gene.
             try {
-                System.out.println( (genes[loaded]==null) + ", " + (genes[loaded][index]==null) + ", " + (KMEM[genes[loaded][index].val()].getMeaning()==null));
-                System.out.printf("%s(%d, %d, %d)\n", KMEM[genes[loaded][index].val()].getMeaning().getName(), genes[loaded][index+1].val(), genes[loaded][index+2].val(), genes[loaded][index+3].val());
 
                 cogs -= KMEM[genes[loaded][index].val()].cost;
                 if(cogs < 0) break;

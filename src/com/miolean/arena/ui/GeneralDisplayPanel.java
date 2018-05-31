@@ -26,6 +26,7 @@ public class GeneralDisplayPanel extends JPanel implements HyperlinkListener, Ac
     MemoryPanel memoryPanel;
     EvolutionPanel evolutionPanel;
     EntityPanel entityPanel;
+    DebugPanel debugPanel;
 
     java.util.List<ActiveRobotListener> listenerList = new ArrayList<ActiveRobotListener>();
     Entity viewholder;
@@ -83,18 +84,12 @@ public class GeneralDisplayPanel extends JPanel implements HyperlinkListener, Ac
         //ImageIcon genomeIcon = new ImageIcon(GeneralDisplayPanel.class.getClassLoader().getResource("img/list.png"));
 
 
-        //Let's be honest: the genome panel is a huge pain and not very helpful.
-        //makeGenomePanel(genomePanel);
+        debugPanel = new DebugPanel();
 
         tabbedPane.addTab("Program Memory", memoryPanel);
         tabbedPane.addTab("Entities", entityPanel);
-        tabbedPane.addTab("Genome", genomePanel);
         tabbedPane.addTab("Evolution", evolutionPanel);
-
-        JLabel genomeLabel = new JLabel("Genome", JLabel.CENTER);
-        genomeLabel.setVerticalTextPosition(JLabel.BOTTOM);
-        genomeLabel.setHorizontalTextPosition(JLabel.CENTER);
-        tabbedPane.setTabComponentAt(2, genomeLabel);
+        tabbedPane.addTab("Debug", debugPanel);
 
         infoPanelPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         this.add(infoPanelPanel, c);
@@ -141,6 +136,7 @@ public class GeneralDisplayPanel extends JPanel implements HyperlinkListener, Ac
         memoryPanel.updateInfo();
         evolutionPanel.updateInfo();
         entityPanel.updateInfo();
+        debugPanel.updateInfo();
     }
 //
 //    public void makeGenomePanel(JPanel genomePanel) {
