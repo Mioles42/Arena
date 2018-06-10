@@ -1,6 +1,7 @@
 package com.miolean.arena.entities;
 
 import com.miolean.arena.framework.Option;
+import com.miolean.arena.genetics.GeneCommand;
 
 import java.awt.*;
 import java.io.InputStream;

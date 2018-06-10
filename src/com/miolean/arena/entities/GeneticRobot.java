@@ -322,20 +322,29 @@ public class GeneticRobot extends Robot {
 
         while(index < genes.length) {
 
+            if(getCogs() < 0) break;
+
+
+            if(genes[loaded][index] == null) {
+                System.err.println("Null gene");
+            }
             Gene gene = KMEM[genes[loaded][index].val()];
+
 
             try {
                 if(gene.getNumParameters() == 0) {
+                    System.out.println("Parameters: Expected 0, actual " + gene.getMeaning().getParameterTypes().length);
                     gene.getMeaning().invoke(this);
-                } else if(gene.getNumParameters() == 1) {
+                } else if(gene.getNumParameters() == 1 && index < 255) {
                     gene.getMeaning().invoke(this, genes[loaded][index+1].val());
-                } else if(gene.getNumParameters() == 2) {
+                } else if(gene.getNumParameters() == 2 && index < 254) {
                     gene.getMeaning().invoke(this, genes[loaded][index+1].val(), genes[loaded][index+2].val());
-                } else {
+                } else if(index < 253){
                     gene.getMeaning().invoke(this, genes[loaded][index+1].val(), genes[loaded][index+2].val(), genes[loaded][index+3].val());
                 }
+                setCogs(getCogs() - gene.getCost());
                 index += 1 + gene.getNumParameters();
-            } catch (IllegalAccessException | InvocationTargetException | IllegalArgumentException e) {
+            } catch (IllegalAccessException | InvocationTargetException e) {
                 System.err.println("Error when running gene " + gene + " with " + gene.getNumParameters() + " parameters");
                 e.printStackTrace();
             }

@@ -9,5 +9,8 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface GeneCommand{
-    String[] alias() default {};
+    int args();
+    int cost();
+    int weight();
+    int bonus() default 0;
 }
