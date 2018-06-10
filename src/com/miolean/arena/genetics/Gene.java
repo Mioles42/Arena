@@ -6,6 +6,7 @@ import com.miolean.arena.entities.DefaultGeneticRobot;
 import com.miolean.arena.entities.Robot;
 
 import java.lang.reflect.Method;
+import java.util.Objects;
 import java.util.Scanner;
 
 public class Gene {
@@ -85,7 +86,7 @@ public class Gene {
                 //For all the methods that it looks like we've designated as reflected
                 boolean defined = false;
                 for(Gene g: KMEM) if(g.meaning.equals(m)) defined = true;
-                if(! defined) System.err.println("Gene mismatch: " + m.getName() + " present but not defined in origin file");
+                if(! defined && !(m.getName().equals("_UNDEF"))) System.err.println("Gene mismatch: " + m.getName() + " present but not defined in origin file");
             }
         }
 

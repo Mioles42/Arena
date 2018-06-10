@@ -56,7 +56,7 @@ public abstract class Robot extends Entity implements Comparable<Robot>{
 
 
     //Color:
-    private UByte hue = ub(100);
+    private int hue = 100;
 
     //State variables:
     private double fitness = 0;
@@ -148,7 +148,7 @@ public abstract class Robot extends Entity implements Comparable<Robot>{
 
         g.setColor(Color.GRAY);
         g.fillOval((int) x - SIZE/8, (int) y - SIZE/8, SIZE/4, SIZE/4); //Beacon
-        g.setColor(Color.getHSBColor(hue.val()/256.0f,0.9f,0.5f));
+        g.setColor(Color.getHSBColor(hue/256.0f,0.9f,0.5f));
         g.fillOval((int) x - SIZE/10, (int) y - SIZE/10, SIZE/5, SIZE/5); //Beacon
 
         g.setColor(Color.black);
@@ -212,6 +212,7 @@ public abstract class Robot extends Entity implements Comparable<Robot>{
     }
     protected void upgrade(UByte stat, int amount) {
         //TODO manage conversion problems with signed UBytes
+        //TODO probably needs a cooldown
         cogs -= amount;
         int newValue = amount + stats[Math.abs(stat.val()>>5)].val();
         stats[Math.abs(stat.val()>>5)] = (amount > 255)? ub(255):ub(amount);
@@ -254,8 +255,8 @@ public abstract class Robot extends Entity implements Comparable<Robot>{
     public void setCogs(double cogs) { this.cogs = cogs; }
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
-    public UByte getHue() {return hue;}
-    public void setHue(UByte hue) {this.hue = hue;}
+    public int getHue() {return hue;}
+    public void setHue(int hue) {this.hue = hue;}
 
     @Override
     public int compareTo(Robot o) {

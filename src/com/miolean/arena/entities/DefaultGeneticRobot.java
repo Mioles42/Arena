@@ -60,8 +60,8 @@ public class DefaultGeneticRobot extends GeneticRobot {
     }
 
     //TODO Implement test commands after we can disable selected genes
+    public void _SCALC() {}
     public void _TCALC() {}
-    public void _LCALC() {}
     public void _HURT() {}
 
     public void _GOTO (int reg) {index = WMEM[reg].val() - 4;}
@@ -228,8 +228,16 @@ public class DefaultGeneticRobot extends GeneticRobot {
 
     //TODO Find other nearby entities
     public void _VIEW (int viewReg) {viewDistance = WMEM[viewReg].val();}
-    public void _NEAR (int arg0, int arg1, int arg2) {}
-    public void _NRST (int arg0, int arg1, int arg2) {}
+    public void _NEAR (int targReg) {}
+    public void _CNEAR (int targReg) {}
+    public void _RNEAR (int targReg) {}
+    public void _BNEAR (int targReg) {}
+    public void _WNEAR (int targReg) {}
+    public void _NST (int targReg) {}
+    public void _CNST (int targReg) {}
+    public void _RNST (int targReg) {}
+    public void _BNST (int targReg) {}
+    public void _WNST (int targReg) {}
 
     //General actions
     public void _HEAL () {repair();}
@@ -239,38 +247,35 @@ public class DefaultGeneticRobot extends GeneticRobot {
     public void _TURNL(int forceReg) {rotate(WMEM[forceReg].val());}
     public void _TURNR(int forceReg) {rotate(-WMEM[forceReg].val());}
 
+    public void _WALL (int lengthReg, int widthReg) {} //TODO Implement _WALL() [when Walls exist]
+    public void _SPIT (int valueReg) {} //TODO Implement _SPIT() [when Cogs exist]
+    public void _HUE (int sourceReg) {setHue(WMEM[sourceReg].val());}
+    public void _FACE(int uuidReg) {} //TODO Face towards an entity
+
     //Math
-    public void _ADD  (int arg0, int arg1, int arg2) {WMEM[arg0] = ub(arg1 + arg2);}
-    public void _SUB  (int arg0, int arg1, int arg2) {WMEM[arg0] = ub(arg1 - arg2);}
-    public void _PROD (int arg0, int arg1, int arg2) {WMEM[arg0] = ub(arg1 * arg2);}
-    public void _QUOT (int arg0, int arg1, int arg2) {if(arg2 != 0) WMEM[arg0] = ub(arg1 / arg2);}
-    public void _BWOR (int arg0, int arg1, int arg2) {WMEM[arg0] = ub(arg1 | arg2);}
-    public void _BWAND(int arg0, int arg1, int arg2) {WMEM[arg0] = ub(arg1 & arg2);}
-    public void _BWXOR(int arg0, int arg1, int arg2) {WMEM[arg0] = ub(arg1 ^ arg2);}
+    public void _ADD  (int arg0, int arg1) {WMEM[arg0] = ub(WMEM[arg0].val() + WMEM[arg1].val());}
+    public void _SUB  (int arg0, int arg1) {WMEM[arg0] = ub(WMEM[arg0].val() + WMEM[arg1].val());}
+    public void _PROD (int arg0, int arg1) {WMEM[arg0] = ub(WMEM[arg0].val() + WMEM[arg1].val());}
+    public void _QUOT (int arg0, int arg1) {if(WMEM[arg1].val() != 0) WMEM[arg0] = ub(WMEM[arg0].val() + WMEM[arg1].val());}
     public void _INCR (int arg0) {WMEM[arg0] = ub(WMEM[arg0].val() + 1);}
 
     //Identity of other Robots
-    public void _OTYPE(int targReg, int uuidReg) {if(uuidReg < 255 && getArena().fromUUID(WMEM[uuidReg].val(),WMEM[uuidReg+1].val()) instanceof Robot) WMEM[targReg] = ub(typeOf(getArena().fromUUID(WMEM[uuidReg].val(),WMEM[uuidReg+1].val())));}
-    public void _OHP  (int targReg, int uuidReg) {if(uuidReg < 255 && getArena().fromUUID(WMEM[uuidReg].val(),WMEM[uuidReg+1].val()) instanceof Robot) WMEM[targReg] = ub((int) (getArena().fromUUID(WMEM[uuidReg].val(),WMEM[uuidReg+1].val()).getHealth()));}
+    public void _OTYPE(int targReg, int uuidReg) {if(uuidReg < 255) WMEM[targReg] = ub(typeOf(getArena().fromUUID(WMEM[uuidReg].val(),WMEM[uuidReg+1].val())));}
+    public void _OHP  (int targReg, int uuidReg) {if(uuidReg < 255) WMEM[targReg] = ub((int) (getArena().fromUUID(WMEM[uuidReg].val(),WMEM[uuidReg+1].val()).getHealth()));}
     public void _OCOG (int targReg, int uuidReg) {if(uuidReg < 255 && getArena().fromUUID(WMEM[uuidReg].val(),WMEM[uuidReg+1].val()) instanceof Robot) WMEM[targReg] = ub((int)((Robot) getArena().fromUUID(WMEM[uuidReg].val(),WMEM[uuidReg+1].val())).getCogs());}
-    // 8
-    public void _WALL (int arg0, int arg1, int arg2) {} //TODO Implement _WALL() [when Walls exist]
-    public void _SPIT (int arg0, int arg1, int arg2) {} //TODO Implement _SPIT() [when Cogs exist]
-    public void _HUE (int sourceReg) {setHue(WMEM[sourceReg]);}
-    // getArena
-    public void _UUIDM(int arg0, int arg1, int arg2) {WMEM[arg0] = ub(getUUID());}
-    public void _UUIDL(int arg0, int arg1, int arg2) {WMEM[arg0] = ub(getUUID());}
-    public void _HP   (int arg0) {WMEM[arg0] = ub((int) getHealth());}
-    public void _COG  (int arg0) {WMEM[arg0] = ub((int) getCogs());}
-    public void _PNT  (int arg0, int arg1, int arg2) {WMEM[arg0] = ub((int) getFitness());}
-    // A
-    public void _UPG  (int arg0, int arg1, int arg2) {upgrade(WMEM[arg0], WMEM[arg1].val());}
-    public void _STAT (int arg0, int arg1, int arg2) {WMEM[arg0] = stats[Math.abs(arg1>>5)];}
-    public void _KWGT (int arg0, int arg1, int arg2) {if(KMEM[WMEM[arg1].val()] != null) WMEM[arg0] = ub(KMEM[WMEM[arg1].val()].getWeight());}
-    public void _COST (int arg0, int arg1, int arg2) {if(KMEM[WMEM[arg1].val()] != null) WMEM[arg0] = ub((int)(KMEM[WMEM[arg1].val()].getCost()*4));}
-    // B
+    public void _OHUE (int targReg, int uuidReg) {if(uuidReg < 255 && getArena().fromUUID(WMEM[uuidReg].val(),WMEM[uuidReg+1].val()) instanceof Robot) WMEM[targReg] = ub((int)((Robot) getArena().fromUUID(WMEM[uuidReg].val(),WMEM[uuidReg+1].val())).getHue());}
+    public void _OFIT (int targReg, int uuidReg) {if(uuidReg < 255 && getArena().fromUUID(WMEM[uuidReg].val(),WMEM[uuidReg+1].val()) instanceof Robot) WMEM[targReg] = ub((int)((Robot) getArena().fromUUID(WMEM[uuidReg].val(),WMEM[uuidReg+1].val())).getFitness());}
 
-    // C
+    public void _UUID(int targReg) {if(targReg < 255) { WMEM[targReg] = ub(getUUID()>>8); WMEM[targReg] = ub(getUUID());}}
+    public void _HP   (int targReg) {WMEM[targReg] = ub((int) getHealth());}
+    public void _COG  (int targReg) {WMEM[targReg] = ub((int) getCogs());}
+    public void _PNT  (int targReg) {WMEM[targReg] = ub((int) getFitness());}
+
+    public void _UPG  (int statReg, int amountReg) {upgrade(WMEM[statReg], WMEM[amountReg].val());}
+    public void _STAT (int targReg, int statReg) {WMEM[targReg] = stats[Math.abs(statReg>>5)];}
+    public void _KWGT (int targReg, int kAddrReg) {if(KMEM[WMEM[kAddrReg].val()] != null) WMEM[targReg] = ub(KMEM[WMEM[kAddrReg].val()].getWeight());}
+    public void _COST (int targReg, int kAddrReg) {if(KMEM[WMEM[kAddrReg].val()] != null) WMEM[targReg] = ub((int)(KMEM[WMEM[kAddrReg].val()].getCost()*4));}
+
     public void _OPOSX(int targReg, int uuidReg) {if(uuidReg < 255 && getArena().fromUUID(WMEM[uuidReg].val(),  WMEM[uuidReg+1].val()) != null) WMEM[targReg] = ub((int) getArena().fromUUID(WMEM[uuidReg].val(),  WMEM[uuidReg].val()+1).getX());}
     public void _OVELX(int targReg, int uuidReg) {if(uuidReg < 255 && getArena().fromUUID(WMEM[uuidReg].val(),  WMEM[uuidReg+1].val()) != null) WMEM[targReg] = ub((int) getArena().fromUUID(WMEM[uuidReg].val(),  WMEM[uuidReg].val()+1).getVelX());}
     public void _OACCX(int targReg, int uuidReg) {if(uuidReg < 255 && getArena().fromUUID(WMEM[uuidReg].val(),  WMEM[uuidReg+1].val()) != null) WMEM[targReg] = ub((int) getArena().fromUUID(WMEM[uuidReg].val(),  WMEM[uuidReg].val()+1).getAccX());}
@@ -280,19 +285,15 @@ public class DefaultGeneticRobot extends GeneticRobot {
     public void _OPOSR(int targReg, int uuidReg) {if(uuidReg < 255 && getArena().fromUUID(WMEM[uuidReg].val(),  WMEM[uuidReg+1].val()) != null) WMEM[targReg] = ub((int) getArena().fromUUID(WMEM[uuidReg].val(),  WMEM[uuidReg].val()+1).getR());}
     public void _OVELR(int targReg, int uuidReg) {if(uuidReg < 255 && getArena().fromUUID(WMEM[uuidReg].val(),  WMEM[uuidReg+1].val()) != null) WMEM[targReg] = ub((int) getArena().fromUUID(WMEM[uuidReg].val(),  WMEM[uuidReg].val()+1).getVelR());}
     public void _OACCR(int targReg, int uuidReg) {if(uuidReg < 255 && getArena().fromUUID(WMEM[uuidReg].val(),  WMEM[uuidReg+1].val()) != null) WMEM[targReg] = ub((int) getArena().fromUUID(WMEM[uuidReg].val(),  WMEM[uuidReg].val()+1).getAccR());}
-    // D
-    public void _LSMEM(int arg0, int arg1, int arg2) {}
-    public void _SMEMX(int arg0, int arg1, int arg2) {}
-    public void _DEFS (int arg0, int arg1, int arg2) {if(SMEM[arg0] == null) createMemory(SMEM, arg0);}
-    public void _SDEL (int arg0, int arg1, int arg2) {}
-    public void _LPMEM(int arg0, int arg1, int arg2) {}
-    public void _PMEMX(int arg0, int arg1, int arg2) {}
-    public void _DEFP (int arg0, int arg1, int arg2) {if(PMEM[arg0] == null) createMemory(PMEM, arg0);}
-    public void _PDEL (int arg0, int arg1, int arg2) {}
-    public void _LUMEM(int arg0, int arg1, int arg2) {}
-    public void _UMEMX(int arg0, int arg1, int arg2) {}
-    public void _DEFU (int arg0, int arg1, int arg2) {if(UMEM[arg0] == null) createMemory(UMEM, arg0);}
-    public void _UDEP (int arg0, int arg1, int arg2) {}
+
+    //TODO Better manage multiple memories
+    public void _DEFS (int newMemReg) {if(SMEM[WMEM[newMemReg].val()] == null) createMemory(SMEM, WMEM[newMemReg].val());}
+    public void _DELS (int memReg) {if(SMEM[WMEM[memReg].val()] != null && WMEM[memReg].val() != 0) SMEM[WMEM[memReg].val()] = null;}
+    public void _DEFP (int newMemReg) {if(PMEM[WMEM[newMemReg].val()] == null) createMemory(PMEM, WMEM[newMemReg].val());}
+    public void _DELP (int memReg) {if(SMEM[WMEM[memReg].val()] != null && WMEM[memReg].val() != 0 && !(WMEM[memReg].val() == loaded && CURRENT == PMEM)) PMEM[WMEM[memReg].val()] = null;}
+    public void _DEFU (int newMemReg) {if(UMEM[WMEM[newMemReg].val()] == null) createMemory(UMEM, WMEM[newMemReg].val());}
+    public void _DELU (int memReg) {if(SMEM[WMEM[memReg].val()] != null && WMEM[memReg].val() != 0 && !(WMEM[memReg].val() == loaded && CURRENT == UMEM)) UMEM[WMEM[memReg].val()] = null;}
+    public void _LOADED(int targReg) {WMEM[targReg] = ub(loaded);}
 
     //TODO Get rid of this awful, awful command
     @Deprecated
@@ -309,7 +310,6 @@ public class DefaultGeneticRobot extends GeneticRobot {
     public void _PCOPY() {}
     public void _UCOPY() {}
 
-    // F
     public void _REP  () {reproduce();}
     public void _TWK  (int geneToTweak, int sourceReg) {if(KMEM[geneToTweak] != null) KMEM[geneToTweak].setWeight(WMEM[sourceReg].val());}
     public void _KRAND(int targReg) {WMEM[targReg] = randomGene();}
