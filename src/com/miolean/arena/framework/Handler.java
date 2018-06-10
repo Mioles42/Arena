@@ -7,18 +7,18 @@ import com.miolean.arena.entities.*;
  */
 public class Handler implements Perpetual {
 
-    Field field;
+    Arena arena;
     private int lastUUIDUsed = 0;
 
     public static Robot BASE_ROBOT;
 
-    public Handler(Field field) {
+    public Handler(Arena arena) {
 
-        this.field = field;
+        this.arena = arena;
     }
 
     public void tick(Object... o) {
-        field.updateAll();
+        arena.updateAll();
     }
 
 

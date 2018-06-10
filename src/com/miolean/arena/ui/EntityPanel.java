@@ -1,7 +1,6 @@
 package com.miolean.arena.ui;
 
 import com.miolean.arena.entities.*;
-import com.miolean.arena.entities.Robot;
 
 import javax.swing.*;
 import javax.swing.event.HyperlinkListener;
@@ -20,15 +19,15 @@ public class EntityPanel extends JPanel implements ActionListener{
 
     JScrollPane scrollPane;
 
-    Field field;
+    Arena arena;
 
     JComboBox<String> comboBox;
     private static final int INDEX_TANKS = 1;
     private static final int INDEX_ENTITIES = 0;
 
-    public EntityPanel(Field field) {
+    public EntityPanel(Arena arena) {
 
-        this.field = field;
+        this.arena = arena;
 
         GridBagConstraints c;
         LayoutManager layout = new GridBagLayout();
@@ -117,10 +116,10 @@ public class EntityPanel extends JPanel implements ActionListener{
         String result = "";
 
         if(comboBox.getSelectedIndex() == INDEX_TANKS) {
-            result += "<p>Total Robots: " + field.getRobots().size() + "</p>";
+            result += "<p>Total Robots: " + arena.getRobots().size() + "</p>";
 
-            for (int i = 0; i < field.getRobots().size(); i++) {
-                com.miolean.arena.entities.Robot t = field.getRobots().get(i);
+            for (int i = 0; i < arena.getRobots().size(); i++) {
+                com.miolean.arena.entities.Robot t = arena.getRobots().get(i);
 
 
                 result += t.toHTML();
@@ -130,7 +129,7 @@ public class EntityPanel extends JPanel implements ActionListener{
             }
         } else if(comboBox.getSelectedIndex() == INDEX_ENTITIES) {
 
-            java.util.List<Entity> entities = new ArrayList<>(field.getEntities().values());
+            java.util.List<Entity> entities = new ArrayList<>(arena.getEntities().values());
 
             for (int i = 0; i < entities.size(); i++) {
                 if(entities.get(i) == null) continue;

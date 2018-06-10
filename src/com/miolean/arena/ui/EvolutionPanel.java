@@ -1,13 +1,11 @@
 package com.miolean.arena.ui;
 
-import com.miolean.arena.entities.Field;
+import com.miolean.arena.entities.Arena;
 import com.miolean.arena.entities.Robot;
 
 import javax.swing.*;
 import javax.swing.event.HyperlinkListener;
 import java.awt.*;
-import java.util.Collection;
-import java.util.Collections;
 
 public class EvolutionPanel extends JPanel{
 
@@ -16,16 +14,16 @@ public class EvolutionPanel extends JPanel{
 
     JScrollPane scrollPane;
 
-    Field field;
+    Arena arena;
 
     private static final int INDEX_UMEM = 0;
     private static final int INDEX_PMEM = 1;
     private static final int INDEX_SMEM = 2;
     private static final int INDEX_WMEM = 3;
 
-    public EvolutionPanel(Field field) {
+    public EvolutionPanel(Arena arena) {
 
-        this.field = field;
+        this.arena = arena;
 
         GridBagConstraints c;
         LayoutManager layout = new GridBagLayout();
@@ -73,8 +71,8 @@ public class EvolutionPanel extends JPanel{
     void updateInfo() {
         String result = "";
 
-        for(int i = field.getTopRobots().size()-1; i >= 0; i--) {
-            Robot t = field.getTopRobots().get(i);
+        for(int i = arena.getTopRobots().size()-1; i >= 0; i--) {
+            Robot t = arena.getTopRobots().get(i);
             result += "<p><b>[" + (10-i) + "]</b>  ";
             result += t.toHTML();
             result += "</p>";

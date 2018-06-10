@@ -9,7 +9,7 @@ import java.util.*;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class Field {
+public class Arena {
 
     private static final int MAX_ROBOTS = 32*16;
     private static final int MAX_COGS = 200*4;
@@ -21,16 +21,16 @@ public class Field {
     private ConcurrentHashMap<Integer, Entity> entities;
     private List<Robot> robots;
     private List<Cog> cogs;
-    private List<Robot> topRobots;
+    private List<GeneticRobot> topRobots;
 
     private int time = 0;
 
-    public Field() {
+    public Arena() {
         entities = new ConcurrentHashMap<>();
         robots = new ArrayList<>();
         cogs = new ArrayList<>();
         topRobots = new ArrayList<>();
-        topRobots.add(new Robot(Option.class.getClassLoader().getResourceAsStream("gen/default.ergo"), this));
+        topRobots.add(new DefaultGeneticRobot(Option.class.getClassLoader().getResourceAsStream("gen/default.ergo"), this));
         topRobots.get(0).setName("Dummy");
     }
 
@@ -64,7 +64,7 @@ public class Field {
 
             marker = System.nanoTime();
             if(e instanceof Robot && ((Robot) e).getFitness() > 0 && (((Robot) e).getFitness() > topRobots.get(0).getFitness()) || e == topRobots.get(0)) {
-                Robot r = (Robot) e;
+                GeneticRobot r = (GeneticRobot) e;
                 if(! topRobots.contains(r)) {
                     topRobots.add(r);
                 }
@@ -115,7 +115,7 @@ public class Field {
         if(uuid < 0) return topRobots.get(uuid*-1-200-1);
         return entities.get(uuid);
     }
-    public Entity fromUUID(UByte great, UByte less) {return entities.get(great.val() * 255 + less.val());}
+    public Entity fromUUID(int great, int less) {return entities.get(great * 255 + less);}
 
     public Entity atLocation(int x, int y) {
         TrackerDot location = new TrackerDot(x, y, 4,0,this);
@@ -146,7 +146,7 @@ public class Field {
 
         if(Option.random.nextFloat() < 0.01) {
             Robot robot;
-            robot = new Robot(getTopRobots().get(Option.random.nextInt(getTopRobots().size())), this);
+            robot = new DefaultGeneticRobot(getTopRobots().get(Option.random.nextInt(getTopRobots().size())), this);
 
             robot.setX(Option.random.nextFloat() * ARENA_SIZE);
             robot.setY(Option.random.nextFloat() * ARENA_SIZE);
@@ -156,7 +156,7 @@ public class Field {
     }
 
     public ConcurrentHashMap<Integer, Entity> getEntities() { return entities;}
-    public List<Robot> getTopRobots() { return topRobots;}
+    public List<GeneticRobot> getTopRobots() { return topRobots;}
     public List<Robot> getRobots() { return robots;}
     public List<Cog> getCogs() { return cogs;}
 

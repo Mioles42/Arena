@@ -5,8 +5,8 @@ import static com.miolean.arena.framework.UByte.ub;
 
 public class ControlledRobot extends Robot {
 
-    public ControlledRobot(int x, int y, Field field) {
-        super(field);
+    public ControlledRobot(int x, int y, Arena arena) {
+        super(arena);
         setX(x);
         setY(y);
         setHealth(100);

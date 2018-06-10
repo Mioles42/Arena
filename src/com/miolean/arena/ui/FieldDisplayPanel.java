@@ -2,7 +2,6 @@ package com.miolean.arena.ui;
 
 import com.miolean.arena.entities.*;
 import com.miolean.arena.entities.Robot;
-import com.miolean.arena.framework.Debug;
 import com.miolean.arena.framework.Option;
 import com.miolean.arena.framework.Renderer;
 
@@ -11,8 +10,8 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
 
-import static com.miolean.arena.entities.Field.ARENA_SIZE;
-import static com.miolean.arena.entities.Field.BORDER;
+import static com.miolean.arena.entities.Arena.ARENA_SIZE;
+import static com.miolean.arena.entities.Arena.BORDER;
 
 public class FieldDisplayPanel extends JPanel implements KeyListener, MouseListener, MouseMotionListener, ActiveRobotListener{
 
@@ -21,31 +20,31 @@ public class FieldDisplayPanel extends JPanel implements KeyListener, MouseListe
     java.util.List<ActiveRobotListener> listenerList = new ArrayList<>();
 
     Entity viewholder;
-    Field field;
+    Arena arena;
 
     private boolean isRunning = true;
 
 
-    public FieldDisplayPanel(Field field) {
+    public FieldDisplayPanel(Arena arena) {
 
-        this.field = field;
+        this.arena = arena;
 
         requestFocus();
 
-        renderer = new Renderer(field);
+        renderer = new Renderer(arena);
 
-        viewholder = new ControlledRobot(300, 300, field);
-        field.add(viewholder);
+        viewholder = new ControlledRobot(300, 300, arena);
+        arena.add(viewholder);
 
-        Bullet rogue = new Bullet(null, field);
+        Bullet rogue = new Bullet(null, arena);
         rogue.setX(200);
         rogue.setY(200);
-        field.add(rogue);
+        arena.add(rogue);
 
-        com.miolean.arena.entities.Robot dummy = new Robot(Option.class.getClassLoader().getResourceAsStream("gen/cain.ergo"), field);
+        com.miolean.arena.entities.Robot dummy = new DefaultGeneticRobot(Option.class.getClassLoader().getResourceAsStream("gen/cain.ergo"), arena);
         dummy.setHealth(256);
 
-        field.add(dummy);
+        arena.add(dummy);
 
         this.setBackground(new Color(170, 170, 160));
 
@@ -64,20 +63,20 @@ public class FieldDisplayPanel extends JPanel implements KeyListener, MouseListe
 
 
     public void setViewholder(int x, int y) {
-        Entity e = field.atLocation(x, y);
+        Entity e = arena.atLocation(x, y);
 
         if (e == null) {
             if (viewholder instanceof ControlledRobot && viewholder.isAlive()) {
                 viewholder.setX(x);
                 viewholder.setY(y);
             } else {
-                e = new ControlledRobot(x, y, field);
-                field.add(e);
+                e = new ControlledRobot(x, y, arena);
+                arena.add(e);
                 viewholder = e;
             }
 
         } else {
-            if (viewholder instanceof ControlledRobot) field.remove(viewholder);
+            if (viewholder instanceof ControlledRobot) arena.remove(viewholder);
             viewholder = e;
         }
 
@@ -90,7 +89,7 @@ public class FieldDisplayPanel extends JPanel implements KeyListener, MouseListe
 
         if(e == null) throw new NumberFormatException("Null viewholder.");
 
-        if (viewholder instanceof ControlledRobot) field.remove(viewholder);
+        if (viewholder instanceof ControlledRobot) arena.remove(viewholder);
         viewholder = e;
 
         if (viewholder instanceof com.miolean.arena.entities.Robot && !(viewholder instanceof ControlledRobot))
@@ -156,7 +155,7 @@ public class FieldDisplayPanel extends JPanel implements KeyListener, MouseListe
         char key = e.getKeyChar();
         if(key == 'l') {
             System.out.println("============Top robots============");
-            for(com.miolean.arena.entities.Robot t: field.getTopRobots()) {
+            for(com.miolean.arena.entities.Robot t: arena.getTopRobots()) {
                 System.out.println("Robot " + t + " [Fitness " + t.getFitness() + "]");
             }
         }
@@ -203,18 +202,18 @@ public class FieldDisplayPanel extends JPanel implements KeyListener, MouseListe
         }
 
         if(e.getButton() == MouseEvent.BUTTON3) {
-            Cog cog = new Cog(30, field);
+            Cog cog = new Cog(30, arena);
             cog.setX(x);
             cog.setY(y);
-            field.add(cog);
+            arena.add(cog);
         }
 
         if(e.getButton() == MouseEvent.BUTTON2) {
-            com.miolean.arena.entities.Robot creation = new com.miolean.arena.entities.Robot(Option.class.getResourceAsStream("cain.ergo"), field);
+            com.miolean.arena.entities.Robot creation = new DefaultGeneticRobot(Option.class.getResourceAsStream("cain.ergo"), arena);
             creation.setX(x);
             creation.setY(y);
             creation.setName("creation");
-            field.add(creation);
+            arena.add(creation);
         }
     }
     @Override public void mousePressed(MouseEvent e) {}

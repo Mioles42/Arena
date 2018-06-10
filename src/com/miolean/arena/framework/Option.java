@@ -21,9 +21,9 @@ public class Option {
     public static NumericalInput renderSpeed = new NumericalInput("Render speed", "The number of render actions to run per second", 1, 1000, 50);
 
     public static NumericalInput robotSize = new NumericalInput("Robot size", "The default robot size", 5, 300, 40);
-    public static NumericalInput scale = new NumericalInput("Render scale", "The magnification of the field display", 1, 60, 5);
+    public static NumericalInput scale = new NumericalInput("Render scale", "The magnification of the arena display", 1, 60, 5);
 
-    public static CompoundInput speedOptions = new CompoundInput("Field speed options", "Affect the performance of Ergo", updateSpeed, displaySpeed, renderSpeed);
+    public static CompoundInput speedOptions = new CompoundInput("Arena speed options", "Affect the performance of Ergo", updateSpeed, displaySpeed, renderSpeed);
 
 
     private static Input[] inputs = {updateSpeed, displaySpeed, renderSpeed, robotSize, scale, speedOptions};

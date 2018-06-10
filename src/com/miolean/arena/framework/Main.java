@@ -1,12 +1,11 @@
 package com.miolean.arena.framework;
 
-import com.miolean.arena.entities.Field;
+import com.miolean.arena.entities.Arena;
 import com.miolean.arena.input.Input;
 import com.miolean.arena.ui.FieldDisplayPanel;
 import com.miolean.arena.ui.GeneralDisplayPanel;
 
 import javax.swing.*;
-import javax.xml.bind.annotation.XmlElementDecl;
 import java.awt.*;
 import java.awt.event.*;
 
@@ -17,7 +16,7 @@ public class Main implements Runnable, WindowListener, ActionListener {
 
     JMenu optionMenu = new JMenu("Option");
 
-    Field field;
+    Arena arena;
     JFrame window;
     private Handler handler;
     private boolean isRunning = true;
@@ -30,12 +29,12 @@ public class Main implements Runnable, WindowListener, ActionListener {
     }
 
     private Main() {
-        field = new Field();
-        fieldDisplayPanel = new com.miolean.arena.ui.FieldDisplayPanel(field);
-        generalDisplayPanel = new GeneralDisplayPanel(field);
+        arena = new Arena();
+        fieldDisplayPanel = new com.miolean.arena.ui.FieldDisplayPanel(arena);
+        generalDisplayPanel = new GeneralDisplayPanel(arena);
         initializeGUI();
 
-        handler = new Handler(field);
+        handler = new Handler(arena);
 
     }
 

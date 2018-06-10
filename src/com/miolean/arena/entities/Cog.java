@@ -1,5 +1,7 @@
 package com.miolean.arena.entities;
 
+import com.miolean.arena.framework.Debug;
+
 import java.awt.*;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Rectangle2D;
@@ -8,8 +10,8 @@ public class Cog extends Entity {
 
     private int value;
 
-    public Cog(int value, Field field) {
-        super((int) (5*Math.sqrt(value)), (int) (5*Math.sqrt(value)), 1, field);
+    public Cog(int value, Arena arena) {
+        super((int) (5*Math.sqrt(value)), (int) (5*Math.sqrt(value)), 1, arena);
         this.value = value;
     }
 
@@ -30,11 +32,15 @@ public class Cog extends Entity {
 
     @Override
     public boolean intersectsWith(Entity e) {
+        long marker = System.nanoTime();
         if(! (e instanceof Robot)) return false; //Don't interact with anything but Tanks
 
         //Assume an elliptical collision
         Ellipse2D.Double bounds = new Ellipse2D.Double(e.getX() - e.getWidth()/2, e.getY() - e.getHeight()/2, e.getWidth(), e.getHeight());
-        return bounds.intersects(new Rectangle2D.Double(getX() - getWidth()/2, getY() - getHeight()/2, getWidth(), getHeight()));
+        boolean result = bounds.intersects(new Rectangle2D.Double(getX() - getWidth()/2, getY() - getHeight()/2, getWidth(), getHeight()));
+
+        Debug.logTime("Cog intersections", marker - System.nanoTime());
+        return result;
     }
 
     @Override

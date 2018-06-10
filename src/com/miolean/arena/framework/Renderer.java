@@ -1,6 +1,6 @@
 package com.miolean.arena.framework;
 
-import com.miolean.arena.entities.Field;
+import com.miolean.arena.entities.Arena;
 
 import java.awt.*;
 
@@ -9,15 +9,15 @@ import java.awt.*;
  */
 public class Renderer implements Perpetual{
 
-    private Field field;
+    private Arena arena;
 
-    public Renderer(Field field) {
-        this.field = field;
+    public Renderer(Arena arena) {
+        this.arena = arena;
     }
 
     public void tick(Object... args) {
         Graphics g = (Graphics) args[0];
-        field.renderAll(g);
+        arena.renderAll(g);
     }
 
 

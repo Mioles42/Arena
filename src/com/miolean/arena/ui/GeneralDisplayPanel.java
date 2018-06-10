@@ -1,23 +1,14 @@
 package com.miolean.arena.ui;
 
+import com.miolean.arena.entities.Arena;
 import com.miolean.arena.entities.Entity;
-import com.miolean.arena.entities.Field;
-import com.miolean.arena.entities.Gene;
+import com.miolean.arena.entities.GeneticRobot;
 import com.miolean.arena.entities.Robot;
-import com.miolean.arena.framework.Option;
-import com.miolean.arena.input.CheckboxInput;
-import com.miolean.arena.input.NumericalInput;
 
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-import javax.swing.tree.DefaultMutableTreeNode;
 import java.awt.*;
-import java.io.OutputStream;
 import java.util.ArrayList;
 
 public class GeneralDisplayPanel extends JPanel implements HyperlinkListener, ActiveRobotListener {
@@ -32,11 +23,11 @@ public class GeneralDisplayPanel extends JPanel implements HyperlinkListener, Ac
     Entity viewholder;
     Entity infoholder;
 
-    Field field;
+    Arena arena;
 
 
-    public GeneralDisplayPanel(Field field) {
-        this.field = field;
+    public GeneralDisplayPanel(Arena arena) {
+        this.arena = arena;
 
         LayoutManager layout = new GridBagLayout();
         setLayout(layout);
@@ -52,10 +43,15 @@ public class GeneralDisplayPanel extends JPanel implements HyperlinkListener, Ac
 
     public void makeMainLayout() {
 
-        JPanel genomePanel = new JPanel();
         memoryPanel = new MemoryPanel(null);
-        evolutionPanel = new EvolutionPanel(field);
-        entityPanel = new EntityPanel(field);
+        evolutionPanel = new EvolutionPanel(arena);
+        entityPanel = new EntityPanel(arena);
+        debugPanel = new DebugPanel();
+
+        JScrollPane debugScrollPane = new JScrollPane();
+        debugScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        debugScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        debugScrollPane.setViewportView(debugPanel);
 
         evolutionPanel.addHyperlinkListener(this);
         entityPanel.addHyperlinkListener(this);
@@ -84,12 +80,11 @@ public class GeneralDisplayPanel extends JPanel implements HyperlinkListener, Ac
         //ImageIcon genomeIcon = new ImageIcon(GeneralDisplayPanel.class.getClassLoader().getResource("img/list.png"));
 
 
-        debugPanel = new DebugPanel();
 
         tabbedPane.addTab("Program Memory", memoryPanel);
         tabbedPane.addTab("Entities", entityPanel);
         tabbedPane.addTab("Evolution", evolutionPanel);
-        tabbedPane.addTab("Debug", debugPanel);
+        tabbedPane.addTab("Debug", debugScrollPane);
 
         infoPanelPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         this.add(infoPanelPanel, c);
@@ -186,7 +181,7 @@ public class GeneralDisplayPanel extends JPanel implements HyperlinkListener, Ac
     @Override
     public void hyperlinkUpdate(HyperlinkEvent e) {
         if(e.getEventType() == HyperlinkEvent.EventType.ACTIVATED){
-            infoholder = field.fromHTML(e.getDescription());
+            infoholder = arena.fromHTML(e.getDescription());
             alertInfoholderChange(((Robot)infoholder));
             if(infoholder.isAlive()) {
                 viewholder = infoholder;
@@ -212,7 +207,7 @@ public class GeneralDisplayPanel extends JPanel implements HyperlinkListener, Ac
 
     @Override
     public void infoholderChanged(Robot e) {
-        memoryPanel.source = e;
+        if(e instanceof GeneticRobot) memoryPanel.source = (GeneticRobot) e;
     }
 
     public void alertViewholderChange(Entity e) {
@@ -220,6 +215,5 @@ public class GeneralDisplayPanel extends JPanel implements HyperlinkListener, Ac
     }
     public void alertInfoholderChange(Robot e) {
         for(ActiveRobotListener arl: listenerList) arl.infoholderChanged(e);
-        memoryPanel.source = e;
     }
 }

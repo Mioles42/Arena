@@ -5,8 +5,8 @@ import com.miolean.arena.framework.Option;
 import java.awt.*;
 import java.awt.geom.Point2D;
 
-import static com.miolean.arena.entities.Field.ARENA_SIZE;
-import static com.miolean.arena.entities.Field.BORDER;
+import static com.miolean.arena.entities.Arena.ARENA_SIZE;
+import static com.miolean.arena.entities.Arena.BORDER;
 
 public class Bullet extends Entity {
 
@@ -19,8 +19,8 @@ public class Bullet extends Entity {
     private Robot target;
     private int damage;
 
-    public Bullet(Robot source, Field field) {
-        super(SIZE, SIZE, 1, field);
+    public Bullet(Robot source, Arena arena) {
+        super(SIZE, SIZE, 1, arena);
         this.source = source;
 
         if(source != null) {
@@ -96,8 +96,8 @@ public class Bullet extends Entity {
         if(source != null && source.getHealth() <= 0) source = null;
 
         if(source != null) {
-            if (Math.abs(getVelX()) < 1 && Math.abs(getVelY()) < 1) getField().remove(getUUID());
-            if ((getX() > ARENA_SIZE - BORDER) || (getX() < BORDER) || (getY() > ARENA_SIZE - BORDER) || (getY() < BORDER)) getField().remove(getUUID());
+            if (Math.abs(getVelX()) < 1 && Math.abs(getVelY()) < 1) getArena().remove(getUUID());
+            if ((getX() > ARENA_SIZE - BORDER) || (getX() < BORDER) || (getY() > ARENA_SIZE - BORDER) || (getY() < BORDER)) getArena().remove(getUUID());
         } else if(target != null){
             double xdis = target.getX() - getX();
             double ydis = target.getY() - getY();
@@ -121,7 +121,7 @@ public class Bullet extends Entity {
 
             for(int i = 0; i < ROGUE_OBSERVATION; i++) {
 
-                Entity attemptedTarget = getField().fromUUID(Option.random.nextInt(Field.MAX_ENTITIES));
+                Entity attemptedTarget = getArena().fromUUID(Option.random.nextInt(Arena.MAX_ENTITIES));
 
                 if (attemptedTarget != null && attemptedTarget instanceof Robot) {
                     double axdis = attemptedTarget.getX() - getX();
@@ -138,7 +138,7 @@ public class Bullet extends Entity {
             setVelR(0.1);
 
             for(int i = 0; i < ROGUE_OBSERVATION; i++){
-                Entity attemptedTarget = getField().fromUUID(Option.random.nextInt(Field.MAX_ENTITIES));
+                Entity attemptedTarget = getArena().fromUUID(Option.random.nextInt(Arena.MAX_ENTITIES));
                 if(attemptedTarget != null && attemptedTarget instanceof Robot) {
                     target = (Robot) attemptedTarget;
                     System.out.println("Found target");

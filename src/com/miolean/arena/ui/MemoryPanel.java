@@ -1,5 +1,6 @@
 package com.miolean.arena.ui;
 
+import com.miolean.arena.entities.GeneticRobot;
 import com.miolean.arena.entities.Robot;
 
 import javax.swing.*;
@@ -16,14 +17,14 @@ public class MemoryPanel extends JPanel {
     private JScrollPane scrollPane;
     private Point scrollPosition;
 
-    com.miolean.arena.entities.Robot source;
+    GeneticRobot source;
 
     private static final int INDEX_UMEM = 0;
     private static final int INDEX_PMEM = 1;
     private static final int INDEX_SMEM = 2;
     private static final int INDEX_WMEM = 3;
 
-    MemoryPanel(Robot source) {
+    MemoryPanel(GeneticRobot source) {
 
         this.source = source;
 

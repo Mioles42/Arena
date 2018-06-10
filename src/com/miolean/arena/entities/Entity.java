@@ -3,8 +3,8 @@ package com.miolean.arena.entities;
 import java.awt.*;
 import java.io.Serializable;
 
-import static com.miolean.arena.entities.Field.ARENA_SIZE;
-import static com.miolean.arena.entities.Field.BORDER;
+import static com.miolean.arena.entities.Arena.ARENA_SIZE;
+import static com.miolean.arena.entities.Arena.BORDER;
 
 /**
  * Created by commandm on 2/16/17.
@@ -40,17 +40,17 @@ public abstract class Entity implements Serializable {
     private long age = 0;
 
     //Other things:
-    private Field field;
+    private Arena arena;
 
     //ID management
     private int uuid = -1;
 
 
-    Entity(int width, int height, int health, Field field) {
+    Entity(int width, int height, int health, Arena arena) {
         this.width = width;
         this.height = height;
         this.health = health;
-        this.field = field;
+        this.arena = arena;
     }
 
 
@@ -110,6 +110,8 @@ public abstract class Entity implements Serializable {
     }
 
     boolean quickIntersects(Entity e) {
+
+
         //The idea is to decide ASAP that e doesn't intersect.
 
         //First check: Are these things moving?
@@ -124,8 +126,10 @@ public abstract class Entity implements Serializable {
         if(Math.abs(x - e.getX()) > maxBounds || Math.abs(y - e.getY()) > maxBounds) return false;
 
 
+
         //We have to assume that this might intersect then, unfortunately.
         return true;
+
 
     }
 
@@ -140,7 +144,7 @@ public abstract class Entity implements Serializable {
     }
 
     void tick() {
-        if(health <= 0 || field == null) die();
+        if(health <= 0 || arena == null) die();
         else if(age > 0) update();
         age++;
     }
@@ -169,7 +173,7 @@ public abstract class Entity implements Serializable {
     public int getUUID() { return uuid; }
     public int getWidth() { return width; }
     public int getHeight() { return height;}
-    public Field getField() { return field; }
+    public Arena getArena() { return arena; }
     public void setX(double x) { this.x = x; }
     public void setY(double y) { this.y = y; }
     public void setR(double r) { this.r = r; }
@@ -192,7 +196,7 @@ public abstract class Entity implements Serializable {
     public final void die() {
         alive = false;
         onDeath();
-        field.remove(this);
+        arena.remove(this);
     }
 
     public final void appear(int uuid) {
@@ -203,7 +207,8 @@ public abstract class Entity implements Serializable {
 
     public void damage(double amount) {health -= amount;}
     public void heal(double amount) {health += amount;}
-    public void add(Entity e) {field.add(e);}
+    public void add(Entity e) {
+        arena.add(e);}
 
     @Override
     public String toString() {
