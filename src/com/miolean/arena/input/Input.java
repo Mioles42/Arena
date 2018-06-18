@@ -19,14 +19,14 @@ public abstract class Input {
         this.description = description;
     }
 
-    public abstract JPanel open();
+    public abstract JPanel toPanel();
     public abstract Object getValue();
     public abstract void setValue(Object value);
 
     public String getName() { return name; }
     public String getDescription() { return description; }
 
-    private void alertListeners() {
+    void alertListeners() {
         for(ChangeListener l: listenerList) l.stateChanged(new ChangeEvent(this));
     }
 

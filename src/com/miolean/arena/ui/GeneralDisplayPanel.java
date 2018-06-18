@@ -119,7 +119,7 @@ public class GeneralDisplayPanel extends JPanel implements HyperlinkListener, Ac
         c.weightx = .2;
         c.weighty = .3;
 
-        //controlPanel.add(Option.speedOptions.open(), c);
+        //controlPanel.add(Option.speedOptions.toPanel(), c);
 
 
 

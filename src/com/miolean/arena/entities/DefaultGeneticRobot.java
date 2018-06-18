@@ -1,11 +1,9 @@
 package com.miolean.arena.entities;
 
 import com.miolean.arena.framework.Option;
-import com.miolean.arena.genetics.GeneCommand;
 
 import java.awt.*;
 import java.io.InputStream;
-import java.util.Stack;
 
 import static com.miolean.arena.entities.Arena.ARENA_SIZE;
 import static com.miolean.arena.framework.UByte.ub;
@@ -265,7 +263,7 @@ public class DefaultGeneticRobot extends GeneticRobot {
     public void _OHP  (int targReg, int uuidReg) {if(uuidReg < 255) WMEM[targReg] = ub((int) (getArena().fromUUID(WMEM[uuidReg].val(),WMEM[uuidReg+1].val()).getHealth()));}
     public void _OCOG (int targReg, int uuidReg) {if(uuidReg < 255 && getArena().fromUUID(WMEM[uuidReg].val(),WMEM[uuidReg+1].val()) instanceof Robot) WMEM[targReg] = ub((int)((Robot) getArena().fromUUID(WMEM[uuidReg].val(),WMEM[uuidReg+1].val())).getCogs());}
     public void _OHUE (int targReg, int uuidReg) {if(uuidReg < 255 && getArena().fromUUID(WMEM[uuidReg].val(),WMEM[uuidReg+1].val()) instanceof Robot) WMEM[targReg] = ub((int)((Robot) getArena().fromUUID(WMEM[uuidReg].val(),WMEM[uuidReg+1].val())).getHue());}
-    public void _OFIT (int targReg, int uuidReg) {if(uuidReg < 255 && getArena().fromUUID(WMEM[uuidReg].val(),WMEM[uuidReg+1].val()) instanceof Robot) WMEM[targReg] = ub((int)((Robot) getArena().fromUUID(WMEM[uuidReg].val(),WMEM[uuidReg+1].val())).getFitness());}
+    public void _OFIT (int targReg, int uuidReg) {if(uuidReg < 255 && getArena().fromUUID(WMEM[uuidReg].val(),WMEM[uuidReg+1].val()) instanceof Robot) WMEM[targReg] = ub((int)((GeneticRobot) getArena().fromUUID(WMEM[uuidReg].val(),WMEM[uuidReg+1].val())).getFitness());}
 
     public void _UUID(int targReg) {if(targReg < 255) { WMEM[targReg] = ub(getUUID()>>8); WMEM[targReg] = ub(getUUID());}}
     public void _HP   (int targReg) {WMEM[targReg] = ub((int) getHealth());}
@@ -314,10 +312,10 @@ public class DefaultGeneticRobot extends GeneticRobot {
     public void _REP  () {reproduce();}
     public void _TWK  (int geneToTweak, int sourceReg) {if(KMEM[geneToTweak] != null) KMEM[geneToTweak].setWeight(WMEM[sourceReg].val());}
     public void _KRAND(int targReg) {WMEM[targReg] = randomGene();}
-    public void _URAND(int targReg, int sourceUMem) {if(UMEM[sourceUMem] != null) WMEM[targReg] = randomExists(UMEM[sourceUMem]);}
-    public void _PRAND(int targReg, int sourceUMem) {if(PMEM[sourceUMem] != null) WMEM[targReg] = randomExists(PMEM[sourceUMem]);}
-    public void _SRAND(int targReg, int sourceUMem) {if(SMEM[sourceUMem] != null) WMEM[targReg] = randomExists(SMEM[sourceUMem]);}
-    public void _WRAND(int targReg) {WMEM[targReg] = randomExists(WMEM);}
+    public void _URAND(int targReg, int sourceUMem) {if(UMEM[sourceUMem] != null) WMEM[targReg] = randomAddress(UMEM[sourceUMem]);}
+    public void _PRAND(int targReg, int sourceUMem) {if(PMEM[sourceUMem] != null) WMEM[targReg] = randomAddress(PMEM[sourceUMem]);}
+    public void _SRAND(int targReg, int sourceUMem) {if(SMEM[sourceUMem] != null) WMEM[targReg] = randomAddress(SMEM[sourceUMem]);}
+    public void _WRAND(int targReg) {WMEM[targReg] = randomAddress(WMEM);}
     public void _IRAND(int targReg) {WMEM[targReg] = ub((int) (Option.random.nextFloat() * 255));}
 
 }

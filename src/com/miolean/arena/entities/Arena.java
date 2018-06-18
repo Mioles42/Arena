@@ -2,7 +2,6 @@ package com.miolean.arena.entities;
 
 import com.miolean.arena.framework.Debug;
 import com.miolean.arena.framework.Option;
-import com.miolean.arena.framework.UByte;
 
 import java.awt.*;
 import java.util.*;
@@ -63,7 +62,7 @@ public class Arena {
 
 
             marker = System.nanoTime();
-            if(e instanceof Robot && ((Robot) e).getFitness() > 0 && (((Robot) e).getFitness() > topRobots.get(0).getFitness()) || e == topRobots.get(0)) {
+            if(e instanceof GeneticRobot && ((GeneticRobot) e).getFitness() > 0 && (((GeneticRobot) e).getFitness() > topRobots.get(0).getFitness()) || e == topRobots.get(0)) {
                 GeneticRobot r = (GeneticRobot) e;
                 if(! topRobots.contains(r)) {
                     topRobots.add(r);
@@ -80,7 +79,7 @@ public class Arena {
 
     public void renderAll(Graphics g) {
         for(Entity e: entities.values()) {
-            e.render(g);
+            e.renderBody(g, (int) e.getX(), (int) e.getY());
         }
     }
 

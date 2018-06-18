@@ -22,7 +22,7 @@ public class Main implements Runnable, WindowListener, ActionListener {
     private boolean isRunning = true;
 
     public static void main(String[] args) {
-       Main main = new Main();
+        Main main = new Main();
 
         Thread ergoThread = new Thread(main, "ergoloop");
         ergoThread.run();
@@ -33,6 +33,7 @@ public class Main implements Runnable, WindowListener, ActionListener {
         fieldDisplayPanel = new com.miolean.arena.ui.FieldDisplayPanel(arena);
         generalDisplayPanel = new GeneralDisplayPanel(arena);
         initializeGUI();
+
 
         handler = new Handler(arena);
 
@@ -105,6 +106,7 @@ public class Main implements Runnable, WindowListener, ActionListener {
     public void run() {
         System.out.println("Running...");
 
+
         long lastUpdate = System.nanoTime();
         long lastRender = System.nanoTime();
         long lastDisplay = System.nanoTime();
@@ -160,7 +162,7 @@ public class Main implements Runnable, WindowListener, ActionListener {
             System.out.println(m.getActionCommand());
             JPanel launchedPanel = null;
             Input option = Option.fromName(m.getActionCommand());
-            if(option != null) launchedPanel = option.open();
+            if(option != null) launchedPanel = option.toPanel();
 
             if(launchedPanel != null) {
                 JDialog dialog = new JDialog();

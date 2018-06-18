@@ -3,8 +3,8 @@ package com.miolean.arena.entities;
 import com.miolean.arena.framework.Option;
 import com.miolean.arena.framework.UByte;
 import com.miolean.arena.genetics.Gene;
-import com.sun.javaws.exceptions.InvalidArgumentException;
 
+import javax.swing.*;
 import java.awt.*;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
@@ -15,7 +15,7 @@ import static com.miolean.arena.entities.Arena.ARENA_SIZE;
 import static com.miolean.arena.framework.UByte.ub;
 import static com.miolean.arena.framework.UByte.ubDeepCopy;
 
-public class GeneticRobot extends Robot {
+public class GeneticRobot extends Robot implements Comparable<GeneticRobot>{
 
 
 
@@ -32,6 +32,8 @@ public class GeneticRobot extends Robot {
     protected Stack<Point> stack = new Stack<>();
 
 
+    private double fitness = 0;
+    private int generation = 0;
 
     private static int totalKWeight;
 
@@ -333,7 +335,6 @@ public class GeneticRobot extends Robot {
 
             try {
                 if(gene.getNumParameters() == 0) {
-                    System.out.println("Parameters: Expected 0, actual " + gene.getMeaning().getParameterTypes().length);
                     gene.getMeaning().invoke(this);
                 } else if(gene.getNumParameters() == 1 && index < 255) {
                     gene.getMeaning().invoke(this, genes[loaded][index+1].val());
@@ -444,7 +445,7 @@ public class GeneticRobot extends Robot {
     public String stringSMEM(int memory) {return passiveMemoryToString(SMEM[memory], true);}
     public String stringWMEM() {return passiveMemoryToString(WMEM, true);}
 
-    static UByte randomExists(UByte[] memory) {
+    static UByte randomAddress(UByte[] memory) {
 
         int totalExist = 0;
         for(UByte u: memory) if(u != ub(0)) totalExist++;
@@ -456,7 +457,6 @@ public class GeneticRobot extends Robot {
         }
         return ub(i);
     }
-
     static UByte randomGene() {
 
         int rand = (int) (Option.random.nextFloat() * totalKWeight);
@@ -471,8 +471,39 @@ public class GeneticRobot extends Robot {
 
     }
 
-    int umemAt(int memory, int address) {return UMEM[memory][address].val();}
-    int pmemAt(int memory, int address) {return PMEM[memory][address].val();}
-    int smemAt(int memory, int address) {return SMEM[memory][address].val();}
-    int wmemAt(int address) {return WMEM[address].val();}
+    @Override
+    public JPanel toPanel() {
+        JPanel entityPanel = new JPanel() {
+
+            @Override
+            public void paintComponent(Graphics g) {
+                GeneticRobot.this.renderBody(g, this.getWidth()/2, 50);
+            }
+
+
+        };
+        return entityPanel;
+    }
+
+    @Override
+    public void renderStatus(Graphics g, int x, int y) {
+        super.renderStatus(g, x, y);
+
+        g.setColor(new Color(100, 255, 100, 200));
+        g.fillRect(x, y + 50, (int) getFitness(), 20);
+        g.setColor(Color.BLACK);
+        g.drawRect(x, y + 50, (int) getFitness(), 20);
+        if(getFitness() < 20) g.drawString((int) getFitness() + "", x + 3 + (int) getFitness(), y + 50 + 17);
+        else g.drawString(getFitness() + "", x+3, y + 50 + 17);
+    }
+
+
+    @Override
+    public int compareTo(GeneticRobot o) {
+        return (int) (fitness - o.getFitness());
+    }
+    public double getFitness() { return fitness; }
+    public void setFitness(double fitness) { this.fitness = fitness; }
+    public int getGeneration() { return generation; }
+    public void setGeneration(int generation) { this.generation = generation; }
 }

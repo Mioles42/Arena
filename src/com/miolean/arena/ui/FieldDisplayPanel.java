@@ -122,32 +122,7 @@ public class FieldDisplayPanel extends JPanel implements KeyListener, MouseListe
         g.translate((int) -(-viewholder.getX() + this.getWidth()/2), (int) -(-viewholder.getY() + this.getHeight()/2));
 
         //Apply no translations to these things
-        g.setColor(new Color(255, 100, 100, 200));
-        g.fillRect(15, getHeight()-60, (int) viewholder.getHealth(), 20);
-        g.setColor(Color.BLACK);
-        g.drawRect(15, getHeight()-60, (int) viewholder.getHealth(), 20);
-        if(viewholder.getHealth() < 20) g.drawString((int) viewholder.getHealth() + "", 18 + (int) viewholder.getHealth(), getHeight()-45);
-        else g.drawString(viewholder.getHealth() + "", 18, getHeight()-45);
-
-        if(viewholder instanceof com.miolean.arena.entities.Robot) {
-            g.setColor(new Color(100, 100, 255, 200));
-            g.fillRect(15, getHeight() - 90, (int) ((com.miolean.arena.entities.Robot) viewholder).getCogs(), 20);
-            g.setColor(Color.BLACK);
-            String label = String.format("%2.2f", ((com.miolean.arena.entities.Robot) viewholder).getCogs());
-            if (((com.miolean.arena.entities.Robot) viewholder).getCogs() < 20)
-                g.drawString(label, 18 + (int) ((com.miolean.arena.entities.Robot) viewholder).getCogs(), getHeight() - 75);
-            else g.drawString(label, 18, getHeight() - 75);
-            g.drawRect(15, getHeight() - 90, (int) ((com.miolean.arena.entities.Robot) viewholder).getCogs(), 20);
-
-            g.setColor(new Color(100, 255, 100, 200));
-            g.fillRect(15, getHeight() - 120, (int) ((com.miolean.arena.entities.Robot) viewholder).getFitness(), 20);
-            g.setColor(Color.BLACK);
-            label = String.format("%2.2f", ((com.miolean.arena.entities.Robot) viewholder).getFitness());
-            if (((com.miolean.arena.entities.Robot) viewholder).getFitness() < 20)
-                g.drawString(label, (int) (18 + ((com.miolean.arena.entities.Robot) viewholder).getFitness()), getHeight() - 105);
-            else g.drawString(label, 18, getHeight() - 105);
-            g.drawRect(15, getHeight() - 120, (int) ((com.miolean.arena.entities.Robot) viewholder).getFitness(), 20);
-        }
+        viewholder.renderStatus(g, 20, getHeight()-100);
 
     }
 
@@ -155,7 +130,7 @@ public class FieldDisplayPanel extends JPanel implements KeyListener, MouseListe
         char key = e.getKeyChar();
         if(key == 'l') {
             System.out.println("============Top robots============");
-            for(com.miolean.arena.entities.Robot t: arena.getTopRobots()) {
+            for(com.miolean.arena.entities.GeneticRobot t: arena.getTopRobots()) {
                 System.out.println("Robot " + t + " [Fitness " + t.getFitness() + "]");
             }
         }
@@ -183,7 +158,6 @@ public class FieldDisplayPanel extends JPanel implements KeyListener, MouseListe
         if(key == 'd') Option.KEY[Option.KEY_D] = false;
         if(key == ' ') Option.KEY[Option.KEY_SPACE] = false;
         if(e.getKeyCode() == KeyEvent.VK_ESCAPE) {
-            System.out.println("com.miolean.arena.GeneralDisplayPanel closing...");
             System.exit(0);
         }
     }

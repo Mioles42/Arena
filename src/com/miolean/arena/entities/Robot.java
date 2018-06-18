@@ -29,7 +29,7 @@ import static com.miolean.arena.framework.UByte.ubDeepCopy;
  * I: No memory; refers to immediate (literal) values
  */
 
-public abstract class Robot extends Entity implements Comparable<Robot>{
+public abstract class Robot extends Entity {
 
     //General constants
     protected static final int DEFAULT_STAT_VALUE = 10;
@@ -59,8 +59,6 @@ public abstract class Robot extends Entity implements Comparable<Robot>{
     private int hue = 100;
 
     //State variables:
-    private double fitness = 0;
-    private int generation = 0;
     private double cogs = 0;
 
 
@@ -77,12 +75,12 @@ public abstract class Robot extends Entity implements Comparable<Robot>{
     }
 
     @Override
-    public void render(Graphics g) {
+    public void renderBody(Graphics g, int x, int y) {
 
         int SIZE = getWidth();
 
         g.setColor(Color.black);
-        g.drawOval((int) (getX() - SIZE/2), (int) (getY() - SIZE/2), SIZE, SIZE);
+        g.drawOval((int) (x - SIZE/2), (int) (y - SIZE/2), SIZE, SIZE);
 
 
         //Trigonometric functions are expensive so let's use math to minimize
@@ -99,8 +97,6 @@ public abstract class Robot extends Entity implements Comparable<Robot>{
         //cos(r +- u) = cos(r)cos(u) +- sin(r)sin(u)
         //tan(r +- u) = sin(r +- u) / cos(r +- u) [not that division is so much better]
 
-        double x = getX();
-        double y = getY();
 
         //Wheels!
         int[] wheelXPoints = {
@@ -121,13 +117,13 @@ public abstract class Robot extends Entity implements Comparable<Robot>{
         int[] gunXPoints = {
                 (int) (x+SIZE*.7*(cosR*cosd2 - sinR*sind2)), //y + size * a little bit more * cos(r - .5)
                 (int) (x+SIZE*.7*(cosR*cosd2 + sinR*sind2)), //y + size * a little bit more * cos(r - .5)
-                (int) (x)
+                (x)
         };
 
         int[] gunYPoints = {
                 (int) (y-SIZE*.7*(sinR*cosd2 + sind2*cosR)),
                 (int) (y-SIZE*.7*(sinR*cosd2 - sind2*cosR)),
-                (int) (y)
+                (y)
 
         };
 
@@ -144,15 +140,15 @@ public abstract class Robot extends Entity implements Comparable<Robot>{
         if(healthPercent < 0) healthPercent = 0;
         if(healthPercent > 1) healthPercent = 1;
         g.setColor(new Color((int) (healthPercent * 100 + 100), (int) (healthPercent * 100 + 100), (int) (healthPercent * 100 + 100)));
-        g.fillOval((int) x - SIZE/2, (int) y - SIZE/2, SIZE, SIZE); //Body
+        g.fillOval( x - SIZE/2,  y - SIZE/2, SIZE, SIZE); //Body
 
         g.setColor(Color.GRAY);
-        g.fillOval((int) x - SIZE/8, (int) y - SIZE/8, SIZE/4, SIZE/4); //Beacon
+        g.fillOval( x - SIZE/8,  y - SIZE/8, SIZE/4, SIZE/4); //Beacon
         g.setColor(Color.getHSBColor(hue/256.0f,0.9f,0.5f));
-        g.fillOval((int) x - SIZE/10, (int) y - SIZE/10, SIZE/5, SIZE/5); //Beacon
+        g.fillOval( x - SIZE/10,  y - SIZE/10, SIZE/5, SIZE/5); //Beacon
 
         g.setColor(Color.black);
-        g.drawString(name, (int) x - SIZE, (int) y - SIZE);
+        g.drawString(name,  x - SIZE,  y - SIZE);
     }
 
     @Override
@@ -242,15 +238,11 @@ public abstract class Robot extends Entity implements Comparable<Robot>{
         result += "<a href=ergo_uuid_"+getUUID() + ">";
         if(!isAlive()) result += "<font color=\"red\">";
         else result += "<font color=\"blue\">";
-        result += getName() + " [Fitness: " + String.format("%.2f", getFitness()) + "]";
+        result += getName();
         if(!isAlive()) result += "</font>";
         return result;
     }
 
-    public double getFitness() { return fitness; }
-    public void setFitness(double fitness) { this.fitness = fitness; }
-    public int getGeneration() { return generation; }
-    public void setGeneration(int generation) { this.generation = generation; }
     public double getCogs() { return cogs; }
     public void setCogs(double cogs) { this.cogs = cogs; }
     public String getName() { return name; }
@@ -258,8 +250,16 @@ public abstract class Robot extends Entity implements Comparable<Robot>{
     public int getHue() {return hue;}
     public void setHue(int hue) {this.hue = hue;}
 
+
     @Override
-    public int compareTo(Robot o) {
-        return (int) (fitness - o.getFitness());
+    public void renderStatus(Graphics g, int x, int y) {
+        super.renderStatus(g, x, y);
+
+        g.setColor(new Color(100, 100, 255, 200));
+        g.fillRect(x, y + 25, (int) getCogs(), 20);
+        g.setColor(Color.BLACK);
+        g.drawRect(x, y + 25, (int) getCogs(), 20);
+        if(getCogs() < 20) g.drawString((int) getCogs() + "", x + 3 + (int) getCogs(), y + 25 + 17);
+        else g.drawString(getCogs() + "", x+3, y + 25 + 17);
     }
 }

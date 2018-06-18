@@ -28,7 +28,7 @@ public class CheckboxInput extends Input {
     }
 
     @Override
-    public JPanel open() {
+    public JPanel toPanel() {
 
         JPanel panel = new JPanel();
         JLabel label = new JLabel(getName());

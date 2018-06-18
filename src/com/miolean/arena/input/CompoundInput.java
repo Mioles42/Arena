@@ -1,14 +1,7 @@
 package com.miolean.arena.input;
 
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-import java.lang.ref.WeakReference;
-import java.util.ArrayList;
-import java.util.List;
 
 public class CompoundInput extends Input {
 
@@ -25,7 +18,7 @@ public class CompoundInput extends Input {
     }
 
     @Override
-    public JPanel open() {
+    public JPanel toPanel() {
         JPanel panel = new JPanel(new GridBagLayout());
         GridBagConstraints g = new GridBagConstraints();
 
@@ -37,7 +30,7 @@ public class CompoundInput extends Input {
 
         internalPanel.setLayout(new GridBagLayout());
         for(Input i: inputs) {
-            internalPanel.add(i.open(), g);
+            internalPanel.add(i.toPanel(), g);
             g.gridy += 2;
         }
 

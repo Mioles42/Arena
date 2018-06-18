@@ -18,7 +18,7 @@ public class Option {
 
     public static NumericalInput updateSpeed = new NumericalInput("Update speed", "The number of update actions to run per second", 1, 1000, 20);
     public static NumericalInput displaySpeed = new NumericalInput("Display speed", "The number of info-display actions to run per second", 1, 1000, 5);
-    public static NumericalInput renderSpeed = new NumericalInput("Render speed", "The number of render actions to run per second", 1, 1000, 50);
+    public static NumericalInput renderSpeed = new NumericalInput("Render speed", "The number of renderBody actions to run per second", 1, 1000, 50);
 
     public static NumericalInput robotSize = new NumericalInput("Robot size", "The default robot size", 5, 300, 40);
     public static NumericalInput scale = new NumericalInput("Render scale", "The magnification of the arena display", 1, 60, 5);

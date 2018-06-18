@@ -1,5 +1,6 @@
 package com.miolean.arena.entities;
 
+import javax.swing.*;
 import java.awt.*;
 import java.io.Serializable;
 
@@ -9,7 +10,7 @@ import static com.miolean.arena.entities.Arena.BORDER;
 /**
  * Created by commandm on 2/16/17.
  * Anything that moves according to set physics is an Entity.
- * Entities can update themselves every tick and render themselves.
+ * Entities can update themselves every tick and renderBody themselves.
  * They can also interact with Entities with which they intersect.
  */
 
@@ -149,7 +150,6 @@ public abstract class Entity implements Serializable {
         age++;
     }
 
-    public abstract void render(Graphics g);
     protected abstract void update();
     public abstract boolean intersectsWith(Entity e);
     public abstract void intersect(Entity e);
@@ -192,26 +192,44 @@ public abstract class Entity implements Serializable {
         else this.uuid = uuid;
     }
 
-
     public final void die() {
         alive = false;
         onDeath();
         arena.remove(this);
     }
-
     public final void appear(int uuid) {
         alive = true;
         this.uuid = uuid;
         onBirth();
     }
-
     public void damage(double amount) {health -= amount;}
     public void heal(double amount) {health += amount;}
-    public void add(Entity e) {
-        arena.add(e);}
+    public void add(Entity e) {arena.add(e);}
+
+    public abstract void renderBody(Graphics g, int x, int y);
+    public void renderStatus(Graphics g, int x, int y) {
+        g.setColor(new Color(255, 100, 100, 200));
+        g.fillRect(x, y, (int) getHealth(), 20);
+        g.setColor(Color.BLACK);
+        g.drawRect(x, y, (int) getHealth(), 20);
+        if(getHealth() < 20) g.drawString((int) getHealth() + "", x + 3 + (int) getHealth(), y+17);
+        else g.drawString(getHealth() + "", x+3, y+17);
+    }
 
     @Override
     public String toString() {
         return this.getClass().getSimpleName();
     }
+    public JPanel toPanel() {
+        JPanel entityPanel = new JPanel() {
+
+            @Override
+            public void paintComponent(Graphics g) {
+                Entity.this.renderBody(g, this.getWidth()/2, 50);
+            }
+        };
+        return entityPanel;
+    }
+
+
 }

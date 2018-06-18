@@ -40,19 +40,16 @@ public class Bullet extends Entity {
 
 
     @Override
-    public void render(Graphics g) {
+    public void renderBody(Graphics g, int x, int y) {
 
 
         if(target != null || source != null) g.setColor(new Color(100 + damage / 2, 150 - damage / 2, 50));
         else g.setColor(new Color(100, 100, 255));
 
-        double x = getX();
-        double y = getY();
-
         if(source != null) {
-            g.fillOval((int) x - SIZE / 2, (int) y - SIZE / 2, SIZE, SIZE);
+            g.fillOval( x - SIZE / 2,  y - SIZE / 2, SIZE, SIZE);
             g.setColor(Color.black);
-            g.drawOval((int) x - SIZE / 2, (int) y - SIZE / 2, SIZE, SIZE);
+            g.drawOval( x - SIZE / 2,  y - SIZE / 2, SIZE, SIZE);
         } else {
 
             double sinR = Math.sin(getR() + Math.PI);
@@ -64,13 +61,13 @@ public class Bullet extends Entity {
             int[] XPoints = {
                     (int) (x+SIZE*3*(cosR*cosExtra - sinR*sinExtra)),
                     (int) (x+SIZE*3*(cosR*cosExtra + sinR*sinExtra)),
-                    (int) (x)
+                     (x)
             };
 
             int[] YPoints = {
                     (int) (y-SIZE*3*(sinR*cosExtra + sinExtra*cosR)),
                     (int) (y-SIZE*3*(sinR*cosExtra - sinExtra*cosR)),
-                    (int) (y)
+                     (y)
 
             };
 

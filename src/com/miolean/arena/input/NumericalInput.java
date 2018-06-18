@@ -26,12 +26,12 @@ public class NumericalInput extends Input implements ChangeListener {
     }
 
     @Override
-    public JPanel open() {
+    public JPanel toPanel() {
 
         JPanel panel = new JPanel();
         JLabel label = new JLabel(getName());
         JSlider slider = new JSlider();
-        WeakReference weak = new WeakReference<>(slider);
+        WeakReference<JSlider> weak = new WeakReference<>(slider);
         sliders.add(weak);
         slider.setMaximum(max);
         slider.setMinimum(min);
@@ -54,6 +54,7 @@ public class NumericalInput extends Input implements ChangeListener {
     @Override
     public void setValue(Object value) {
         this.value = (Integer) value;
+        alertListeners();
     }
 
     @Override
@@ -67,5 +68,6 @@ public class NumericalInput extends Input implements ChangeListener {
             }
             ((JSlider)w.get()).setValue(value);
         }
+        alertListeners();
     }
 }

@@ -11,7 +11,6 @@ public class ControlledRobot extends Robot {
         setY(y);
         setHealth(100);
         setName("Controlled Bot");
-        setFitness(-1);
 
         //Do better default stats.
         stats[STAT_SPEED] = ub(20);
