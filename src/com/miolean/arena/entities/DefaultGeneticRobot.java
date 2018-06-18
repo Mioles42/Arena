@@ -63,12 +63,12 @@ public class DefaultGeneticRobot extends GeneticRobot {
     public void _TCALC() {}
     public void _HURT() {}
 
-    public void _GOTO (int reg) {index = WMEM[reg].val() - 4;}
-    public void _GOE  (int reg) {if(equalFlag) index = WMEM[reg].val() - 4;}
-    public void _GOG  (int reg) {if(greaterFlag) index = WMEM[reg].val() - 4;}
-    public void _IGOTO(int immed) {index = immed - 4;}
-    public void _IGOE (int immed) {if(equalFlag) index = immed - 4;}
-    public void _IGOG (int immed) {if(greaterFlag) index = immed - 4;}
+    public void _GOTO (int reg) {index = WMEM[reg].val() - 2;}
+    public void _GOE  (int reg) {if(equalFlag) index = WMEM[reg].val() - 2;}
+    public void _GOG  (int reg) {if(greaterFlag) index = WMEM[reg].val() - 2;}
+    public void _IGOTO(int immed) {index = immed - 2;}
+    public void _IGOE (int immed) {if(equalFlag) index = immed - 2;}
+    public void _IGOG (int immed) {if(greaterFlag) index = immed - 2;}
 
     public void _COMP (int reg1, int reg2) {
         equalFlag = (WMEM[reg1].val() == WMEM[reg2].val());

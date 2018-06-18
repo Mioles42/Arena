@@ -126,6 +126,9 @@ public class Arena {
     }
 
     public Entity fromHTML(String html) {
+
+        Debug.breakpoint();
+
         if(html.contains("ergo_uuid_")) {
             html = html.replaceAll("ergo_uuid_", "");
             return fromUUID(Integer.parseInt(html));

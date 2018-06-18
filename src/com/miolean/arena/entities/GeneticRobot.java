@@ -45,7 +45,7 @@ public class GeneticRobot extends Robot implements Comparable<GeneticRobot>{
     }
 
     //Create a Robot from a parent
-    public GeneticRobot(GeneticRobot parent, Arena arena) {
+    public GeneticRobot(GeneticRobot parent, Arena arena){
         super(arena);
 
         String name = Option.wordRandom.nextWord();
@@ -384,7 +384,7 @@ public class GeneticRobot extends Robot implements Comparable<GeneticRobot>{
     }
 
     void reproduce() {
-        Robot offspring = new GeneticRobot(this, getArena());
+        Robot offspring = new DefaultGeneticRobot(this, getArena());
         add(offspring);
     }
 
@@ -506,4 +506,9 @@ public class GeneticRobot extends Robot implements Comparable<GeneticRobot>{
     public void setFitness(double fitness) { this.fitness = fitness; }
     public int getGeneration() { return generation; }
     public void setGeneration(int generation) { this.generation = generation; }
+
+    public UByte wmemAt(int i) {return WMEM[i];}
+    public UByte smemAt(int i, int j) {return SMEM[i][j];}
+    public UByte pmemAt(int i, int j) {return PMEM[i][j];}
+    public UByte umemAt(int i, int j) {return UMEM[i][j];}
 }

@@ -1,0 +1,23 @@
+
+name Test1;
+
+edit registry at 0:
+    1 2 3 4 5 6 7 8
+
+    at 25:
+    42
+
+    at 75:
+    9 10 11 12 13 14 15 16
+
+edit program 0 at 0:
+    1 2 3 4
+    at 12:
+    _PRINT 0 0 0
+    _REP -- -- --
+    at 76:
+    _IGOTO 78
+    _IGOTO 80
+    _IGOTO 82
+    _IGOTO 84
+    _IGOTO 86

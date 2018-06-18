@@ -85,4 +85,9 @@ public class Debug {
         cycleTime = (System.nanoTime() - lastRefresh);
         lastRefresh = System.nanoTime();
     }
+
+    public static void breakpoint() {
+        //This is useful in the context of IntelliJ
+        System.out.println("Hit breakpoint");
+    }
 }
