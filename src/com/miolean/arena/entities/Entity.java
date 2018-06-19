@@ -30,6 +30,8 @@ public abstract class Entity implements Serializable {
     private final static double DRAG = 0.1; //The amount that an Entity naturally slows down each tick, per unit of velocity.
     private final static double RDRAG = 0.5;
 
+    //Rendering flags
+
     //Size components:
     private int width;
     private int height;
@@ -207,6 +209,7 @@ public abstract class Entity implements Serializable {
     public void add(Entity e) {arena.add(e);}
 
     public abstract void renderBody(Graphics g, int x, int y);
+
     public void renderStatus(Graphics g, int x, int y) {
         g.setColor(new Color(255, 100, 100, 200));
         g.fillRect(x, y, (int) getHealth(), 20);

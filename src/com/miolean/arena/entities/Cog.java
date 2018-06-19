@@ -2,6 +2,7 @@ package com.miolean.arena.entities;
 
 import com.miolean.arena.framework.Debug;
 
+import javax.sound.midi.Track;
 import java.awt.*;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Rectangle2D;
@@ -33,7 +34,7 @@ public class Cog extends Entity {
     @Override
     public boolean intersectsWith(Entity e) {
         long marker = System.nanoTime();
-        if(! (e instanceof Robot)) return false; //Don't interact with anything but Tanks
+        if(! (e instanceof Robot || e instanceof TrackerDot)) return false; //Don't interact with anything but Tanks
 
         //Assume an elliptical collision
         Ellipse2D.Double bounds = new Ellipse2D.Double(e.getX() - e.getWidth()/2, e.getY() - e.getHeight()/2, e.getWidth(), e.getHeight());

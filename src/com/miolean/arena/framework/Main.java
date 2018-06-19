@@ -14,6 +14,8 @@ public class Main implements Runnable, WindowListener, ActionListener {
     private FieldDisplayPanel fieldDisplayPanel;
     private GeneralDisplayPanel generalDisplayPanel;
 
+
+
     JMenu optionMenu = new JMenu("Option");
 
     Arena arena;

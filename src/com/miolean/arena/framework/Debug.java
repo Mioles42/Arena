@@ -31,6 +31,9 @@ public class Debug {
 
     public static void drawDebugLog(Graphics g) {
 
+        long oldTime = System.nanoTime();
+
+
         if(oldLog == null) return;
         int i = 0;
         long totalTime = 0;
@@ -76,6 +79,8 @@ public class Debug {
         g.drawString("Total in cycle", 20, 40 + 45 * i);
         g.drawString("100%", 20, 53 + 45 * i);
         g.drawString(cycleTime/1000 + "µs", 20, 66 + 45 * i);
+
+        Debug.logTime("Debug display", oldTime - System.nanoTime());
     }
 
     public static void refresh() {

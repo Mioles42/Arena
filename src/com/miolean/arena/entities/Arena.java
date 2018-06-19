@@ -2,8 +2,10 @@ package com.miolean.arena.entities;
 
 import com.miolean.arena.framework.Debug;
 import com.miolean.arena.framework.Option;
+import com.miolean.arena.ui.FieldDisplayPanel;
 
 import java.awt.*;
+import java.awt.geom.Point2D;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -77,9 +79,23 @@ public class Arena {
         Debug.logTime("Fitness", System.nanoTime() - marker);
     }
 
-    public void renderAll(Graphics g) {
+    public void renderAll(Graphics2D g) {
         for(Entity e: entities.values()) {
             e.renderBody(g, (int) e.getX(), (int) e.getY());
+        }
+    }
+
+    public void renderAll(Graphics2D g, Point mouse) {
+        float[] dist = {0.0f, 0.7f};
+        Color[] colors = {Color.BLUE, FieldDisplayPanel.BACKGROUND_COLOR};
+
+        for(Entity e: entities.values()) {
+            if(e.intersectsWith(new TrackerDot(mouse.x, mouse.y, 4, 1, this))) {
+                System.out.println("Alt rendering");
+                g.setPaint(new RadialGradientPaint((float) e.getX(), (float) e.getY(), (float) (e.getWidth() + 8), dist, colors, MultipleGradientPaint.CycleMethod.NO_CYCLE));
+                g.fillOval((int) (e.getX() - (e.getWidth() + 8)/2), (int) (e.getY() - (e.getHeight() + 8)/2), (int) (e.getWidth() + 8), (int) (e.getHeight() + 8));
+                e.renderBody(g, (int) e.getX(), (int) e.getY());
+            } else e.renderBody(g, (int) e.getX(), (int) e.getY());
         }
     }
 
