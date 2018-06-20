@@ -40,8 +40,7 @@ public class Bullet extends Entity {
 
 
     @Override
-    public void renderBody(Graphics g, int x, int y) {
-
+    public void renderBody(Graphics g, int x, int y, byte flags) {
 
         if(target != null || source != null) g.setColor(new Color(100 + damage / 2, 150 - damage / 2, 50));
         else g.setColor(new Color(100, 100, 255));

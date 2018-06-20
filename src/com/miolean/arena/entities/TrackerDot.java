@@ -12,7 +12,7 @@ public class TrackerDot extends Entity {
     }
 
     @Override
-    public void renderBody(Graphics g, int x, int y) {
+    public void renderBody(Graphics g, int x, int y, byte flags) {
         g.setColor(Color.black);
         g.fillOval(x - 2, y - 2, 4, 4);
     }

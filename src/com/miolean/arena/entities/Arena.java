@@ -81,21 +81,16 @@ public class Arena {
 
     public void renderAll(Graphics2D g) {
         for(Entity e: entities.values()) {
-            e.renderBody(g, (int) e.getX(), (int) e.getY());
+            e.renderBody(g, (int) e.getX(), (int) e.getY(), Entity.RENDER_LOW_QUALITY);
         }
     }
 
     public void renderAll(Graphics2D g, Point mouse) {
-        float[] dist = {0.0f, 0.7f};
-        Color[] colors = {Color.BLUE, FieldDisplayPanel.BACKGROUND_COLOR};
 
         for(Entity e: entities.values()) {
             if(e.intersectsWith(new TrackerDot(mouse.x, mouse.y, 4, 1, this))) {
-                System.out.println("Alt rendering");
-                g.setPaint(new RadialGradientPaint((float) e.getX(), (float) e.getY(), (float) (e.getWidth() + 8), dist, colors, MultipleGradientPaint.CycleMethod.NO_CYCLE));
-                g.fillOval((int) (e.getX() - (e.getWidth() + 8)/2), (int) (e.getY() - (e.getHeight() + 8)/2), (int) (e.getWidth() + 8), (int) (e.getHeight() + 8));
-                e.renderBody(g, (int) e.getX(), (int) e.getY());
-            } else e.renderBody(g, (int) e.getX(), (int) e.getY());
+                e.renderBody(g, (int) e.getX(), (int) e.getY(), (byte) (Entity.RENDER_GLOWING | Entity.RENDER_DECORATED));
+            } else e.renderBody(g, (int) e.getX(), (int) e.getY(), Entity.RENDER_DECORATED);
         }
     }
 
@@ -130,7 +125,9 @@ public class Arena {
         if(uuid < 0) return topRobots.get(uuid*-1-200-1);
         return entities.get(uuid);
     }
-    public Entity fromUUID(int great, int less) {return entities.get(great * 255 + less);}
+    public Entity fromUUID(int great, int less) {
+        return entities.get(great * 255 + less);
+    }
 
     public Entity atLocation(int x, int y) {
         TrackerDot location = new TrackerDot(x, y, 4,0,this);

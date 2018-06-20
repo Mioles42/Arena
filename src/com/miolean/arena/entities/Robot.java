@@ -4,7 +4,9 @@ import com.miolean.arena.framework.Debug;
 import com.miolean.arena.framework.Option;
 import com.miolean.arena.framework.UByte;
 import com.miolean.arena.genetics.*;
+import com.miolean.arena.ui.FieldDisplayPanel;
 
+import javax.swing.*;
 import java.awt.*;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
@@ -36,20 +38,20 @@ public abstract class Robot extends Entity {
     protected static final int MAX_BULLET_RECHARGE = 40;
     protected static final int MAX_HEAL_RECHARGE = 64;
     protected static final int INITIAL_COGS = 40;
-    protected static final int HARD_COG_DEFICIT_LIMIT = -40;
     protected static final double DIFFICULTY = 0.05;
 
 
     //Stat constants
-    static final int STAT_FIRE_SPEED = 0x0; //shot speed
-    static final int STAT_DAMAGE = 0x1; //shot damage
+    static final int STAT_MAX_HEALTH = 0x0;
+
     static final int STAT_REGEN = 0x2; //regeneration
-    static final int STAT_SPEED = 0x3; //acceleration (translates to speed due to drag)
-    static final int STAT_TOUGHNESS = 0x4; //body damage
-    static final int STAT_ROTATE_SPEED = 0x5;
-    static final int STAT_BULLET_SPEED = 0x6;
-    static final int STAT_MAX_HEALTH = 0x7;
-    static final int STAT_BULLET_SPREAD = 0x8;
+    static final int STAT_FIRE_SPEED = 0x3; //shot speed
+    static final int STAT_BULLET_SPEED = 0x4;
+    static final int STAT_BULLET_SPREAD = 0x5;
+
+    static final int STAT_ROTATE_SPEED = 0x6;
+    static final int STAT_SPEED = 0x7; //acceleration (translates to speed due to drag)
+    static final int STAT_DAMAGE = 0x8; //shot damage
 
 
     protected UByte[] stats = new UByte[9];
@@ -71,16 +73,20 @@ public abstract class Robot extends Entity {
     //Create a totally blank Robot (for whatever reason)
     Robot(Arena arena) {
         super(Option.robotSize.getValue(), Option.robotSize.getValue(), 10, arena);
+        for(int i = 0; i < stats.length; i++) stats[i] = ub(10);
         setMass(10);
     }
 
     @Override
-    public void renderBody(Graphics g, int x, int y) {
+    public void renderBody(Graphics f, int x, int y, byte flags) {
 
         int SIZE = getWidth();
 
+        Graphics2D g = (Graphics2D) f;
+        if((flags & RENDER_GLOWING) == RENDER_GLOWING) EntityDecorator.drawCircularGlow(g, this, x, y);
+
         g.setColor(Color.black);
-        g.drawOval((int) (x - SIZE/2), (int) (y - SIZE/2), SIZE, SIZE);
+        g.drawOval( (x - SIZE/2),  (y - SIZE/2), SIZE, SIZE);
 
 
         //Trigonometric functions are expensive so let's use math to minimize
@@ -148,7 +154,7 @@ public abstract class Robot extends Entity {
         g.fillOval( x - SIZE/10,  y - SIZE/10, SIZE/5, SIZE/5); //Beacon
 
         g.setColor(Color.black);
-        g.drawString(name,  x - SIZE,  y - SIZE);
+        if((flags & RENDER_DECORATED) == RENDER_DECORATED) g.drawString(name,  x - SIZE,  y - SIZE);
     }
 
     @Override
@@ -252,8 +258,18 @@ public abstract class Robot extends Entity {
 
 
     @Override
-    public void renderStatus(Graphics g, int x, int y) {
-        super.renderStatus(g, x, y);
+    public void renderStatus(Graphics f, int x, int y, byte flags) {
+        super.renderStatus(f, x, y, RENDER_LOW_QUALITY);
+
+        Graphics2D g = (Graphics2D) f;
+
+        if((flags & RENDER_GLOWING) == RENDER_GLOWING) {
+            float[] dist = {0.0f, 0.7f};
+            Color[] colors = {Color.BLUE, FieldDisplayPanel.BACKGROUND_COLOR};
+            g.setPaint(new RadialGradientPaint((float) getX(), (float) getY(), (float) (getWidth() + 8), dist, colors, MultipleGradientPaint.CycleMethod.NO_CYCLE));
+            g.fillOval((int) (getX() - (getWidth() + 8)/2), (int) (getY() - (getHeight() + 8)/2), (int) (getWidth() + 8), (int) (getHeight() + 8));
+
+        }
 
         g.setColor(new Color(100, 100, 255, 200));
         g.fillRect(x, y + 25, (int) getCogs(), 20);
@@ -261,5 +277,49 @@ public abstract class Robot extends Entity {
         g.drawRect(x, y + 25, (int) getCogs(), 20);
         if(getCogs() < 20) g.drawString((int) getCogs() + "", x + 3 + (int) getCogs(), y + 25 + 17);
         else g.drawString(getCogs() + "", x+3, y + 25 + 17);
+
+        Color[] statColors = {
+                new Color(240, 96, 117), //Max health
+                new Color(0, 0, 0), //Max cogs
+                new Color(196, 36, 240), //Regen rate
+                new Color(240, 186, 122), //Fire speed
+                new Color(18, 240, 120), //Bullet speed
+                new Color(240, 103, 32), //Bullet spread
+                new Color(240, 195, 53), //Rotate speed
+                new Color(56, 240, 231), //Movement speed
+                new Color(240, 24, 8), //Damage
+
+        };
+
+        for(int statNumber = 0; statNumber < 8; statNumber++) {
+
+            g.setColor(statColors[statNumber]);
+            g.fillRect(x + 110 + (statNumber/3)*40, y + statNumber%3*25, 30, 20);
+            g.setColor(Color.black);
+            g.drawRect(x + 110 + (statNumber/3)*40, y + statNumber%3*25, 30, 20);
+            g.drawString(stats[statNumber].val() + "",x + 110 + (statNumber/3)*40 + 2, y + statNumber%3*25 + 17);
+        }
+    }
+
+    @Override
+    public JPanel toPanel() {
+        JPanel entityPanel = new JPanel() {
+
+            @Override
+            public void paintComponent(Graphics g) {
+                super.paintComponent(g);
+
+                g.setFont(g.getFont().deriveFont(Font.BOLD));
+                g.drawString(name, 15, 25);
+                g.setFont(g.getFont().deriveFont(Font.PLAIN));
+
+                g.drawRoundRect(15, 35, Robot.this.getWidth() + 30, Robot.this.getHeight() + 30, 4, 4);
+                Robot.this.renderBody(g, 15 + (Robot.this.getWidth() + 30) / 2, 35 + (Robot.this.getHeight() + 30) / 2, RENDER_GLOWING);
+                Robot.this.renderStatus(g, Robot.this.getWidth() + 70, 35, RENDER_LOW_QUALITY);
+
+                g.drawLine(5, 125, getWidth()-5, 125);
+            }
+        };
+        return entityPanel;
     }
 }

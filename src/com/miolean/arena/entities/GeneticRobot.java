@@ -3,6 +3,7 @@ package com.miolean.arena.entities;
 import com.miolean.arena.framework.Option;
 import com.miolean.arena.framework.UByte;
 import com.miolean.arena.genetics.Gene;
+import com.miolean.arena.ui.FieldDisplayPanel;
 
 import javax.swing.*;
 import java.awt.*;
@@ -90,9 +91,6 @@ public class GeneticRobot extends Robot implements Comparable<GeneticRobot>{
         PMEM[0] = new UByte[256];
         SMEM[0] = new UByte[256];
 
-
-        //2: Initialize stats.
-        for(int i = 0; i < stats.length; i++) stats[i] = ub(10);
 
         //3: Initialize the memories at 0
         createMemory(SMEM, 0);
@@ -472,29 +470,24 @@ public class GeneticRobot extends Robot implements Comparable<GeneticRobot>{
     }
 
     @Override
-    public JPanel toPanel() {
-        JPanel entityPanel = new JPanel() {
+    public void renderStatus(Graphics f, int x, int y, byte flags) {
+        super.renderStatus(f, x, y, flags);
 
-            @Override
-            public void paintComponent(Graphics g) {
-                GeneticRobot.this.renderBody(g, this.getWidth()/2, 50);
-            }
+        Graphics2D g = (Graphics2D) f;
+        if((flags & RENDER_GLOWING) == RENDER_GLOWING) {
+            float[] dist = {0.0f, 0.7f};
+            Color[] colors = {Color.BLUE, FieldDisplayPanel.BACKGROUND_COLOR};
+            g.setPaint(new RadialGradientPaint((float) getX(), (float) getY(), (float) (getWidth() + 8), dist, colors, MultipleGradientPaint.CycleMethod.NO_CYCLE));
+            g.fillOval((int) (getX() - (getWidth() + 8)/2), (int) (getY() - (getHeight() + 8)/2), (int) (getWidth() + 8), (int) (getHeight() + 8));
 
-
-        };
-        return entityPanel;
-    }
-
-    @Override
-    public void renderStatus(Graphics g, int x, int y) {
-        super.renderStatus(g, x, y);
+        }
 
         g.setColor(new Color(100, 255, 100, 200));
         g.fillRect(x, y + 50, (int) getFitness(), 20);
         g.setColor(Color.BLACK);
         g.drawRect(x, y + 50, (int) getFitness(), 20);
-        if(getFitness() < 20) g.drawString((int) getFitness() + "", x + 3 + (int) getFitness(), y + 50 + 17);
-        else g.drawString(getFitness() + "", x+3, y + 50 + 17);
+        if(getFitness() < 20) g.drawString(((int) getFitness()) + "", x + 3 + (int) getFitness(), y + 50 + 17);
+        else g.drawString((int) getFitness() + "", x+3, y + 50 + 17);
     }
 
 

@@ -1,6 +1,7 @@
 package com.miolean.arena.entities;
 
 import com.miolean.arena.framework.Debug;
+import com.miolean.arena.ui.FieldDisplayPanel;
 
 import javax.sound.midi.Track;
 import java.awt.*;
@@ -14,10 +15,15 @@ public class Cog extends Entity {
     public Cog(int value, Arena arena) {
         super((int) (5*Math.sqrt(value)), (int) (5*Math.sqrt(value)), 1, arena);
         this.value = value;
+        setMass(Math.sqrt(value));
     }
 
     @Override
-    public void renderBody(Graphics g, int x, int y) {
+    public void renderBody(Graphics f, int x, int y, byte flags) {
+        Graphics2D g = (Graphics2D) f;
+        if((flags & RENDER_GLOWING) == RENDER_GLOWING) EntityDecorator.drawCircularGlow(g, this, x, y);
+
+
         g.setColor(Color.GRAY);
         try { g.setColor(new Color(256 - value*4, 128 + value*4, 150));}
         catch (Exception e) {System.out.println("Tried to set a cog's color with value " + value);}

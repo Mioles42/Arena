@@ -1,9 +1,8 @@
 package com.miolean.arena.ui;
 
-import com.miolean.arena.entities.Arena;
-import com.miolean.arena.entities.Entity;
-import com.miolean.arena.entities.GeneticRobot;
+import com.miolean.arena.entities.*;
 import com.miolean.arena.entities.Robot;
+import com.miolean.arena.framework.Debug;
 
 import javax.swing.*;
 import javax.swing.event.HyperlinkEvent;
@@ -18,6 +17,7 @@ public class GeneralDisplayPanel extends JPanel implements HyperlinkListener, Ac
     EvolutionPanel evolutionPanel;
     EntityPanel entityPanel;
     DebugPanel debugPanel;
+    JPanel controlPanel;
 
     java.util.List<ActiveRobotListener> listenerList = new ArrayList<ActiveRobotListener>();
     Entity viewholder;
@@ -90,7 +90,7 @@ public class GeneralDisplayPanel extends JPanel implements HyperlinkListener, Ac
         this.add(infoPanelPanel, c);
 
         //Add the control panel:
-        JPanel controlPanel = new JPanel();
+        controlPanel = new JPanel();
         JPanel controlPanelPanel = new JPanel();
 
         c = new GridBagConstraints();
@@ -111,13 +111,11 @@ public class GeneralDisplayPanel extends JPanel implements HyperlinkListener, Ac
         ));
         this.add(controlPanelPanel, c);
 
-        controlPanel.setLayout(new GridBagLayout());
-        c = new GridBagConstraints();
-        c.fill = GridBagConstraints.HORIZONTAL;
-        c.gridx = 0;
-        c.gridy = 0;
-        c.weightx = .2;
-        c.weighty = .3;
+        controlPanel.setLayout(new BorderLayout());
+
+        JPanel p = ((Entity)arena.getEntities().values().toArray()[1]).toPanel();
+        controlPanel.add(p);
+
 
         //controlPanel.add(Option.speedOptions.toPanel(), c);
 
@@ -132,51 +130,8 @@ public class GeneralDisplayPanel extends JPanel implements HyperlinkListener, Ac
         evolutionPanel.updateInfo();
         entityPanel.updateInfo();
         debugPanel.updateInfo();
+        controlPanel.repaint();
     }
-//
-//    public void makeGenomePanel(JPanel genomePanel) {
-//
-//        genomePanel.setLayout(new GridBagLayout());
-//
-//        int category = -1;
-//
-//        DefaultMutableTreeNode root = new DefaultMutableTreeNode("");
-//        DefaultMutableTreeNode branch = null;
-//        DefaultMutableTreeNode twig;
-//
-//
-//        for(int i = 0; i < com.miolean.arena.entities.Robot.KMEM.length; i++) {
-//            if(i/16 > category) {
-//                if(branch != null) root.add(branch);
-//                category = i/16;
-//                branch = new DefaultMutableTreeNode(Integer.toHexString(category).toUpperCase() + "  " + Gene.GENE_CATEGORIES[category]);
-//                //Add a new section!
-//            }
-//            if(com.miolean.arena.entities.Robot.KMEM[i] != null) {
-//                 twig = new DefaultMutableTreeNode(Integer.toHexString(i).toUpperCase() + "|  " + com.miolean.arena.entities.Robot.KMEM[i]);
-//                 branch.add(twig);
-//            }
-//        }
-//
-//        root.add(branch);
-//
-//        GridBagConstraints c = new GridBagConstraints();
-//        c.fill = GridBagConstraints.BOTH;
-//        c.gridx = 0;
-//        c.gridy = 0;
-//        c.gridheight = 1;
-//        c.gridwidth = 1;
-//        c.ipadx = 5;
-//        c.ipady = 5;
-//        c.weightx = .1;
-//        c.weighty = .1;
-//
-//        JTree tree = new JTree(root);
-//        tree.setEditable(false);
-//        tree.setFocusable(false);
-//        JScrollPane scrollPane = new JScrollPane(tree);
-//        genomePanel.add(scrollPane, c);
-//    }
 
     @Override
     public void hyperlinkUpdate(HyperlinkEvent e) {
@@ -202,12 +157,14 @@ public class GeneralDisplayPanel extends JPanel implements HyperlinkListener, Ac
 
     @Override
     public void viewholderChanged(Entity e) {
+        Debug.breakpoint();
         viewholder = e;
+        controlPanel.removeAll();
+        controlPanel.add(e.toPanel());
     }
 
     @Override
-    public void infoholderChanged(Robot e) {
-        if(e instanceof GeneticRobot) memoryPanel.source = (GeneticRobot) e;
+    public void infoholderChanged(Robot e) { if(e instanceof GeneticRobot) memoryPanel.source = (GeneticRobot) e;
     }
 
     public void alertViewholderChange(Entity e) {

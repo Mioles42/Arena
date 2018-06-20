@@ -31,16 +31,13 @@ public class Debug {
 
     public static void drawDebugLog(Graphics g) {
 
-        long oldTime = System.nanoTime();
-
-
         if(oldLog == null) return;
         int i = 0;
         long totalTime = 0;
 
 
         for (Map.Entry<String, Long> entry : oldLog.entrySet()) {
-            g.setColor(Color.getHSBColor(((i * 73) % 256)/255.0f, 200/255.0f, 200/255.0f));
+            g.setColor(Color.getHSBColor(((i * 79) % 256)/255.0f, 200/255.0f, 200/255.0f));
 
             if (entry.getValue() > 0) {
                 g.fillRect((int) (10 + (totalTime * 300) / cycleTime), 30, (int) ((entry.getValue() * 300) / cycleTime), 20);
@@ -80,7 +77,6 @@ public class Debug {
         g.drawString("100%", 20, 53 + 45 * i);
         g.drawString(cycleTime/1000 + "µs", 20, 66 + 45 * i);
 
-        Debug.logTime("Debug display", oldTime - System.nanoTime());
     }
 
     public static void refresh() {
