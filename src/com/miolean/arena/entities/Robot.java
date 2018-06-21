@@ -295,24 +295,4 @@ public abstract class Robot extends Entity {
         }
     }
 
-    @Override
-    public LivePanel toPanel() {
-
-        final JPanel statusPanel = EntityDecorator.quickStatusPanel(this);
-        final JPanel ancestryPanel = new JPanel();
-
-
-        statusPanel.setName("Status");
-        ancestryPanel.setName("Ancestry");
-        JComponent tabs = EntityDecorator.mergePanels(statusPanel, ancestryPanel);
-        LivePanel result = new LivePanel() {
-            @Override
-            public void display() {
-                statusPanel.repaint();
-                ancestryPanel.repaint();
-            }
-        };
-        result.add(tabs);
-        return result;
-    }
 }

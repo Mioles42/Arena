@@ -5,22 +5,36 @@ import java.awt.*;
 
 public abstract class LivePanel extends JPanel {
 
+    JPanel topBar;
+
     public LivePanel() {
-        super.setLayout(new BorderLayout());
+        super.setLayout(new GridBagLayout());
+        GridBagConstraints g = new GridBagConstraints();
+        g.gridx = 0;
+        g.gridy = 0;
+        g.weightx = 1.0;
+        g.weighty = 0.1;
+        g.fill = GridBagConstraints.BOTH;
 
-        JPanel topBar = new JPanel();
-        topBar.add(Box.createHorizontalStrut(40));
-        topBar.setBackground(Color.CYAN);
-        add(topBar, BorderLayout.NORTH);
 
-
+        topBar = new JPanel();
+        topBar.setBackground(new Color(220, 220, 220));
+        this.setBackground(new Color(220, 220, 220));
+        add(topBar, g);
     }
 
     public abstract void display();
 
     @Override
-    protected void addImpl(Component c, Object constraints, int index) {
-        super.addImpl(c, BorderLayout.CENTER, index);
+    public Component add(Component c) {
+        GridBagConstraints g = new GridBagConstraints();
+        g.gridy = 1;
+        g.gridx = 0;
+        g.weighty = 0.9;
+        g.weightx = 1.0;
+        g.fill = GridBagConstraints.BOTH;
+        super.add(c, g);
+        return c;
     }
 
 }

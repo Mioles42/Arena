@@ -119,9 +119,9 @@ public class GeneralDisplayPanel extends JPanel implements HyperlinkListener, Ac
 
     public void display() {
 
-        memoryPanel.updateInfo();
-        evolutionPanel.updateInfo();
-        entityPanel.updateInfo();
+//        memoryPanel.updateInfo();
+//        evolutionPanel.updateInfo();
+//        entityPanel.updateInfo();
         debugPanel.updateInfo();
         controlPanel.display();
     }
@@ -152,8 +152,6 @@ public class GeneralDisplayPanel extends JPanel implements HyperlinkListener, Ac
     public void viewholderChanged(Entity e) {
         Debug.breakpoint();
         viewholder = e;
-        controlPanel.removeAll();
-        controlPanel.add(e.toPanel());
     }
 
     @Override

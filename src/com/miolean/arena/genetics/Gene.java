@@ -95,7 +95,7 @@ public class Gene {
 
     @Override
     public String toString() {
-        return (meaning == null? "Unlisted" : meaning.getName().substring(1)) + ": " + description + "     [cost " + cost + ", weight " + weight + "]";
+        return (meaning == null? "[no meaning]" : meaning.getName().substring(1));
     }
 
     public Method getMeaning() {

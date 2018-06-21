@@ -141,6 +141,7 @@ public class Main implements Runnable, WindowListener, ActionListener {
                 Debug.logTime("Display", System.nanoTime()-time);
 
                 //Updating the value of the cycles is actually also on the display cycle
+                //(it's generally the least urgent cycle)
                 updateCycle = (int) (1000000000.0/Option.updateSpeed.getValue());
                 renderCycle = (int) (1000000000.0/Option.renderSpeed.getValue());
                 displayCycle = (int) (1000000000.0/Option.displaySpeed.getValue());
