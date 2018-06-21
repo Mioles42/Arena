@@ -17,7 +17,7 @@ public class GeneralDisplayPanel extends JPanel implements HyperlinkListener, Ac
     EvolutionPanel evolutionPanel;
     EntityPanel entityPanel;
     DebugPanel debugPanel;
-    JPanel controlPanel;
+    LivePanel controlPanel;
 
     java.util.List<ActiveRobotListener> listenerList = new ArrayList<ActiveRobotListener>();
     Entity viewholder;
@@ -77,10 +77,6 @@ public class GeneralDisplayPanel extends JPanel implements HyperlinkListener, Ac
         c.weightx = .2;
         c.weighty = .5;
 
-        //ImageIcon genomeIcon = new ImageIcon(GeneralDisplayPanel.class.getClassLoader().getResource("img/list.png"));
-
-
-
         tabbedPane.addTab("Program Memory", memoryPanel);
         tabbedPane.addTab("Entities", entityPanel);
         tabbedPane.addTab("Evolution", evolutionPanel);
@@ -90,7 +86,7 @@ public class GeneralDisplayPanel extends JPanel implements HyperlinkListener, Ac
         this.add(infoPanelPanel, c);
 
         //Add the control panel:
-        controlPanel = new JPanel();
+        controlPanel = ((Entity) arena.getEntities().values().toArray()[1]).toPanel();
         JPanel controlPanelPanel = new JPanel();
 
         c = new GridBagConstraints();
@@ -111,10 +107,7 @@ public class GeneralDisplayPanel extends JPanel implements HyperlinkListener, Ac
         ));
         this.add(controlPanelPanel, c);
 
-        controlPanel.setLayout(new BorderLayout());
-
-        JPanel p = ((Entity)arena.getEntities().values().toArray()[1]).toPanel();
-        controlPanel.add(p);
+        System.out.println(controlPanel.getSize());
 
 
         //controlPanel.add(Option.speedOptions.toPanel(), c);
@@ -130,7 +123,7 @@ public class GeneralDisplayPanel extends JPanel implements HyperlinkListener, Ac
         evolutionPanel.updateInfo();
         entityPanel.updateInfo();
         debugPanel.updateInfo();
-        controlPanel.repaint();
+        controlPanel.display();
     }
 
     @Override

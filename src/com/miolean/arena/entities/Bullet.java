@@ -53,20 +53,20 @@ public class Bullet extends Entity {
 
             double sinR = Math.sin(getR() + Math.PI);
             double cosR = Math.cos(getR() + Math.PI);
-            double sinExtra = .25867;
-            double cosExtra = .88007;
+            double sinExtra = .53867;
+            double cosExtra = .60007;
 
             //Fun fact: This is stolen from Robot's gun barrel.
             int[] XPoints = {
-                    (int) (x+SIZE*3*(cosR*cosExtra - sinR*sinExtra)),
-                    (int) (x+SIZE*3*(cosR*cosExtra + sinR*sinExtra)),
-                     (x)
+                    (int) (x+SIZE*1.2*(cosR*cosExtra - sinR*sinExtra)),
+                    (int) (x+SIZE*1.2*(cosR*cosExtra + sinR*sinExtra)),
+                    (int) (x-SIZE*1.2*cosR)
             };
 
             int[] YPoints = {
-                    (int) (y-SIZE*3*(sinR*cosExtra + sinExtra*cosR)),
-                    (int) (y-SIZE*3*(sinR*cosExtra - sinExtra*cosR)),
-                     (y)
+                    (int) (y-SIZE*1.2*(sinR*cosExtra + sinExtra*cosR)),
+                    (int) (y-SIZE*1.2*(sinR*cosExtra - sinExtra*cosR)),
+                    (int) (y+SIZE*1.2*sinR)
 
             };
 

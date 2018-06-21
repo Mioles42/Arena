@@ -62,7 +62,7 @@ public class FieldDisplayPanel extends JPanel implements KeyListener, MouseListe
     public void setViewholder(int x, int y) {
         Entity e = arena.atLocation(x, y);
 
-        if (e == null || ! e.isAlive()) {
+        if (e == null || ! e.isAlive() || e instanceof ControlledRobot) {
             if (viewholder instanceof ControlledRobot && viewholder.isAlive()) {
                 viewholder.setX(x);
                 viewholder.setY(y);

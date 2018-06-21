@@ -3,19 +3,13 @@ package com.miolean.arena.entities;
 import com.miolean.arena.framework.Debug;
 import com.miolean.arena.framework.Option;
 import com.miolean.arena.framework.UByte;
-import com.miolean.arena.genetics.*;
 import com.miolean.arena.ui.FieldDisplayPanel;
+import com.miolean.arena.ui.LivePanel;
 
 import javax.swing.*;
 import java.awt.*;
-import java.io.InputStream;
-import java.lang.reflect.InvocationTargetException;
-import java.util.Scanner;
-import java.util.Stack;
 
-import static com.miolean.arena.entities.Arena.ARENA_SIZE;
 import static com.miolean.arena.framework.UByte.ub;
-import static com.miolean.arena.framework.UByte.ubDeepCopy;
 
 /**
  * Created by commandm on 5/13/17.
@@ -302,24 +296,23 @@ public abstract class Robot extends Entity {
     }
 
     @Override
-    public JPanel toPanel() {
-        JPanel entityPanel = new JPanel() {
+    public LivePanel toPanel() {
 
+        final JPanel statusPanel = EntityDecorator.quickStatusPanel(this);
+        final JPanel ancestryPanel = new JPanel();
+
+
+        statusPanel.setName("Status");
+        ancestryPanel.setName("Ancestry");
+        JComponent tabs = EntityDecorator.mergePanels(statusPanel, ancestryPanel);
+        LivePanel result = new LivePanel() {
             @Override
-            public void paintComponent(Graphics g) {
-                super.paintComponent(g);
-
-                g.setFont(g.getFont().deriveFont(Font.BOLD));
-                g.drawString(name, 15, 25);
-                g.setFont(g.getFont().deriveFont(Font.PLAIN));
-
-                g.drawRoundRect(15, 35, Robot.this.getWidth() + 30, Robot.this.getHeight() + 30, 4, 4);
-                Robot.this.renderBody(g, 15 + (Robot.this.getWidth() + 30) / 2, 35 + (Robot.this.getHeight() + 30) / 2, RENDER_GLOWING);
-                Robot.this.renderStatus(g, Robot.this.getWidth() + 70, 35, RENDER_LOW_QUALITY);
-
-                g.drawLine(5, 125, getWidth()-5, 125);
+            public void display() {
+                statusPanel.repaint();
+                ancestryPanel.repaint();
             }
         };
-        return entityPanel;
+        result.add(tabs);
+        return result;
     }
 }

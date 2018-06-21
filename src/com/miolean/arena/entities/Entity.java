@@ -1,6 +1,7 @@
 package com.miolean.arena.entities;
 
 import com.miolean.arena.framework.Debug;
+import com.miolean.arena.ui.LivePanel;
 
 import javax.swing.*;
 import java.awt.*;
@@ -232,10 +233,11 @@ public abstract class Entity implements Serializable {
     public String toString() {
         return this.getClass().getSimpleName();
     }
-    public JPanel toPanel() {
+    public LivePanel toPanel() {
 
+        final JPanel statusPanel = EntityDecorator.quickStatusPanel(this);
 
-        JPanel entityPanel = new JPanel() {
+        LivePanel result = new LivePanel() {
 
             @Override
             public void paintComponent(Graphics g) {
@@ -244,9 +246,16 @@ public abstract class Entity implements Serializable {
                 Entity.this.renderBody(g, this.getWidth()/2, 50, RENDER_LOW_QUALITY);
                 Debug.logTime("Rendering Entity panel",oldTime - System.nanoTime());
             }
+
+            @Override
+            public void display() {
+                statusPanel.repaint();
+            }
         };
 
-        return entityPanel;
+        result.add(EntityDecorator.toScrollPane(statusPanel));
+
+        return result;
     }
 
 
