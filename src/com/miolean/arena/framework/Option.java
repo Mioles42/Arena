@@ -1,5 +1,6 @@
 package com.miolean.arena.framework;
 
+import com.miolean.arena.input.CheckboxInput;
 import com.miolean.arena.input.CompoundInput;
 import com.miolean.arena.input.Input;
 import com.miolean.arena.input.NumericalInput;
@@ -24,7 +25,7 @@ public class Option {
     public static NumericalInput scale = new NumericalInput("Render scale", "The magnification of the arena display", 1, 60, 5);
 
     public static CompoundInput speedOptions = new CompoundInput("Arena speed options", "Affect the performance of Ergo", updateSpeed, displaySpeed, renderSpeed);
-
+    public static CheckboxInput showWireframes = new CheckboxInput("Show wireframes", "Shows the bounds of Entities");
 
     private static Input[] inputs = {updateSpeed, displaySpeed, renderSpeed, robotSize, scale, speedOptions};
 

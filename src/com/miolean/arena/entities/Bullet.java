@@ -26,6 +26,7 @@ public class Bullet extends Entity {
         if(source != null) {
             setX(source.getX());
             setY(source.getY());
+            while(intersectsWith(source)) applyPhysics();
             damage = source.stats[Robot.STAT_DAMAGE].val();
             setVelX((15 + source.stats[Robot.STAT_BULLET_SPEED].val()) * Math.cos(source.getR() + source.stats[Robot.STAT_BULLET_SPREAD].val() / 128.0 * (Option.random.nextFloat() - .5)));
             setVelY((15 + source.stats[Robot.STAT_BULLET_SPEED].val()) * -Math.sin(source.getR() + source.stats[Robot.STAT_BULLET_SPREAD].val() / 128.0 * (Option.random.nextFloat() - .5)));
@@ -82,6 +83,49 @@ public class Bullet extends Entity {
         setAccY(force * -Math.sin(getR()) / 16);
     }
 
+
+    @Override
+    public boolean intersectsWith(Entity e) {
+        if( e instanceof TrackerDot) return false;
+        if(e == null || e == source || (e instanceof Bullet && ((Bullet) e).source == source)) return false; //Don't interact with your own source
+        if(super.intersectsWith(e)) return true;
+
+        //This is going to be tedious if we don't make up some shorthands.
+        //I know, memory usage and so forth, but it'll be OK
+        double x = getX();
+        double y = getY();
+        double velX = getVelX();
+        double velY = getVelY();
+        double accX = getAccX();
+        double accY = getAccY();
+
+        Rectangle extendedBounds = new Rectangle(new Point((int)x, (int)y));
+        extendedBounds.add(new Point((int) (x+velX+accX), (int) (y+velY+accY)));
+        extendedBounds.setLocation((int) (extendedBounds.getX() - e.getWidth()), (int) (extendedBounds.getY() - e.getHeight()));
+        extendedBounds.setSize((int) (extendedBounds.getWidth() + 2*e.getWidth()), (int) (extendedBounds.getHeight() + 2*e.getHeight()));
+
+        if(extendedBounds.contains(new Point2D.Double(e.getX(), e.getY()))) {
+            double slope = (velY + accY) / (velX + accX);
+
+            double k = y - slope * x;
+
+            double a = e.getX() - (e.getY()-k)/slope;
+            double b = e.getY() - e.getX()*slope - k;
+            double g2 = (a*a*b*b) / (a*a + b*b);
+
+            if(g2 < (SIZE/2 + e.getWidth()/2)*(SIZE/2 + e.getWidth()/2)) {
+                return true;
+            }
+
+        }
+
+        return false;
+    }
+
+
+    //Unfortunately there's no quick way to fill in the skips for bullets
+    @Override
+    public boolean quickIntersects(Entity e) {return true;}
 
     @Override
     public void update() {
@@ -144,54 +188,11 @@ public class Bullet extends Entity {
     }
 
     @Override
-    public boolean intersectsWith(Entity e) {
-        if( e instanceof TrackerDot) return false;
-        if(e == null || e == source || (e instanceof Bullet && ((Bullet) e).source == source)) return false; //Don't interact with your own source
-
-
-        //This is going to be tedious if we don't make up some shorthands.
-        //I know, memory usage and so forth, but it'll be OK
-        double x = getX();
-        double y = getY();
-        double velX = getVelX();
-        double velY = getVelY();
-        double accX = getAccX();
-        double accY = getAccY();
-
-        Rectangle extendedBounds = new Rectangle(new Point((int)x, (int)y));
-        extendedBounds.add(new Point((int) (x+velX+accX), (int) (y+velY+accY)));
-        extendedBounds.setLocation((int) (extendedBounds.getX() - e.getWidth()), (int) (extendedBounds.getY() - e.getHeight()));
-        extendedBounds.setSize((int) (extendedBounds.getWidth() + 2*e.getWidth()), (int) (extendedBounds.getHeight() + 2*e.getHeight()));
-
-        if(extendedBounds.contains(new Point2D.Double(e.getX(), e.getY()))) {
-            double slope = (velY + accY) / (velX + accX);
-
-            double k = y - slope * x;
-
-            double a = e.getX() - (e.getY()-k)/slope;
-            double b = e.getY() - e.getX()*slope - k;
-            double g2 = (a*a*b*b) / (a*a + b*b);
-
-            if(g2 < (SIZE/2 + e.getWidth()/2)*(SIZE/2 + e.getWidth()/2)) {
-                return true;
-            }
-
-        }
-
-        return false;
-    }
-
-
-    //Unfortunately there's no quick way to fill in the skips for bullets
-    @Override
-    public boolean quickIntersects(Entity e) {return true;}
-
-    @Override
     public void intersect(Entity e) {
 
         repel(e);
         if(! (e instanceof Cog)) e.damage(damage);
-        damage(1);
+        if(! (e instanceof Wall)) damage(1);
     }
 
     @Override
@@ -214,5 +215,14 @@ public class Bullet extends Entity {
             result += "<font color=\"maroon\">Rogue Bullet";
         }
         return result;
+    }
+
+    @Override
+    public Polygon getBaseBounds() {
+        return new Polygon(
+                new int[] {getWidth()/2, 0, -getWidth()/2, 0},
+                new int[] {0, getHeight()/2, 0, -getHeight()/2},
+                4
+        );
     }
 }

@@ -41,4 +41,13 @@ public class TrackerDot extends Entity {
         //TODO
         return null;
     }
+
+    @Override
+    public Polygon getBaseBounds() {
+        return new Polygon(
+                new int[] {getWidth()/2, 0, -getWidth()/2, 0},
+                new int[] {0, getHeight()/2, 0, -getHeight()/2},
+                4
+        );
+    }
 }

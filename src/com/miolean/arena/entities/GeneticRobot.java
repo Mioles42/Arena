@@ -39,7 +39,7 @@ public class GeneticRobot extends Robot implements Comparable<GeneticRobot>{
     private static int totalKWeight;
 
     static {
-        KMEM = Gene.loadAll();
+        KMEM = Gene.loadAll(false);
         for(Gene g: KMEM) {
             if(g != null) totalKWeight += g.getWeight();
         }
@@ -284,7 +284,7 @@ public class GeneticRobot extends Robot implements Comparable<GeneticRobot>{
     private void throwCompileError(String reason) {
         System.err.println("Error compiling Robot " + getName() + ":");
         System.err.println(reason);
-        System.exit(0);
+        //TODO Exiting immediately is not appropriate here; should throw an exception
     }
 
     @Override

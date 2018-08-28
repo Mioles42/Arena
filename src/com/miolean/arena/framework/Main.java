@@ -25,7 +25,6 @@ public class Main implements Runnable, WindowListener, ActionListener {
 
     public static void main(String[] args) {
         Main main = new Main();
-
         Thread ergoThread = new Thread(main, "ergoloop");
         ergoThread.run();
     }
@@ -42,6 +41,11 @@ public class Main implements Runnable, WindowListener, ActionListener {
     }
 
     public void initializeGUI() {
+        try {
+            UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e) {
+            e.printStackTrace();
+        }
         window = new JFrame("Ergo");
         window.setSize(1200, 700);
         window.setLocation(20, 200);
@@ -49,6 +53,8 @@ public class Main implements Runnable, WindowListener, ActionListener {
         window.setLayout(new GridBagLayout());
         window.setResizable(true);
         window.addWindowListener(this);
+
+
 
         JMenuBar menuBar = new JMenuBar();
         window.setJMenuBar(menuBar);
@@ -58,6 +64,7 @@ public class Main implements Runnable, WindowListener, ActionListener {
 
         quickAddMenuItem(Option.speedOptions, optionMenu, "Run speed...", KeyStroke.getKeyStroke(KeyEvent.VK_R, InputEvent.ALT_MASK));
         quickAddMenuItem(Option.scale, optionMenu, "Scale...", null);
+        quickAddMenuItem(Option.showWireframes, optionMenu, "Show wireframes", null);
 
 
         //Add the main panel:

@@ -28,7 +28,7 @@ public class Gene {
 
     public static Gene[] loadAll() {
         Gene[] KMEM = new Gene[256];
-        String[][] data = new String[256][];
+        String[][] data = new String[256][11];
 
         Scanner in = new Scanner(Robot.class.getClassLoader().getResourceAsStream("cfg/ergo_origin.csv"));
         in.useDelimiter("\n");
@@ -91,6 +91,20 @@ public class Gene {
         }
 
         return KMEM;
+    }
+
+    @Deprecated
+    public static Gene[] loadAll(boolean nothing) {
+        Gene gene = new Gene();
+        try {
+            gene.meaning = DefaultGeneticRobot.class.getMethod("_NO");
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        }
+
+        Gene[] result =  new Gene[256];
+        for(int i = 0; i < result.length; i++) result[i] = gene;
+        return result;
     }
 
     @Override
