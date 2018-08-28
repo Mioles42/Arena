@@ -14,6 +14,8 @@ public class Main implements Runnable, WindowListener, ActionListener {
     private FieldDisplayPanel fieldDisplayPanel;
     private GeneralDisplayPanel generalDisplayPanel;
 
+
+
     JMenu optionMenu = new JMenu("Option");
 
     Arena arena;
@@ -33,9 +35,9 @@ public class Main implements Runnable, WindowListener, ActionListener {
         fieldDisplayPanel = new com.miolean.arena.ui.FieldDisplayPanel(arena);
         generalDisplayPanel = new GeneralDisplayPanel(arena);
         initializeGUI();
-
-
         handler = new Handler(arena);
+
+        Option.currentArena.setValue(arena);
 
     }
 
@@ -43,7 +45,6 @@ public class Main implements Runnable, WindowListener, ActionListener {
         window = new JFrame("Ergo");
         window.setSize(1200, 700);
         window.setLocation(20, 200);
-        window.setVisible(true);
         window.setLayout(new GridBagLayout());
         window.setResizable(true);
         window.addWindowListener(this);
@@ -56,6 +57,7 @@ public class Main implements Runnable, WindowListener, ActionListener {
 
         quickAddMenuItem(Option.speedOptions, optionMenu, "Run speed...", KeyStroke.getKeyStroke(KeyEvent.VK_R, InputEvent.ALT_MASK));
         quickAddMenuItem(Option.scale, optionMenu, "Scale...", null);
+        quickAddMenuItem(Option.showDataInRegistries, optionMenu, "Data display...", KeyStroke.getKeyStroke(KeyEvent.VK_CAPS_LOCK, 0));
 
 
         //Add the main panel:
@@ -93,6 +95,7 @@ public class Main implements Runnable, WindowListener, ActionListener {
 
         generalDisplayPanel.addActiveRobotListener(fieldDisplayPanel);
         fieldDisplayPanel.addActiveRobotListener(generalDisplayPanel);
+        window.setVisible(true);
     }
 
     private void quickAddMenuItem(Input input, JMenu parent, String text, KeyStroke accelerator) {
@@ -139,6 +142,7 @@ public class Main implements Runnable, WindowListener, ActionListener {
                 Debug.logTime("Display", System.nanoTime()-time);
 
                 //Updating the value of the cycles is actually also on the display cycle
+                //(it's generally the least urgent cycle)
                 updateCycle = (int) (1000000000.0/Option.updateSpeed.getValue());
                 renderCycle = (int) (1000000000.0/Option.renderSpeed.getValue());
                 displayCycle = (int) (1000000000.0/Option.displaySpeed.getValue());

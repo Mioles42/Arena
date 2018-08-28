@@ -3,7 +3,6 @@ package com.miolean.arena.ui;
 import com.miolean.arena.entities.*;
 import com.miolean.arena.entities.Robot;
 import com.miolean.arena.framework.Option;
-import com.miolean.arena.framework.Renderer;
 
 import javax.swing.*;
 import java.awt.*;
@@ -15,12 +14,12 @@ import static com.miolean.arena.entities.Arena.BORDER;
 
 public class FieldDisplayPanel extends JPanel implements KeyListener, MouseListener, MouseMotionListener, ActiveRobotListener{
 
-    private com.miolean.arena.framework.Renderer renderer;
-
     java.util.List<ActiveRobotListener> listenerList = new ArrayList<>();
 
     Entity viewholder;
     Arena arena;
+
+    public static final Color BACKGROUND_COLOR = new Color(170, 170, 160);
 
     private boolean isRunning = true;
 
@@ -30,8 +29,6 @@ public class FieldDisplayPanel extends JPanel implements KeyListener, MouseListe
         this.arena = arena;
 
         requestFocus();
-
-        renderer = new Renderer(arena);
 
         viewholder = new ControlledRobot(300, 300, arena);
         arena.add(viewholder);
@@ -46,7 +43,7 @@ public class FieldDisplayPanel extends JPanel implements KeyListener, MouseListe
 
         arena.add(dummy);
 
-        this.setBackground(new Color(170, 170, 160));
+        this.setBackground(BACKGROUND_COLOR);
 
         this.addKeyListener(this);
         this.addMouseListener(this);
@@ -65,23 +62,26 @@ public class FieldDisplayPanel extends JPanel implements KeyListener, MouseListe
     public void setViewholder(int x, int y) {
         Entity e = arena.atLocation(x, y);
 
-        if (e == null) {
+        if (e == null || ! e.isAlive() || e instanceof ControlledRobot) {
             if (viewholder instanceof ControlledRobot && viewholder.isAlive()) {
                 viewholder.setX(x);
                 viewholder.setY(y);
+                return;
             } else {
                 e = new ControlledRobot(x, y, arena);
                 arena.add(e);
-                viewholder = e;
             }
-
-        } else {
-            if (viewholder instanceof ControlledRobot) arena.remove(viewholder);
-            viewholder = e;
         }
 
-        if (viewholder instanceof com.miolean.arena.entities.Robot && !(viewholder instanceof ControlledRobot))
+        if (viewholder instanceof ControlledRobot) {
+            arena.remove(viewholder);
+        }
+
+        if (e instanceof GeneticRobot)
             alertInfoholderChange((Robot)e);
+
+        viewholder = e;
+
         alertViewholderChange(e);
     }
 
@@ -116,13 +116,17 @@ public class FieldDisplayPanel extends JPanel implements KeyListener, MouseListe
         g.setColor(Color.RED);
         g.drawRect(10, 10, ARENA_SIZE - BORDER, ARENA_SIZE - BORDER);
 
-        renderer.tick(g);
+        Point mouse = new Point(
+                MouseInfo.getPointerInfo().getLocation().x - getLocationOnScreen().x -(int)(-viewholder.getX() + this.getWidth()/2),
+                MouseInfo.getPointerInfo().getLocation().y - getLocationOnScreen().y -(int)(-viewholder.getY() + this.getHeight()/2)
+                );
+        arena.renderAll(g, mouse);
         g.scale(scale, scale);
 
         g.translate((int) -(-viewholder.getX() + this.getWidth()/2), (int) -(-viewholder.getY() + this.getHeight()/2));
 
         //Apply no translations to these things
-        viewholder.renderStatus(g, 20, getHeight()-100);
+        viewholder.renderStatus(g, 20, getHeight()-100, Entity.RENDER_LOW_QUALITY);
 
     }
 

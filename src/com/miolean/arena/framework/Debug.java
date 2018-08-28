@@ -14,6 +14,7 @@ public class Debug {
     private static Map<String, Long> oldLog;
 
     public static void logTime(String category, long value) {
+        if(category == null) return;
         if(log.get(category) != null) log.put(category, log.get(category) + value);
         else log.put(category, value);
     }
@@ -37,7 +38,7 @@ public class Debug {
 
 
         for (Map.Entry<String, Long> entry : oldLog.entrySet()) {
-            g.setColor(Color.getHSBColor(((i * 73) % 256)/255.0f, 200/255.0f, 200/255.0f));
+            g.setColor(Color.getHSBColor(((i * 79) % 256)/255.0f, 200/255.0f, 200/255.0f));
 
             if (entry.getValue() > 0) {
                 g.fillRect((int) (10 + (totalTime * 300) / cycleTime), 30, (int) ((entry.getValue() * 300) / cycleTime), 20);
@@ -76,6 +77,7 @@ public class Debug {
         g.drawString("Total in cycle", 20, 40 + 45 * i);
         g.drawString("100%", 20, 53 + 45 * i);
         g.drawString(cycleTime/1000 + "µs", 20, 66 + 45 * i);
+
     }
 
     public static void refresh() {
@@ -84,5 +86,10 @@ public class Debug {
         for(String s: oldLog.keySet()) log.put(s, 0L);
         cycleTime = (System.nanoTime() - lastRefresh);
         lastRefresh = System.nanoTime();
+    }
+
+    public static void breakpoint() {
+        //This is useful in the context of IntelliJ
+        System.out.println("Hit breakpoint");
     }
 }

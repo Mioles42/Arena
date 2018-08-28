@@ -2,8 +2,10 @@ package com.miolean.arena.entities;
 
 import com.miolean.arena.framework.Debug;
 import com.miolean.arena.framework.Option;
+import com.miolean.arena.ui.FieldDisplayPanel;
 
 import java.awt.*;
+import java.awt.geom.Point2D;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -77,9 +79,18 @@ public class Arena {
         Debug.logTime("Fitness", System.nanoTime() - marker);
     }
 
-    public void renderAll(Graphics g) {
+    public void renderAll(Graphics2D g) {
         for(Entity e: entities.values()) {
-            e.renderBody(g, (int) e.getX(), (int) e.getY());
+            e.renderBody(g, (int) e.getX(), (int) e.getY(), Entity.RENDER_LOW_QUALITY);
+        }
+    }
+
+    public void renderAll(Graphics2D g, Point mouse) {
+
+        for(Entity e: entities.values()) {
+            if(e.intersectsWith(new TrackerDot(mouse.x, mouse.y, 4, 1, this))) {
+                e.renderBody(g, (int) e.getX(), (int) e.getY(), (byte) (Entity.RENDER_GLOWING | Entity.RENDER_DECORATED));
+            } else e.renderBody(g, (int) e.getX(), (int) e.getY(), Entity.RENDER_DECORATED);
         }
     }
 
@@ -114,7 +125,9 @@ public class Arena {
         if(uuid < 0) return topRobots.get(uuid*-1-200-1);
         return entities.get(uuid);
     }
-    public Entity fromUUID(int great, int less) {return entities.get(great * 255 + less);}
+    public Entity fromUUID(int great, int less) {
+        return entities.get(great * 255 + less);
+    }
 
     public Entity atLocation(int x, int y) {
         TrackerDot location = new TrackerDot(x, y, 4,0,this);
@@ -126,6 +139,9 @@ public class Arena {
     }
 
     public Entity fromHTML(String html) {
+
+        Debug.breakpoint();
+
         if(html.contains("ergo_uuid_")) {
             html = html.replaceAll("ergo_uuid_", "");
             return fromUUID(Integer.parseInt(html));

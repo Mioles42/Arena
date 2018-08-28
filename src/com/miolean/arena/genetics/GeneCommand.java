@@ -10,7 +10,8 @@ import java.lang.annotation.*;
 @Documented
 public @interface GeneCommand{
     int args();
-    int cost();
+    double cost();
     int weight();
     int bonus() default 0;
+    boolean defined() default false;
 }

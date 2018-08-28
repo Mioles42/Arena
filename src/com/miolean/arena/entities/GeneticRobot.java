@@ -3,6 +3,8 @@ package com.miolean.arena.entities;
 import com.miolean.arena.framework.Option;
 import com.miolean.arena.framework.UByte;
 import com.miolean.arena.genetics.Gene;
+import com.miolean.arena.ui.FieldDisplayPanel;
+import com.miolean.arena.ui.LivePanel;
 
 import javax.swing.*;
 import java.awt.*;
@@ -38,14 +40,14 @@ public class GeneticRobot extends Robot implements Comparable<GeneticRobot>{
     private static int totalKWeight;
 
     static {
-        KMEM = Gene.loadAll();
+        KMEM = Gene.loadFromOriginFile();
         for(Gene g: KMEM) {
             if(g != null) totalKWeight += g.getWeight();
         }
     }
 
     //Create a Robot from a parent
-    public GeneticRobot(GeneticRobot parent, Arena arena) {
+    public GeneticRobot(GeneticRobot parent, Arena arena){
         super(arena);
 
         String name = Option.wordRandom.nextWord();
@@ -90,9 +92,6 @@ public class GeneticRobot extends Robot implements Comparable<GeneticRobot>{
         PMEM[0] = new UByte[256];
         SMEM[0] = new UByte[256];
 
-
-        //2: Initialize stats.
-        for(int i = 0; i < stats.length; i++) stats[i] = ub(10);
 
         //3: Initialize the memories at 0
         createMemory(SMEM, 0);
@@ -332,7 +331,6 @@ public class GeneticRobot extends Robot implements Comparable<GeneticRobot>{
             }
             Gene gene = KMEM[genes[loaded][index].val()];
 
-
             try {
                 if(gene.getNumParameters() == 0) {
                     gene.getMeaning().invoke(this);
@@ -356,10 +354,7 @@ public class GeneticRobot extends Robot implements Comparable<GeneticRobot>{
                 index = entry.y;
             }
         }
-
     }
-
-
 
     //Instantiate memory number [number] as a UByte[256].
     protected void createMemory(UByte[][] memory, int number) {
@@ -384,7 +379,7 @@ public class GeneticRobot extends Robot implements Comparable<GeneticRobot>{
     }
 
     void reproduce() {
-        Robot offspring = new GeneticRobot(this, getArena());
+        Robot offspring = new DefaultGeneticRobot(this, getArena());
         add(offspring);
     }
 
@@ -472,29 +467,24 @@ public class GeneticRobot extends Robot implements Comparable<GeneticRobot>{
     }
 
     @Override
-    public JPanel toPanel() {
-        JPanel entityPanel = new JPanel() {
+    public void renderStatus(Graphics f, int x, int y, byte flags) {
+        super.renderStatus(f, x, y, flags);
 
-            @Override
-            public void paintComponent(Graphics g) {
-                GeneticRobot.this.renderBody(g, this.getWidth()/2, 50);
-            }
+        Graphics2D g = (Graphics2D) f;
+        if((flags & RENDER_GLOWING) == RENDER_GLOWING) {
+            float[] dist = {0.0f, 0.7f};
+            Color[] colors = {Color.BLUE, FieldDisplayPanel.BACKGROUND_COLOR};
+            g.setPaint(new RadialGradientPaint((float) getX(), (float) getY(), (float) (getWidth() + 8), dist, colors, MultipleGradientPaint.CycleMethod.NO_CYCLE));
+            g.fillOval((int) (getX() - (getWidth() + 8)/2), (int) (getY() - (getHeight() + 8)/2), (int) (getWidth() + 8), (int) (getHeight() + 8));
 
-
-        };
-        return entityPanel;
-    }
-
-    @Override
-    public void renderStatus(Graphics g, int x, int y) {
-        super.renderStatus(g, x, y);
+        }
 
         g.setColor(new Color(100, 255, 100, 200));
         g.fillRect(x, y + 50, (int) getFitness(), 20);
         g.setColor(Color.BLACK);
         g.drawRect(x, y + 50, (int) getFitness(), 20);
-        if(getFitness() < 20) g.drawString((int) getFitness() + "", x + 3 + (int) getFitness(), y + 50 + 17);
-        else g.drawString(getFitness() + "", x+3, y + 50 + 17);
+        if(getFitness() < 20) g.drawString(((int) getFitness()) + "", x + 3 + (int) getFitness(), y + 50 + 17);
+        else g.drawString((int) getFitness() + "", x+3, y + 50 + 17);
     }
 
 
@@ -506,4 +496,116 @@ public class GeneticRobot extends Robot implements Comparable<GeneticRobot>{
     public void setFitness(double fitness) { this.fitness = fitness; }
     public int getGeneration() { return generation; }
     public void setGeneration(int generation) { this.generation = generation; }
+
+    public UByte wmemAt(int i) {return WMEM[i];}
+    public UByte smemAt(int i, int j) {return SMEM[i][j];}
+    public UByte pmemAt(int i, int j) {return PMEM[i][j];}
+    public UByte umemAt(int i, int j) {return UMEM[i][j];}
+
+    @Override
+    public LivePanel toPanel() {
+
+        final JComboBox<String> memoryType = new JComboBox<>();
+        memoryType.addItem("Registry");
+        memoryType.addItem("Storage");
+        memoryType.addItem("Program");
+        memoryType.addItem("Meta");
+        memoryType.setSelectedItem("Program");
+
+        SpinnerModel model = new SpinnerNumberModel(0, 0, 255, 1);
+        final JSpinner memoryNumber = new JSpinner(model);
+
+        final JPanel statusPanel = EntityDecorator.quickStatusPanel(this);
+        final JPanel ancestryPanel = new JPanel();
+        final JPanel memoryPanelInternal = new JPanel() {
+            @Override
+            public void paintComponent(Graphics g) {
+                super.paintComponent(g);
+
+                if(memoryType.getSelectedItem().equals("Program") || memoryType.getSelectedItem().equals("Meta")) {
+
+                    int index = 0;
+                    int drawLocation = 0;
+                    UByte[] memory = (memoryType.getSelectedItem().equals("Program"))? PMEM[(int) memoryNumber.getValue()] : UMEM[(int) memoryNumber.getValue()];
+                    while(index < memory.length) {
+                        Gene gene = KMEM[memory[index].val()];
+
+                        if(gene.getMeaning().getName().equals("_NO") || gene.getMeaning().getName().equals("_UNDEF")) {
+                            index++;
+                            continue;
+                        }
+
+                        if(gene.getNumParameters() == 0) {
+                            g.drawString(gene.getMeaning().getName(), 10, 30+25*drawLocation);
+                        }
+                        else if(gene.getNumParameters() == 1 && index < memory.length-1) {
+                            String arguments = "(" + memory[index+1] + ")";
+                            g.drawString(gene.getMeaning().getName() + arguments, 10, 30+25*drawLocation);
+                            index += 1;
+                        }
+                        else if(gene.getNumParameters() == 2 && index < memory.length-2) {
+                            String arguments = "(" + memory[index+1] + ", " + memory[index+2] + ")";
+                            g.drawString(gene.getMeaning().getName() + arguments, 10, 30+25*drawLocation);
+                            index += 2;
+                        }
+                        else if(index < memory.length-3) {
+                            String arguments = "(" + memory[index+1] + ", " + memory[index+2] + ", " + memory[index+3] + ")";
+                            g.drawString(gene.getMeaning().getName() + arguments, 10, 30+25*drawLocation);
+                            index += 3;
+                        }
+                        index++;
+                        drawLocation++;
+
+                    }
+                }
+            }
+        };
+
+        memoryPanelInternal.setPreferredSize(new Dimension(0, 1000));
+
+        final JPanel memoryPanel = new JPanel();
+        memoryPanel.setLayout(new GridBagLayout());
+        GridBagConstraints c = new GridBagConstraints();
+
+        c.gridx = 0;
+        c.gridy = 0;
+        c.weighty = .05;
+        c.weightx = 1;
+        c.gridwidth = 1;
+        c.gridheight = 1;
+        c.fill = GridBagConstraints.BOTH;
+        c.insets = new Insets(5, 5, 5, 5);
+        memoryPanel.add(new JLabel("Memory and address:"), c);
+        c.gridx = 1;
+        memoryPanel.add(memoryType, c);
+        c.gridx = 2;
+        memoryPanel.add(memoryNumber, c);
+        c = new GridBagConstraints();
+        c.gridy=1;
+        c.gridx = 0;
+        c.gridwidth = 3;
+        c.weighty = 0.95;
+        c.fill = GridBagConstraints.BOTH;
+        memoryPanel.add(EntityDecorator.toScrollPane(memoryPanelInternal), c);
+
+
+
+        statusPanel.setName("Status");
+        ancestryPanel.setName("Ancestry");
+        memoryPanel.setName("Memory");
+        JComponent tabs = EntityDecorator.mergeComponents(
+                EntityDecorator.toScrollPane(statusPanel),
+                EntityDecorator.toScrollPane(ancestryPanel),
+                memoryPanel);
+        LivePanel result = new LivePanel() {
+            @Override
+            public void display() {
+                statusPanel.repaint();
+                ancestryPanel.repaint();
+                memoryPanelInternal.repaint();
+            }
+        };
+        result.add(tabs);
+        return result;
+    }
 }

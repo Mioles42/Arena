@@ -1,5 +1,8 @@
 package com.miolean.arena.entities;
 
+import com.miolean.arena.framework.Debug;
+import com.miolean.arena.ui.LivePanel;
+
 import javax.swing.*;
 import java.awt.*;
 import java.io.Serializable;
@@ -29,6 +32,16 @@ public abstract class Entity implements Serializable {
 
     private final static double DRAG = 0.1; //The amount that an Entity naturally slows down each tick, per unit of velocity.
     private final static double RDRAG = 0.5;
+
+    //Rendering flags
+
+    //Rendering flags
+    public static final byte RENDER_HIGH_QUALITY = 0b00000011;
+    public static final byte RENDER_MID_QUALITY = 0b00000010;
+    public static final byte RENDER_LOW_QUALITY = 0b00000000;
+    public static final byte RENDER_MINISCULE = 0b00000001;
+    public static final byte RENDER_GLOWING = 0b00000100;
+    public static final byte RENDER_DECORATED = 0b00001000;
 
     //Size components:
     private int width;
@@ -206,8 +219,8 @@ public abstract class Entity implements Serializable {
     public void heal(double amount) {health += amount;}
     public void add(Entity e) {arena.add(e);}
 
-    public abstract void renderBody(Graphics g, int x, int y);
-    public void renderStatus(Graphics g, int x, int y) {
+    public abstract void renderBody(Graphics g, int x, int y, byte flags);
+    public void renderStatus(Graphics g, int x, int y, byte flags) {
         g.setColor(new Color(255, 100, 100, 200));
         g.fillRect(x, y, (int) getHealth(), 20);
         g.setColor(Color.BLACK);
@@ -220,15 +233,29 @@ public abstract class Entity implements Serializable {
     public String toString() {
         return this.getClass().getSimpleName();
     }
-    public JPanel toPanel() {
-        JPanel entityPanel = new JPanel() {
+    public LivePanel toPanel() {
+
+        final JPanel statusPanel = EntityDecorator.quickStatusPanel(this);
+
+        LivePanel result = new LivePanel() {
 
             @Override
             public void paintComponent(Graphics g) {
-                Entity.this.renderBody(g, this.getWidth()/2, 50);
+                long oldTime = System.nanoTime();
+                super.paintComponent(g);
+                Entity.this.renderBody(g, this.getWidth()/2, 50, RENDER_LOW_QUALITY);
+                Debug.logTime("Rendering Entity panel",oldTime - System.nanoTime());
+            }
+
+            @Override
+            public void display() {
+                statusPanel.repaint();
             }
         };
-        return entityPanel;
+
+        result.add(EntityDecorator.toScrollPane(statusPanel));
+
+        return result;
     }
 
 

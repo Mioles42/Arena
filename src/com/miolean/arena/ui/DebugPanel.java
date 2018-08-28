@@ -15,6 +15,7 @@ public class DebugPanel extends JPanel {
     }
 
     public void updateInfo() {
+        setPreferredSize(new Dimension(400, 3000));
         Debug.refresh();
         repaint();
     }

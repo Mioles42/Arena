@@ -1,8 +1,10 @@
 package com.miolean.arena.framework;
 
+import sun.plugin.dom.exception.InvalidStateException;
+
 import java.io.Serializable;
 
-public final class UByte implements Serializable {
+public final class UByte implements Serializable, Comparable<UByte> {
 
     private byte value;
 
@@ -52,5 +54,16 @@ public final class UByte implements Serializable {
     @Override
     public int hashCode() {
         return value;
+    }
+
+    @Override
+    public boolean equals(Object u) {
+        if(! (u instanceof UByte)) return false;
+        return ((UByte)u).val() == val();
+    }
+
+    @Override
+    public int compareTo(UByte o) {
+        return (o.val() - val());
     }
 }
