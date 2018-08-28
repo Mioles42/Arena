@@ -3,8 +3,10 @@ package com.miolean.arena.genetics;
 //In other words, a KMEM entry.
 
 import com.miolean.arena.entities.DefaultGeneticRobot;
+import com.miolean.arena.entities.GeneticRobot;
 import com.miolean.arena.entities.Robot;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.Objects;
 import java.util.Scanner;
@@ -21,12 +23,14 @@ public class Gene {
     private String notes;
     private int numParameters;
     private double cost;
+    private boolean defined;
 
 
     private int weight;
     private int bonus;
 
-    public static Gene[] loadAll() {
+    @Deprecated
+    public static Gene[] loadFromOriginFile() {
         Gene[] KMEM = new Gene[256];
         String[][] data = new String[256][];
 
@@ -93,14 +97,56 @@ public class Gene {
         return KMEM;
     }
 
+    public static Gene[] loadFromClass(Class<? extends GeneticRobot> clazz) {
+        Gene[] result = new Gene[256];
+
+        int index = 0;
+        Gene gene;
+        GeneCommand geneInfo;
+        GeneDescription geneDescription;
+
+        for(Method m: clazz.getMethods()) {
+
+            if(m.isAnnotationPresent(GeneCommand.class)) {
+                gene = new Gene();
+                geneInfo = m.getAnnotation(GeneCommand.class);
+                gene.meaning = m;
+                gene.cost = geneInfo.cost();
+                gene.weight = geneInfo.weight();
+                gene.bonus = geneInfo.bonus();
+                gene.numParameters = geneInfo.args(); //I'm aware that there's a difference between parameters and arguments but refuse to change this
+                gene.defined = geneInfo.defined();
+                result[index] = gene;
+                index++;
+
+                if(m.isAnnotationPresent(GeneDescription.class)) {
+                    geneDescription = m.getAnnotation(GeneDescription.class);
+                    if(! geneDescription.description().equals("")) gene.description = geneDescription.description();
+                    if(! geneDescription.arg0().equals("")) gene.arg0Description = geneDescription.arg0();
+                    if(! geneDescription.arg1().equals("")) gene.arg1Description = geneDescription.arg1();
+                    if(! geneDescription.arg2().equals("")) gene.arg2Description = geneDescription.arg2();
+                }
+            }
+
+        }
+        return result;
+    }
+
     @Override
     public String toString() {
         return (meaning == null? "[no meaning]" : meaning.getName().substring(1));
     }
 
+    public static Gene getUndefinedGene() {
+        Gene result = new Gene();
+        result.defined = false;
+        return result;
+    }
+
     public Method getMeaning() {
         return meaning;
-    }public static String getVersion() {
+    }
+    public static String getVersion() {
         return version;
     }
     public String getDescription() {
@@ -136,4 +182,6 @@ public class Gene {
     public int getBonus() {
         return bonus;
     }
+    public boolean isDefined() {return defined;}
+
 }

@@ -14,6 +14,7 @@ public class Debug {
     private static Map<String, Long> oldLog;
 
     public static void logTime(String category, long value) {
+        if(category == null) return;
         if(log.get(category) != null) log.put(category, log.get(category) + value);
         else log.put(category, value);
     }

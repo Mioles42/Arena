@@ -1,11 +1,13 @@
 package com.miolean.arena.ui;
 
+import com.miolean.arena.framework.Perpetual;
+
 import javax.swing.*;
 import java.awt.*;
 
 public abstract class LivePanel extends JPanel {
 
-    JPanel topBar;
+    private JPanel topBar;
 
     public LivePanel() {
         super.setLayout(new GridBagLayout());

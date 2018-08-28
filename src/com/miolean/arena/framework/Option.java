@@ -1,8 +1,6 @@
 package com.miolean.arena.framework;
 
-import com.miolean.arena.input.CompoundInput;
-import com.miolean.arena.input.Input;
-import com.miolean.arena.input.NumericalInput;
+import com.miolean.arena.input.*;
 import com.miolean.random.WordRandom;
 
 import java.util.List;
@@ -19,21 +17,21 @@ public class Option {
     public static NumericalInput updateSpeed = new NumericalInput("Update speed", "The number of update actions to run per second", 1, 1000, 20);
     public static NumericalInput displaySpeed = new NumericalInput("Display speed", "The number of info-display actions to run per second", 1, 1000, 50);
     public static NumericalInput renderSpeed = new NumericalInput("Render speed", "The number of render actions to run per second", 1, 1000, 50);
+    public static CompoundInput speedOptions = new CompoundInput("Arena speed options", "Affect the performance of Ergo", updateSpeed, displaySpeed, renderSpeed);
 
     public static NumericalInput robotSize = new NumericalInput("Robot size", "The default robot size", 5, 300, 40);
     public static NumericalInput scale = new NumericalInput("Render scale", "The magnification of the arena display", 1, 60, 5);
+    public static CheckboxInput showDataInRegistries = new CheckboxInput("Show registry data", "Shows the actual value being passed to commands in memory displays (instead of a registry number) ");
+    public static ArenaInput currentArena = new ArenaInput("Arena", "The current playing area for the program");
+    public static EntityInput viewholder = new EntityInput("Entities", "Select robots or other things to view", currentArena);
 
-    public static CompoundInput speedOptions = new CompoundInput("Arena speed options", "Affect the performance of Ergo", updateSpeed, displaySpeed, renderSpeed);
+
+    private static Input[] inputs = {updateSpeed, displaySpeed, renderSpeed, robotSize, scale, speedOptions, showDataInRegistries, viewholder};
 
 
-    private static Input[] inputs = {updateSpeed, displaySpeed, renderSpeed, robotSize, scale, speedOptions};
-
-    //Publicly accessible random instance
+    //Publicly accessible random instances
     public static Random random = new Random();
     public static WordRandom wordRandom = new WordRandom();
-
-    //1 pixel= 1 tank-meter, I suppose
-
 
     public static boolean[] KEY = new boolean[9];
 

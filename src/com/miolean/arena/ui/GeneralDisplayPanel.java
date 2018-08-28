@@ -3,6 +3,7 @@ package com.miolean.arena.ui;
 import com.miolean.arena.entities.*;
 import com.miolean.arena.entities.Robot;
 import com.miolean.arena.framework.Debug;
+import com.miolean.arena.framework.Option;
 
 import javax.swing.*;
 import javax.swing.event.HyperlinkEvent;
@@ -17,7 +18,7 @@ public class GeneralDisplayPanel extends JPanel implements HyperlinkListener, Ac
     EvolutionPanel evolutionPanel;
     EntityPanel entityPanel;
     DebugPanel debugPanel;
-    LivePanel controlPanel;
+    JPanel controlPanel;
 
     java.util.List<ActiveRobotListener> listenerList = new ArrayList<ActiveRobotListener>();
     Entity viewholder;
@@ -86,7 +87,8 @@ public class GeneralDisplayPanel extends JPanel implements HyperlinkListener, Ac
         this.add(infoPanelPanel, c);
 
         //Add the control panel:
-        controlPanel = ((Entity) arena.getEntities().values().toArray()[1]).toPanel();
+        //controlPanel = ((Entity) arena.getEntities().values().toArray()[1]).toPanel();
+        controlPanel = Option.viewholder.toPanel();
         JPanel controlPanelPanel = new JPanel();
 
         c = new GridBagConstraints();
@@ -107,9 +109,6 @@ public class GeneralDisplayPanel extends JPanel implements HyperlinkListener, Ac
         ));
         this.add(controlPanelPanel, c);
 
-        System.out.println(controlPanel.getSize());
-
-
         //controlPanel.add(Option.speedOptions.toPanel(), c);
 
 
@@ -123,7 +122,7 @@ public class GeneralDisplayPanel extends JPanel implements HyperlinkListener, Ac
 //        evolutionPanel.updateInfo();
 //        entityPanel.updateInfo();
         debugPanel.updateInfo();
-        controlPanel.display();
+        controlPanel.repaint();
     }
 
     @Override

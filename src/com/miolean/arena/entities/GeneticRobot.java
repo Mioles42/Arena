@@ -40,7 +40,7 @@ public class GeneticRobot extends Robot implements Comparable<GeneticRobot>{
     private static int totalKWeight;
 
     static {
-        KMEM = Gene.loadAll();
+        KMEM = Gene.loadFromOriginFile();
         for(Gene g: KMEM) {
             if(g != null) totalKWeight += g.getWeight();
         }
@@ -356,8 +356,6 @@ public class GeneticRobot extends Robot implements Comparable<GeneticRobot>{
         }
     }
 
-
-
     //Instantiate memory number [number] as a UByte[256].
     protected void createMemory(UByte[][] memory, int number) {
         memory[number] = new UByte[256];
@@ -516,8 +514,6 @@ public class GeneticRobot extends Robot implements Comparable<GeneticRobot>{
 
         SpinnerModel model = new SpinnerNumberModel(0, 0, 255, 1);
         final JSpinner memoryNumber = new JSpinner(model);
-
-
 
         final JPanel statusPanel = EntityDecorator.quickStatusPanel(this);
         final JPanel ancestryPanel = new JPanel();
