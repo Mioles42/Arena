@@ -77,7 +77,7 @@ public abstract class Robot extends Entity {
         int SIZE = getWidth();
 
         Graphics2D g = (Graphics2D) f;
-        if((flags & RENDER_GLOWING) == RENDER_GLOWING) EntityDecorator.drawCircularGlow(g, this, x, y);
+        if((flags & RENDER_GLOWING) == RENDER_GLOWING) EntityUtils.drawCircularGlow(g, this, x, y);
 
         g.setColor(Color.black);
         g.drawOval( (x - SIZE/2),  (y - SIZE/2), SIZE, SIZE);
@@ -105,13 +105,13 @@ public abstract class Robot extends Entity {
                 (int) (x-SIZE*.7*(sinR*cosd5 - sind5*cosR)),
                 (int) (x-SIZE*.7*(sinR*cosd5 + sind5*cosR))
         };
-
         int[] wheelYPoints = {
                 (int) (y+SIZE*.7*(cosR*cosd5 + sinR*sind5)),
                 (int) (y+SIZE*.7*(cosR*cosd5 - sinR*sind5)),
                 (int) (y-SIZE*.7*(cosR*cosd5 + sinR*sind5)),
                 (int) (y-SIZE*.7*(cosR*cosd5 - sinR*sind5))
         };
+
 
         //Gun barrel!
         int[] gunXPoints = {
@@ -295,4 +295,38 @@ public abstract class Robot extends Entity {
         }
     }
 
+    @Override
+    public Polygon getBaseBounds() {
+        return new Polygon(
+                new int[] {
+                        (int) (getWidth()/1.4), //Barrel, outer right vertex
+                        getWidth()/2,           //Barrel, inner right vertex
+                        (int) (getWidth()/3.0), //Right wheel, inner upper vertex
+                        (int) (getWidth()/3.0), //Right wheel, outer upper vertex
+                        (int) -(getWidth()/3.0),//Right wheel, outer lower vertex
+                        (int) -(getWidth()/3.0),//Right wheel, inner lower vertex
+                        -getWidth()/2,          //Back end
+                        (int) -(getWidth()/3.0),//Left wheel, inner lower vertex
+                        (int) -(getWidth()/3.0),//Left wheel, outer lower vertex
+                        (int) (getWidth()/3.0), //Left wheel, outer upper vertex
+                        (int) (getWidth()/3.0), //Left wheel, inner upper vertex
+                        getWidth()/2,           //Barrel, outer left vertex
+                        (int) (getWidth()/1.4)},//Barrel, inner left vertex
+                new int[] {
+                        getHeight()/6,          //Barrel, outer right vertex
+                        getHeight()/7,          //Barrel, inner right vertex
+                        (int) (getHeight()/2.4),//Right wheel, inner upper vertex
+                        (int) (getHeight()/1.6),//Right wheel, outer upper vertex
+                        (int) (getHeight()/1.6),//Right wheel, outer lower vertex
+                        (int) (getHeight()/2.4),//Right wheel, inner lower vertex
+                        0,                      //Back end
+                        (int) -(getHeight()/2.4),//Left wheel, inner lower vertex
+                        (int) -(getHeight()/1.6),//Right wheel, outer lower vertex
+                        (int) -(getHeight()/1.6),//Right wheel, outer upper vertex
+                        (int) -(getHeight()/2.4),//Left wheel, inner upper vertex
+                        -getHeight()/7,         //Barrel, outer left vertex
+                        -getHeight()/6},        //Barrel, inner left vertex
+                13
+        );
+    }
 }

@@ -1,9 +1,7 @@
 package com.miolean.arena.entities;
 
 import com.miolean.arena.framework.Debug;
-import com.miolean.arena.ui.FieldDisplayPanel;
 
-import javax.sound.midi.Track;
 import java.awt.*;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Rectangle2D;
@@ -21,7 +19,7 @@ public class Cog extends Entity {
     @Override
     public void renderBody(Graphics f, int x, int y, byte flags) {
         Graphics2D g = (Graphics2D) f;
-        if((flags & RENDER_GLOWING) == RENDER_GLOWING) EntityDecorator.drawCircularGlow(g, this, x, y);
+        if((flags & RENDER_GLOWING) == RENDER_GLOWING) EntityUtils.drawCircularGlow(g, this, x, y);
 
 
         g.setColor(Color.GRAY);
@@ -37,18 +35,18 @@ public class Cog extends Entity {
         applyPhysics();
     }
 
-    @Override
-    public boolean intersectsWith(Entity e) {
-        long marker = System.nanoTime();
-        if(! (e instanceof Robot || e instanceof TrackerDot)) return false; //Don't interact with anything but Tanks
-
-        //Assume an elliptical collision
-        Ellipse2D.Double bounds = new Ellipse2D.Double(e.getX() - e.getWidth()/2, e.getY() - e.getHeight()/2, e.getWidth(), e.getHeight());
-        boolean result = bounds.intersects(new Rectangle2D.Double(getX() - getWidth()/2, getY() - getHeight()/2, getWidth(), getHeight()));
-
-        Debug.logTime("Cog intersections", marker - System.nanoTime());
-        return result;
-    }
+//    @Override
+//    public boolean intersectsWith(Entity e) {
+//        long marker = System.nanoTime();
+//        if(! (e instanceof Robot || e instanceof TrackerDot)) return false; //Don't interact with anything but Tanks
+//
+//        //Assume an elliptical collision
+//        Ellipse2D.Double bounds = new Ellipse2D.Double(e.getX() - e.getWidth()/2, e.getY() - e.getHeight()/2, e.getWidth(), e.getHeight());
+//        boolean result = bounds.intersects(new Rectangle2D.Double(getX() - getWidth()/2, getY() - getHeight()/2, getWidth(), getHeight()));
+//
+//        Debug.logTime("Cog intersections", marker - System.nanoTime());
+//        return result;
+//    }
 
     @Override
     public void intersect(Entity e) {
@@ -71,5 +69,14 @@ public class Cog extends Entity {
     @Override
     public String toHTML() {
         return "<font color=\"orange\">" + value + "-Cog";
+    }
+
+    @Override
+    public Polygon getBaseBounds() {
+        return new Polygon(
+                new int[] {getWidth()/2, -getWidth()/2, -getWidth()/2, getWidth()/2},
+                new int[] {getHeight()/2, getHeight()/2, -getHeight()/2, -getHeight()/2},
+                4
+        );
     }
 }

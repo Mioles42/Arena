@@ -49,6 +49,8 @@ public class Main implements Runnable, WindowListener, ActionListener {
         window.setResizable(true);
         window.addWindowListener(this);
 
+
+
         JMenuBar menuBar = new JMenuBar();
         window.setJMenuBar(menuBar);
 
@@ -57,6 +59,7 @@ public class Main implements Runnable, WindowListener, ActionListener {
 
         quickAddMenuItem(Option.speedOptions, optionMenu, "Run speed...", KeyStroke.getKeyStroke(KeyEvent.VK_R, InputEvent.ALT_MASK));
         quickAddMenuItem(Option.scale, optionMenu, "Scale...", null);
+        quickAddMenuItem(Option.showWireframes, optionMenu, "Show wireframes", null);
         quickAddMenuItem(Option.showDataInRegistries, optionMenu, "Data display...", KeyStroke.getKeyStroke(KeyEvent.VK_CAPS_LOCK, 0));
 
 

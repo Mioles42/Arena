@@ -1,5 +1,6 @@
 package com.miolean.arena.framework;
 
+import com.miolean.arena.input.CheckboxInput;
 import com.miolean.arena.input.*;
 import com.miolean.random.WordRandom;
 

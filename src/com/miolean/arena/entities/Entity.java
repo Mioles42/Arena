@@ -102,6 +102,14 @@ public abstract class Entity implements Serializable {
     }
 
     void repel(Entity e) {
+//
+//
+//
+//        //We're going to push them by their mass's share of the velocity. Does that make sense?
+//
+//        e.move((e.mass/(e.mass + mass) * (ourCompoundVel + theirCompoundVel)), angleOfIncidence + Math.PI);
+
+//
         double compoundVel = Math.sqrt(velX*velX + velY*velY);
         double rposX = x - e.getX();
         double rposY = y  - e.getY();
@@ -113,7 +121,18 @@ public abstract class Entity implements Serializable {
         if(rposY == 0) rposY = 1;
 
 
+        double xdis = e.getX() - getX();
+        double ydis = e.getY() - getY();
+        double angleOfIncidence = Math.atan(xdis/ydis) + Math.PI/2;
+        double ourCompoundVel = (x)*(Math.cos(angleOfIncidence)) + (y)*(Math.sin(angleOfIncidence));
+        double theirCompoundVel = (e.x)*(Math.cos(Math.PI + angleOfIncidence)) + (e.y)*(Math.sin(Math.PI + angleOfIncidence));
+        double momentumOfImpact = (ourCompoundVel * mass) + (theirCompoundVel * e.mass);
+
+        System.out.println("Found impact to be " + momentumOfImpact);
+
         double collisionAngle = Math.atan(rposY/rposX);
+        System.out.println("  Collision angle " + Math.toDegrees(collisionAngle) + "\n  Incidence angle " + Math.toDegrees(angleOfIncidence));
+
         double forceAngle = ((velX > 0)? Math.PI:0) + Math.atan(velY/velX);
         double reflectAngle = 2*collisionAngle-forceAngle;
 
@@ -130,7 +149,8 @@ public abstract class Entity implements Serializable {
 
         //First check: Are these things moving?
         if(Math.abs(e.getVelX()) < 0.05 && Math.abs(velX) < 0.05
-                && Math.abs(e.getVelY()) < 0.05 && Math.abs(velY) < 0.05) {
+                && Math.abs(e.getVelY()) < 0.05 && Math.abs(velY) < 0.05
+                && ! (this instanceof Wall)) {
             //Neither of these appear to really be moving, so it's unlikely that they intersect.
             return false;
         }
@@ -164,8 +184,21 @@ public abstract class Entity implements Serializable {
     }
 
     protected abstract void update();
-    public abstract boolean intersectsWith(Entity e);
+    public boolean intersectsWith(Entity e) {
+        Polygon ourBounds = getBounds();
+        Polygon theirBounds = e.getBounds();
+        for(int i = 0; i < theirBounds.npoints; i++) {
+            if(ourBounds.contains(theirBounds.xpoints[i], theirBounds.ypoints[i])) return true;
+        }
+        for(int i = 0; i < ourBounds.npoints; i++) {
+                if(theirBounds.contains(ourBounds.xpoints[i], ourBounds.ypoints[i])) return true;
+        }
+
+        return false;
+    }
     public abstract void intersect(Entity e);
+
+
     protected abstract void onBirth();
     protected abstract void onDeath();
     public abstract String toHTML();
@@ -219,6 +252,21 @@ public abstract class Entity implements Serializable {
     public void heal(double amount) {health += amount;}
     public void add(Entity e) {arena.add(e);}
 
+    public abstract Polygon getBaseBounds();
+    public Polygon getBounds() {
+        Polygon base = getBaseBounds();
+        double cosR = Math.cos(-r);
+        double sinR = Math.sin(-r);
+        int[] xPoints = new int[base.npoints];
+        int[] yPoints = new int[base.npoints];
+
+        for(int i = 0; i < base.npoints; i++) {
+            xPoints[i] = (int) (x + base.xpoints[i]*cosR - base.ypoints[i]*sinR);
+            yPoints[i] = (int) (y + base.xpoints[i]*sinR + base.ypoints[i]*cosR);
+        }
+
+        return new Polygon(xPoints, yPoints, base.npoints);
+    }
     public abstract void renderBody(Graphics g, int x, int y, byte flags);
     public void renderStatus(Graphics g, int x, int y, byte flags) {
         g.setColor(new Color(255, 100, 100, 200));

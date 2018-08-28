@@ -33,6 +33,10 @@ public class Arena {
         topRobots = new ArrayList<>();
         topRobots.add(new DefaultGeneticRobot(Option.class.getClassLoader().getResourceAsStream("gen/default.ergo"), this));
         topRobots.get(0).setName("Dummy");
+        Wall wall = new Wall(200, 10, 10, this);
+        wall.setX(300);
+        wall.setY(300);
+        add(wall);
     }
 
     public void updateAll() {
@@ -91,6 +95,8 @@ public class Arena {
             if(e.intersectsWith(new TrackerDot(mouse.x, mouse.y, 4, 1, this))) {
                 e.renderBody(g, (int) e.getX(), (int) e.getY(), (byte) (Entity.RENDER_GLOWING | Entity.RENDER_DECORATED));
             } else e.renderBody(g, (int) e.getX(), (int) e.getY(), Entity.RENDER_DECORATED);
+            g.setColor(Color.blue);
+            g.drawPolygon(e.getBounds());
         }
     }
 

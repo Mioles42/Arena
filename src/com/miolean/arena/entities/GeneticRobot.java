@@ -285,7 +285,7 @@ public class GeneticRobot extends Robot implements Comparable<GeneticRobot>{
     private void throwCompileError(String reason) {
         System.err.println("Error compiling Robot " + getName() + ":");
         System.err.println(reason);
-        System.exit(0);
+        //TODO Exiting immediately is not appropriate here; should throw an exception
     }
 
     @Override
@@ -331,6 +331,7 @@ public class GeneticRobot extends Robot implements Comparable<GeneticRobot>{
             }
             Gene gene = KMEM[genes[loaded][index].val()];
 
+
             try {
                 if(gene.getNumParameters() == 0) {
                     gene.getMeaning().invoke(this);
@@ -354,7 +355,10 @@ public class GeneticRobot extends Robot implements Comparable<GeneticRobot>{
                 index = entry.y;
             }
         }
+
     }
+
+
 
     //Instantiate memory number [number] as a UByte[256].
     protected void createMemory(UByte[][] memory, int number) {
@@ -586,16 +590,16 @@ public class GeneticRobot extends Robot implements Comparable<GeneticRobot>{
         c.gridwidth = 3;
         c.weighty = 0.95;
         c.fill = GridBagConstraints.BOTH;
-        memoryPanel.add(EntityDecorator.toScrollPane(memoryPanelInternal), c);
+        memoryPanel.add(EntityUtils.toScrollPane(memoryPanelInternal), c);
 
 
 
         statusPanel.setName("Status");
         ancestryPanel.setName("Ancestry");
         memoryPanel.setName("Memory");
-        JComponent tabs = EntityDecorator.mergeComponents(
-                EntityDecorator.toScrollPane(statusPanel),
-                EntityDecorator.toScrollPane(ancestryPanel),
+        JComponent tabs = EntityUtils.mergeComponents(
+                EntityUtils.toScrollPane(statusPanel),
+                EntityUtils.toScrollPane(ancestryPanel),
                 memoryPanel);
         LivePanel result = new LivePanel() {
             @Override

@@ -1,7 +1,5 @@
 package com.miolean.arena.framework;
 
-import sun.plugin.dom.exception.InvalidStateException;
-
 import java.io.Serializable;
 
 public final class UByte implements Serializable, Comparable<UByte> {
