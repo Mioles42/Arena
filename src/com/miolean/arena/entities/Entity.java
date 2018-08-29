@@ -283,7 +283,7 @@ public abstract class Entity implements Serializable {
     }
     public LivePanel toPanel() {
 
-        final JPanel statusPanel = EntityDecorator.quickStatusPanel(this);
+        final JPanel statusPanel = EntityUtils.quickStatusPanel(this);
 
         LivePanel result = new LivePanel() {
 
@@ -301,7 +301,7 @@ public abstract class Entity implements Serializable {
             }
         };
 
-        result.add(EntityDecorator.toScrollPane(statusPanel));
+        result.add(EntityUtils.toScrollPane(statusPanel));
 
         return result;
     }

@@ -40,7 +40,7 @@ public class GeneticRobot extends Robot implements Comparable<GeneticRobot>{
     private static int totalKWeight;
 
     static {
-        KMEM = Gene.loadFromOriginFile();
+        KMEM = Gene.loadFromClass(DefaultGeneticRobot.class);
         for(Gene g: KMEM) {
             if(g != null) totalKWeight += g.getWeight();
         }
@@ -129,9 +129,12 @@ public class GeneticRobot extends Robot implements Comparable<GeneticRobot>{
             //If next is a command: Translate it into its number
             if (next.startsWith("_")) {
                 if (loadMode < 2) throwCompileError("Command in passive memory.");
-                System.out.println("");
                 for (int i = 0; i < KMEM.length; i++) {
-                    if (KMEM[i].getMeaning() != null && KMEM[i].getMeaning().getName().equals(next)) next = i + "";
+                    System.out.println((KMEM[i]));
+                    if (KMEM[i] != null && KMEM[i].getMeaning() != null && KMEM[i].getMeaning().getName().equals(next)) {
+                        next = i + "";
+                        break;
+                    }
                 }
 
                 if (next.startsWith("_")) {
@@ -519,7 +522,7 @@ public class GeneticRobot extends Robot implements Comparable<GeneticRobot>{
         SpinnerModel model = new SpinnerNumberModel(0, 0, 255, 1);
         final JSpinner memoryNumber = new JSpinner(model);
 
-        final JPanel statusPanel = EntityDecorator.quickStatusPanel(this);
+        final JPanel statusPanel = EntityUtils.quickStatusPanel(this);
         final JPanel ancestryPanel = new JPanel();
         final JPanel memoryPanelInternal = new JPanel() {
             @Override

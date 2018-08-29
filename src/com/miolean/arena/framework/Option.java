@@ -23,6 +23,7 @@ public class Option {
     public static NumericalInput robotSize = new NumericalInput("Robot size", "The default robot size", 5, 300, 40);
     public static NumericalInput scale = new NumericalInput("Render scale", "The magnification of the arena display", 1, 60, 5);
     public static CheckboxInput showDataInRegistries = new CheckboxInput("Show registry data", "Shows the actual value being passed to commands in memory displays (instead of a registry number) ");
+    public static CheckboxInput showWireframes = new CheckboxInput("Show wireframs", "Draws the actual bounds of entities");
     public static ArenaInput currentArena = new ArenaInput("Arena", "The current playing area for the program");
     public static EntityInput viewholder = new EntityInput("Entities", "Select robots or other things to view", currentArena);
 

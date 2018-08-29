@@ -22,7 +22,6 @@ public class EntityInput extends Input {
     @Override
     public JPanel toPanel() {
         JPanel result = new EntityInputPanel();
-        result.setBackground(Color.blue);
         return result;
     }
 
@@ -36,11 +35,13 @@ public class EntityInput extends Input {
             final int ROW_HEIGHT = 5 + g.getFontMetrics().getHeight();
             final int VERTICAL_OFFSET = 20;
 
-            int mouseRow = (MouseInfo.getPointerInfo().getLocation().y - getLocationOnScreen().y - VERTICAL_OFFSET) / ROW_HEIGHT;
+            int mouseRow = (MouseInfo.getPointerInfo().getLocation().y - getLocationOnScreen().y - 8) / ROW_HEIGHT;
 
             for(Entity e: ((Arena) arena.getValue()).getEntities().values()) {
 
-                if(row == mouseRow) g.setColor(Color.blue);
+                if(row == mouseRow) {
+                    g.setColor(Color.blue);
+                }
                 else g.setColor(Color.black);
                 g.drawString(e.toString(), 5, VERTICAL_OFFSET + ROW_HEIGHT*row);
                 row++;
