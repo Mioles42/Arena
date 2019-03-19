@@ -1,5 +1,5 @@
 # Arena
-## A genetic programming experiment.
+## A genetic programming experiment. Currently paused.
 
 Arena (AKA Ergo) was an ongoing project to create an accessible genetic programming system in the style of CRobots and old program-your-robot games.
 
